@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>集客レポート — 全店舗統合ダッシュボード</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;600;700;900&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
+<style>
+:root{--bg:#06090F;--sf:#0D1117;--sf2:#151B26;--sf3:#1C2333;--bd:rgba(255,255,255,0.05);--bdh:rgba(255,255,255,0.1);--tx:#E6EDF3;--txm:#7D8CA1;--txd:#3D4A5C;--ac:#FF6B4A;--acs:rgba(255,107,74,0.12);--tl:#3ECFB4;--tls:rgba(62,207,180,0.12);--gd:#F0C846;--gds:rgba(240,200,70,0.12);--vt:#8B7CF6;--pk:#F472B6;--bl:#60A5FA;--lm:#A3E635;--sk:#38BDF8;--rs:#FB7185;--am:#FBBF24;--em:#34D399;--r:14px;--rr:8px;}
+*{margin:0;padding:0;box-sizing:border-box;}body{background:var(--bg);color:var(--tx);font-family:'Noto Sans JP','Outfit',sans-serif;min-height:100vh;overflow-x:hidden;}::-webkit-scrollbar{width:5px;height:5px;}::-webkit-scrollbar-track{background:transparent;}::-webkit-scrollbar-thumb{background:var(--sf3);border-radius:3px;}.shell{display:flex;min-height:100vh;}
+.sb{width:250px;min-height:100vh;background:var(--sf);border-right:1px solid var(--bd);display:flex;flex-direction:column;position:fixed;left:0;top:0;bottom:0;z-index:100;transition:transform .3s;}.sb-hd{padding:20px 16px 16px;border-bottom:1px solid var(--bd);}.sb-brand{font-family:'Outfit';font-size:16px;font-weight:700;background:linear-gradient(135deg,#fff 40%,var(--ac));-webkit-background-clip:text;-webkit-text-fill-color:transparent;}.sb-sub{font-size:10px;color:var(--txd);letter-spacing:.5px;margin-top:2px;}.sb-sec{padding:14px 12px 6px;font-size:9px;color:var(--txd);text-transform:uppercase;letter-spacing:1.5px;font-weight:700;}.sb-nav{flex:1;overflow-y:auto;padding:0 6px;}
+.ni{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:var(--rr);cursor:pointer;transition:all .2s;margin-bottom:1px;border:1px solid transparent;font-size:12px;color:var(--txm);}.ni:hover{background:var(--sf2);color:var(--tx);border-color:var(--bd);}.ni.on{background:var(--acs);color:var(--ac);border-color:rgba(255,107,74,.15);font-weight:600;}.ni.on .nd{background:var(--ac);box-shadow:0 0 8px var(--ac);}.nd{width:6px;height:6px;border-radius:50%;background:var(--txd);flex-shrink:0;transition:all .2s;}.ni:hover .nd{background:var(--txm);}.ni.sp{color:var(--tl);}.ni.sp .nd{background:var(--tl);}.ni.sp.on{background:var(--tls);border-color:rgba(62,207,180,.15);}.ni.cp{color:var(--gd);}.ni.cp .nd{background:var(--gd);}.ni.cp.on{background:var(--gds);border-color:rgba(240,200,70,.15);}
+.sb-ft{padding:8px;border-top:1px solid var(--bd);}.sb-btn{display:flex;align-items:center;gap:6px;padding:8px 10px;width:100%;border-radius:var(--rr);cursor:pointer;border:1px solid var(--bd);background:var(--sf2);color:var(--txm);font-size:11px;font-family:inherit;transition:all .2s;}.sb-btn:hover{background:var(--sf3);color:var(--tx);}.live-dot{font-size:8px;color:var(--em);margin-left:auto;}
+.mn{margin-left:250px;flex:1;min-width:0;padding:24px 26px 50px;}.ph{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:22px;flex-wrap:wrap;gap:12px;}.pt{font-family:'Outfit';font-size:22px;font-weight:700;letter-spacing:-.5px;display:flex;align-items:center;gap:10px;}.pd{font-size:11px;color:var(--txm);margin-top:3px;}
+.stb{background:var(--sf2);border:1px solid var(--bd);border-radius:var(--rr);padding:9px 14px;margin-bottom:18px;font-size:11px;color:var(--txm);display:flex;align-items:center;gap:8px;flex-wrap:wrap;}.sd{width:6px;height:6px;border-radius:50%;flex-shrink:0;}.sd.lv{background:var(--em);box-shadow:0 0 8px var(--em);animation:pulse 2s infinite;}.sd.dm{background:var(--gd);}@keyframes pulse{0%,100%{opacity:1;}50%{opacity:.4;}}
+.yr-sel{display:flex;gap:4px;margin-left:auto;}.yr-btn{padding:4px 12px;border-radius:5px;font-size:10px;font-weight:600;border:1px solid var(--bd);background:transparent;color:var(--txm);cursor:pointer;font-family:inherit;transition:all .2s;}.yr-btn.on{background:var(--ac);color:#fff;border-color:var(--ac);}.yr-btn:hover:not(.on){border-color:var(--bdh);color:var(--tx);}
+.kr{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;margin-bottom:20px;}.kp{background:var(--sf);border:1px solid var(--bd);border-radius:var(--r);padding:16px 18px;position:relative;overflow:hidden;transition:all .25s;}.kp:hover{border-color:var(--bdh);transform:translateY(-1px);}.kp::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--kc,var(--ac));opacity:.5;}.kl{font-size:9px;color:var(--txd);text-transform:uppercase;letter-spacing:1px;margin-bottom:7px;font-weight:500;}.kv{font-family:'Outfit';font-size:24px;font-weight:700;line-height:1;margin-bottom:3px;}.kn{font-size:10px;color:var(--txd);}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;}.gf{margin-bottom:16px;}.cd{background:var(--sf);border:1px solid var(--bd);border-radius:var(--r);padding:20px;position:relative;}.ct{font-size:12.5px;font-weight:600;margin-bottom:2px;display:flex;align-items:center;gap:7px;}.cdot{width:6px;height:6px;border-radius:50%;flex-shrink:0;}.csu{font-size:10px;color:var(--txm);margin-bottom:16px;}.cb canvas{width:100%!important;}
+.rl{display:flex;flex-direction:column;gap:7px;}.ri{display:flex;align-items:center;gap:9px;}.rp{font-family:'Outfit';font-size:11px;font-weight:700;color:var(--txd);width:16px;text-align:right;}.rn{font-size:11px;width:72px;flex-shrink:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}.rbt{flex:1;height:22px;background:var(--sf2);border-radius:5px;overflow:hidden;}.rb{height:100%;border-radius:5px;transition:width .8s cubic-bezier(.22,1,.36,1);display:flex;align-items:center;justify-content:flex-end;padding-right:7px;font-family:'Outfit';font-size:10px;font-weight:600;color:#fff;min-width:24px;}
+.tw{overflow-x:auto;}table{width:100%;border-collapse:collapse;font-size:11px;}th{text-align:left;padding:8px 10px;font-weight:600;font-size:9px;text-transform:uppercase;letter-spacing:.7px;color:var(--txd);border-bottom:1px solid var(--bd);white-space:nowrap;}td{padding:7px 10px;border-bottom:1px solid var(--bd);white-space:nowrap;}tr:hover td{background:rgba(255,255,255,.015);}.hl{color:var(--ac);font-weight:600;}.dm{color:var(--txd);}.rws td{font-weight:700;border-top:2px solid var(--bd);background:rgba(255,255,255,.02);}
+.mp{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:12px;}.pl{padding:4px 11px;border-radius:5px;font-size:10px;font-weight:500;border:1px solid var(--bd);background:transparent;color:var(--txm);cursor:pointer;font-family:inherit;transition:all .2s;}.pl.on{background:var(--ac);color:#fff;border-color:var(--ac);}.pl:hover:not(.on){border-color:var(--bdh);color:var(--tx);}
+.mo{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:1000;display:none;align-items:center;justify-content:center;backdrop-filter:blur(4px);}.mo.show{display:flex;}.ml{background:var(--sf);border:1px solid var(--bd);border-radius:var(--r);padding:26px;width:600px;max-width:94vw;max-height:85vh;overflow-y:auto;}.ml h2{font-family:'Outfit';font-size:17px;font-weight:700;margin-bottom:4px;}.ml-sub{font-size:11px;color:var(--txm);margin-bottom:18px;}.fg{margin-bottom:12px;}.fl{font-size:9px;color:var(--txm);font-weight:600;text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px;display:block;}.fi{width:100%;padding:8px 11px;background:var(--bg);border:1px solid var(--bd);border-radius:var(--rr);color:var(--tx);font-size:12px;font-family:'Outfit',monospace;outline:none;transition:border-color .2s;}.fi:focus{border-color:var(--ac);}.sl-edit{margin-bottom:14px;max-height:300px;overflow-y:auto;}.se-row{display:flex;gap:5px;align-items:center;padding:6px 0;border-bottom:1px solid var(--bd);font-size:11px;}.se-row input{flex:1;min-width:0;}.se-nm{width:90px;flex-shrink:0;}.del-b{background:transparent;border:1px solid rgba(251,113,133,.3);color:var(--rs);border-radius:4px;padding:4px 8px;cursor:pointer;font-size:9px;font-family:inherit;}.del-b:hover{background:rgba(251,113,133,.1);}.ma{display:flex;gap:6px;justify-content:flex-end;margin-top:18px;}.btn{padding:7px 14px;border-radius:var(--rr);font-size:11px;font-weight:600;border:1px solid var(--bd);background:var(--sf2);color:var(--txm);cursor:pointer;font-family:inherit;transition:all .2s;}.btn:hover{background:var(--sf3);color:var(--tx);}.btn-p{background:var(--ac);color:#fff;border-color:var(--ac);}.btn-p:hover{box-shadow:0 4px 16px var(--acs);opacity:.9;}
+@media(max-width:900px){.sb{transform:translateX(-100%);}.sb.open{transform:translateX(0);}.mn{margin-left:0;padding:16px 12px 36px;}.g2{grid-template-columns:1fr;}.mt{display:flex!important;}}.mt{display:none;position:fixed;top:8px;left:8px;z-index:200;background:var(--sf2);border-radius:var(--rr);padding:6px 10px;cursor:pointer;color:var(--tx);font-size:15px;border:none;}@keyframes fadeIn{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}.fade{animation:fadeIn .3s ease forwards;}
+</style>
+</head>
+<body>
+<button class="mt" onclick="document.querySelector('.sb').classList.toggle('open')">☰</button>
+<div class="shell">
+<nav class="sb" id="sidebar"><div class="sb-hd"><div class="sb-brand">集客レポート</div><div class="sb-sub">全店舗統合ダッシュボード</div></div><div class="sb-nav" id="sbNav"></div><div class="sb-ft"><button class="sb-btn" onclick="openSettings()">⚙ 店舗管理・API設定</button></div></nav>
+<div class="mn" id="mainC"></div>
+</div>
+<div class="mo" id="settingsModal"><div class="ml"><h2>店舗管理・API設定</h2><div class="ml-sub">APIキーは全店舗共通。各店舗のスプレッドシートIDを入力してください。<br>スプレッドシートは「リンクを知っている全員が閲覧可」にしてください。</div><div class="fg"><label class="fl">Google Sheets APIキー</label><input class="fi" id="mApiKey" placeholder="AIza..." /></div><div class="fg"><label class="fl">店舗一覧</label><div class="sl-edit" id="storeListEdit"></div><button class="btn" onclick="addStoreRow()" style="margin-top:5px">＋ 店舗を追加</button></div><div class="ma"><button class="btn" onclick="closeSettings()">キャンセル</button><button class="btn btn-p" onclick="saveSettings()">保存してデータ取得</button></div><div id="sStatus" style="margin-top:10px;font-size:11px;display:none"></div></div></div>
+<script>
+const MO=['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'];
+const CH=['HPB','HP','チラシ','メタ広告','minimo','紹介','骨Fix','MEO','Gマップ','その他'];
+const CC=['#FF6B4A','#3ECFB4','#F0C846','#8B7CF6','#A3E635','#F472B6','#60A5FA','#FBBF24','#FB7185','#7D8CA1'];
+const SC=['#FF6B4A','#3ECFB4','#F0C846','#8B7CF6','#F472B6','#60A5FA','#A3E635','#38BDF8','#FB7185','#FBBF24','#34D399'];
+const YEARS=[2025,2026];
+let stores=[{name:'大森院',id:'1J5hKWFNcg6O5_xSLlJTKHwDycyEEfldOtsTlD4MgAS4'},{name:'京都花園院',id:'1EqUPDKIxIDQXxv3XzIwQ4kGIVk1MZLk-sCPiLXTzV3c'},{name:'人形町院',id:'1go7qwhsbIg7u3YhjfQOjPeZ9cg5gg9cmplJObfNNZ1Y'},{name:'札幌丸山院',id:'1hweX9VNupsLabLz5srF54YBkG4fpZdmDYKJhvonW8aY'},{name:'新馬場院',id:'1OhRZlpVMhc3rNY72YOwxlsnvqU3jvQPa6JrxTZ9Rmr0'},{name:'神戸住吉院',id:'1B6dGyVM96fNmo2QR71H4eVWS1UJpfbxCa6MEh_IANdA'},{name:'中野院',id:'1BPSi-HNmOn6fiyetVmz8612roavCt9s4vMFZamu2r98'},{name:'大里院',id:'1TOT3uDMxUR8S_cL2bvaELrLkw7U5qskfJOdWQUbPow4'}];
+let apiKey='AIzaSyBx1s4wOTZ0kQNEFaxU4982tiUtGVEqrPA';
+let storeData={};let liveStores=new Set();let curView='all';let curYear=2025;let curMonth='1月';let curFilterMonth=null;let charts={};let selectedCompareStores=null;
+let curHpbStore='大森院';
+let hpbStatsByStore={
+  '大森院':{reviews:150,reviewsPrev:145,rating:4.75,blogs:598,ranking:9,rankingKeyword:'大森 整体',rankingUrl:'https://beauty.hotpepper.jp/genre/kgkw011/stc0290015/',salonUrl:'https://beauty.hotpepper.jp/kr/slnH000551938/',lastUpdated:'2026-03-28',lastBlogDate:'2026-03-29',lastReviewDate:'2026-03-29',blogFreqDays:2},
+  '京都花園院':{reviews:119,reviewsPrev:119,rating:4.94,blogs:466,ranking:1,rankingKeyword:'京都花園 整体',rankingUrl:'https://beauty.hotpepper.jp/genre/kgkw011/stc2206645/',salonUrl:'https://beauty.hotpepper.jp/kr/slnH000655277/',lastUpdated:'2026-03-29',lastBlogDate:'2026-03-29',lastReviewDate:'2026-03-29',blogFreqDays:2},
+  '人形町院':{reviews:86,reviewsPrev:86,rating:4.88,blogs:470,ranking:7,rankingKeyword:'人形町 整体',rankingUrl:'https://beauty.hotpepper.jp/genre/kgkw011/stc0070065/',salonUrl:'https://beauty.hotpepper.jp/kr/slnH000655274/',lastUpdated:'2026-03-29',lastBlogDate:'2026-03-29',lastReviewDate:'2026-03-29',blogFreqDays:2},
+  '札幌丸山院':{reviews:170,reviewsPrev:170,rating:4.77,blogs:815,ranking:7,rankingKeyword:'円山 整体',rankingUrl:'https://beauty.hotpepper.jp/genre/kgkw011/stc9936210/',salonUrl:'https://beauty.hotpepper.jp/kr/slnH000667105/',lastUpdated:'2026-03-29',lastBlogDate:'2026-03-29',lastReviewDate:'2026-03-29',blogFreqDays:1},
+  '新馬場院':{reviews:112,reviewsPrev:112,rating:4.81,blogs:513,ranking:3,rankingKeyword:'大井町 整体',rankingUrl:'https://beauty.hotpepper.jp/genre/kgkw011/stc0290010/',salonUrl:'https://beauty.hotpepper.jp/kr/slnH000577795/',lastUpdated:'2026-03-29',lastBlogDate:'2026-03-29',lastReviewDate:'2026-03-29',blogFreqDays:2},
+  '神戸住吉院':{reviews:64,reviewsPrev:64,rating:4.91,blogs:1044,ranking:9,rankingKeyword:'住吉 整体',rankingUrl:'https://beauty.hotpepper.jp/genre/kgkw011/stc2201110/',salonUrl:'https://beauty.hotpepper.jp/kr/slnH000625102/',lastUpdated:'2026-03-29',lastBlogDate:'2026-03-29',lastReviewDate:'2026-03-29',blogFreqDays:1},
+  '中野院':{reviews:47,reviewsPrev:47,rating:4.78,blogs:200,ranking:9,rankingKeyword:'中野 整体',rankingUrl:'https://beauty.hotpepper.jp/genre/kgkw011/stc0040005/',salonUrl:'https://beauty.hotpepper.jp/kr/slnH000717232/',lastUpdated:'2026-03-29',lastBlogDate:'2026-03-29',lastReviewDate:'2026-03-29',blogFreqDays:2},
+  '大里院':{reviews:39,reviewsPrev:39,rating:4.96,blogs:665,ranking:28,rankingKeyword:'沖縄 整体',rankingUrl:'https://beauty.hotpepper.jp/genre/kgkw011/pre47/',salonUrl:'https://beauty.hotpepper.jp/kr/slnH000708947/',lastUpdated:'2026-03-29',lastBlogDate:'2026-03-29',lastReviewDate:'2026-03-29',blogFreqDays:1}
+};
+// ブラウザに保存された設定を読み込む
+(function(){
+  try{
+    const saved=localStorage.getItem('hpb_dashboard_config');
+    if(saved){
+      const c=JSON.parse(saved);
+      if(c.stores&&c.stores.length>0)stores=c.stores;
+      if(c.apiKey)apiKey=c.apiKey;
+      if(c.hpbStatsByStore){Object.keys(c.hpbStatsByStore).forEach(k=>{hpbStatsByStore[k]=Object.assign({},hpbStatsByStore[k]||{},c.hpbStatsByStore[k]);});}
+    }
+  }catch(e){}
+
+  // ── 自動月次スナップショット ──
+  // 新しい月を検知したら reviewsPrev を自動更新し来月のベースラインにする
+  try{
+    const now=new Date();
+    const ym=`${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
+    const lastSnap=localStorage.getItem('hpb_snapshot_month')||'';
+    if(lastSnap && lastSnap!==ym){
+      // 新しい月に入った → 全店舗の reviewsPrev を現在の reviews に更新
+      Object.keys(hpbStatsByStore).forEach(k=>{
+        if(hpbStatsByStore[k].reviews!=null){
+          hpbStatsByStore[k].reviewsPrev=hpbStatsByStore[k].reviews;
+          hpbStatsByStore[k].snapshotMonth=lastSnap;
+        }
+      });
+      localStorage.setItem('hpb_snapshot_month',ym);
+      try{localStorage.setItem('hpb_dashboard_config',JSON.stringify({stores,apiKey,hpbStatsByStore}));}catch(e){}
+      window._autoSnapped=lastSnap; // トースト表示フラグ
+    } else if(!lastSnap){
+      localStorage.setItem('hpb_snapshot_month',ym);
+    }
+  }catch(e){}
+})();
+
+// API fetch — batchGet で効率化（レート制限対策）
+function parseRow38(v){return{HPB:v[3]||0,HP:v[4]||0,チラシ:v[5]||0,メタ広告:v[6]||0,minimo:v[7]||0,紹介:v[8]||0,骨Fix:v[9]||0,MEO:v[10]||0,Gマップ:v[11]||0,その他:v[12]||0,total:v[1]||0};}
+function parseDailyRows(rows){return rows.map((r,i)=>{const row={day:i+1,dayName:(r[1]||'').toString()};row.HPB=parseInt(r[4])||0;row.HP=parseInt(r[5])||0;row.チラシ=parseInt(r[6])||0;row.メタ広告=parseInt(r[7])||0;row.minimo=parseInt(r[8])||0;row.紹介=parseInt(r[9])||0;row.骨Fix=parseInt(r[10])||0;row.MEO=parseInt(r[11])||0;row.Gマップ=parseInt(r[12])||0;row.その他=parseInt(r[13])||0;row.total=CH.reduce((s,k)=>s+row[k],0);return row;}).filter(r=>r.total>0||r.day<=31);}
+async function fetchStore(idx){
+  const s=stores[idx];if(!s.id||!apiKey)return null;
+  try{
+    // 1) シート一覧を取得（1コール）
+    const metaRes=await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${s.id}?key=${apiKey}&fields=sheets.properties.title`);
+    if(!metaRes.ok)return null;
+    const titles=(await metaRes.json()).sheets.map(sh=>sh.properties.title);
+    const result={};
+    for(const year of YEARS){
+      const data={monthly:[],daily:{}};
+      const ranges=[];const monthMap=[];
+      // 名前付きシート（日報 202501 等）
+      for(let m=1;m<=12;m++){
+        const name=`日報 ${year}${String(m).padStart(2,'0')}`;
+        if(!titles.includes(name))continue;
+        ranges.push(`'${name}'!B38:N38`);ranges.push(`'${name}'!A3:N33`);
+        monthMap.push({month:MO[m-1],m});
+      }
+      // 「日報」シート（当月分）
+      let nippoIdx=-1;
+      if(titles.includes('日報')&&year===new Date().getFullYear()){
+        ranges.push(`'日報'!A3`);ranges.push(`'日報'!B38:N38`);ranges.push(`'日報'!A3:N33`);
+        nippoIdx=monthMap.length;
+      }
+      if(ranges.length===0)continue;
+      // 2) batchGet で一括取得（年あたり1コール）
+      const params=ranges.map(r=>`ranges=${encodeURIComponent(r)}`).join('&');
+      const batchRes=await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${s.id}/values:batchGet?key=${apiKey}&${params}`);
+      if(!batchRes.ok)continue;
+      const vrs=(await batchRes.json()).valueRanges||[];
+      const fetchedMs=new Set();
+      // 名前付きシートを処理（各2レンジ：summary+daily）
+      for(let i=0;i<monthMap.length;i++){
+        const sv=vrs[i*2]?.values?.[0];
+        if(sv){const v=sv.map(x=>parseInt(String(x).replace(/,/g,''))||0);data.monthly.push({month:monthMap[i].month,...parseRow38(v)});fetchedMs.add(monthMap[i].m);}
+        const dv=vrs[i*2+1]?.values;
+        if(dv)data.daily[monthMap[i].month]=parseDailyRows(dv);
+      }
+      // 「日報」シートを処理（3レンジ：probe+summary+daily）
+      if(nippoIdx>=0){
+        const base=nippoIdx*2;
+        const probeVal=vrs[base]?.values?.[0]?.[0]?.toString()||'';
+        const mm=probeVal.match(/^(\d{1,2})\//);
+        if(mm){
+          const curM=parseInt(mm[1]);
+          if(!fetchedMs.has(curM)){
+            const sv=vrs[base+1]?.values?.[0];
+            if(sv){const v=sv.map(x=>parseInt(String(x).replace(/,/g,''))||0);data.monthly.push({month:MO[curM-1],...parseRow38(v)});}
+            const dv=vrs[base+2]?.values;
+            if(dv)data.daily[MO[curM-1]]=parseDailyRows(dv);
+          }
+        }
+      }
+      data.monthly.sort((a,b)=>MO.indexOf(a.month)-MO.indexOf(b.month));
+      if(data.monthly.length>0)result[year]=data;
+    }
+    return Object.keys(result).length>0?result:null;
+  }catch(e){console.error('fetchStore error:',e);return null;}
+}
+async function fetchAllStores(){const st=document.getElementById('sStatus');if(st){st.style.display='block';st.style.color='var(--gd)';st.textContent='データ取得中…（2025年＋2026年）';}let ok=0;for(let i=0;i<stores.length;i++){if(!stores[i].id)continue;if(st)st.textContent=`${stores[i].name} を取得中… (${i+1}/${stores.length})`;const d=await fetchStore(i);if(d){if(!storeData[i])storeData[i]={};Object.assign(storeData[i],d);liveStores.add(i);ok++;}}if(st){if(ok>0){st.style.color='var(--em)';st.textContent=`✓ ${ok}店舗のデータを取得しました（2025年＋2026年）`;}else{st.style.color='var(--rs)';st.textContent='⚠ 取得できませんでした。設定を確認してください。';}}renderSidebar();renderMain();}
+
+function getStoreYear(idx,year){return storeData[idx]?.[year]||null;}
+function aggAll(){const map={};stores.forEach((_,i)=>{const d=getStoreYear(i,curYear);if(!d)return;const months=curFilterMonth?d.monthly.filter(m=>m.month===curFilterMonth):d.monthly;months.forEach(m=>{if(!map[m.month]){map[m.month]={month:m.month,total:0};CH.forEach(k=>map[m.month][k]=0);}CH.forEach(k=>map[m.month][k]+=(m[k]||0));map[m.month].total+=m.total;});});return MO.filter(m=>map[m]).map(m=>map[m]);}
+function getMonths(){const s=new Set();stores.forEach((_,i)=>{const d=getStoreYear(i,curYear);if(d)d.monthly.forEach(m=>s.add(m.month));});return MO.filter(m=>s.has(m));}
+
+function renderSidebar(){let h=`<div class="sb-sec">総合</div><div class="ni sp ${curView==='all'?'on':''}" onclick="nav('all')"><span class="nd"></span>全店舗 合計</div><div class="ni cp ${curView==='compare'?'on':''}" onclick="nav('compare')"><span class="nd"></span>店舗比較</div><div class="ni ${curView==='hpb'?'on':''}" onclick="nav('hpb')" style="color:#FF6B4A"><span class="nd" style="background:#FF6B4A"></span>ホットペッパーマーケティング</div><div class="ni ${curView==='alerts'?'on':''}" onclick="nav('alerts')" style="color:#FB7185"><span class="nd" style="background:#FB7185"></span>⚠ HPB更新アラート</div><div class="sb-sec">店舗別</div>`;stores.forEach((s,i)=>{const lv=liveStores.has(i);h+=`<div class="ni ${curView===i?'on':''}" onclick="nav(${i})"><span class="nd" style="background:${SC[i%SC.length]}"></span>${s.name}${lv?'<span class="live-dot">●</span>':''}</div>`;});document.getElementById('sbNav').innerHTML=h;}
+function nav(v){curView=v;renderSidebar();renderMain();document.querySelector('.sb').classList.remove('open');}
+function setYear(y){curYear=y;curFilterMonth=null;renderMain();}
+function setFilterMonth(m){curFilterMonth=m;renderMain();}
+function getAvailableMonths(){const s=new Set();stores.forEach((_,i)=>{const d=getStoreYear(i,curYear);if(d)d.monthly.forEach(m=>s.add(m.month));});return MO.filter(m=>s.has(m));}
+
+function destroyCharts(){Object.values(charts).forEach(c=>{try{c.destroy();}catch(e){}});charts={};}
+Chart.register(ChartDataLabels);
+const CO={responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#7D8CA1',font:{family:'Noto Sans JP',size:10},boxWidth:10,padding:12}},tooltip:{backgroundColor:'#1C2333',titleColor:'#E6EDF3',bodyColor:'#E6EDF3',borderColor:'rgba(255,255,255,.08)',borderWidth:1},datalabels:{display:false}},scales:{x:{grid:{color:'rgba(255,255,255,.03)'},ticks:{color:'#7D8CA1',font:{family:'Noto Sans JP',size:10}}},y:{grid:{color:'rgba(255,255,255,.03)'},ticks:{color:'#7D8CA1'},beginAtZero:true}}};
+function mkBar(id,labels,ds){const c=document.getElementById(id);if(!c)return;charts[id]=new Chart(c,{type:'bar',data:{labels,datasets:ds},options:CO});}
+function mkLine(id,labels,ds){const c=document.getElementById(id);if(!c)return;charts[id]=new Chart(c,{type:'line',data:{labels,datasets:ds},options:CO});}
+function mkDoughnut(id,labels,data,colors){const c=document.getElementById(id);if(!c)return;const total=data.reduce((a,b)=>a+b,0);charts[id]=new Chart(c,{type:'doughnut',data:{labels,datasets:[{data,backgroundColor:colors,borderColor:'#0D1117',borderWidth:3}]},options:{responsive:true,maintainAspectRatio:false,cutout:'58%',plugins:{legend:{position:'right',labels:{color:'#7D8CA1',font:{family:'Noto Sans JP',size:10},padding:10,boxWidth:10}},tooltip:CO.plugins.tooltip,datalabels:{display:true,color:'#fff',font:{weight:'bold',size:11,family:'Noto Sans JP'},formatter:(v)=>{if(!total||v===0)return '';const p=(v/total*100).toFixed(1);return parseFloat(p)<5?'':p+'%';},textShadowColor:'rgba(0,0,0,0.7)',textShadowBlur:4}}}});}
+
+function renderMain(){destroyCharts();const el=document.getElementById('mainC');if(curView==='all')renderAll(el);else if(curView==='compare')renderCompare(el);else if(curView==='hpb')renderHPB(el);else if(curView==='alerts')renderAlerts(el);else renderStore(el,curView);requestAnimationFrame(()=>initCharts());}
+function showMonthEndBanner(){
+  // 月末（25日以降）に登録フォームバナーを表示
+  const day=new Date().getDate();
+  if(day<25)return;
+  if(document.getElementById('monthEndBanner'))return;
+  const banner=document.createElement('div');
+  banner.id='monthEndBanner';
+  banner.style.cssText='position:fixed;bottom:20px;right:20px;z-index:9999;background:#1a2235;border:1px solid rgba(240,200,70,.4);border-radius:12px;padding:16px 20px;max-width:340px;box-shadow:0 8px 32px rgba(0,0,0,.5)';
+  banner.innerHTML=`
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+      <span style="font-size:16px">📅</span>
+      <span style="font-size:13px;font-weight:700;color:#F0C846">月末口コミ数の登録</span>
+      <button onclick="document.getElementById('monthEndBanner').remove()" style="margin-left:auto;background:none;border:none;color:var(--txd);font-size:16px;cursor:pointer;line-height:1">×</button>
+    </div>
+    <div style="font-size:11px;color:var(--txm);margin-bottom:12px">HPBで各店舗の口コミ数を確認して入力してください。<br>来月の差分計算のベースラインになります。</div>
+    <div id="monthEndInputs" style="display:flex;flex-direction:column;gap:6px;margin-bottom:12px">
+      ${stores.map(s=>{const hs=hpbStatsByStore[s.name]||{};return`<div style="display:flex;align-items:center;gap:8px"><span style="font-size:11px;color:var(--tx);width:80px;flex-shrink:0">${s.name}</span><input type="number" id="mei_${s.name.replace(/[^a-z0-9]/gi,'')}" value="${hs.reviews||0}" style="flex:1;background:var(--sf2);border:1px solid var(--bd);border-radius:6px;padding:4px 8px;color:var(--tx);font-size:12px;width:60px"><span style="font-size:10px;color:var(--txd)">件</span></div>`;}).join('')}
+    </div>
+    <div style="display:flex;gap:8px">
+      <button onclick="saveMonthEndSnapshot()" style="flex:1;background:rgba(240,200,70,.15);color:#F0C846;border:1px solid rgba(240,200,70,.3);border-radius:8px;padding:8px;font-size:12px;font-weight:700;cursor:pointer">📥 保存して来月へ</button>
+    </div>
+  `;
+  document.body.appendChild(banner);
+}
+function saveMonthEndSnapshot(){
+  stores.forEach(s=>{
+    const id='mei_'+s.name.replace(/[^a-z0-9]/gi,'');
+    const el=document.getElementById(id);
+    if(!el)return;
+    const val=parseInt(el.value)||0;
+    if(!hpbStatsByStore[s.name])hpbStatsByStore[s.name]={};
+    hpbStatsByStore[s.name].reviews=val;
+    hpbStatsByStore[s.name].reviewsPrev=val;
+    hpbStatsByStore[s.name].snapshotMonth=new Date().toISOString().slice(0,7);
+  });
+  const ym=new Date().toISOString().slice(0,7);
+  localStorage.setItem('hpb_snapshot_month',ym);
+  try{localStorage.setItem('hpb_dashboard_config',JSON.stringify({stores,apiKey,hpbStatsByStore}));}catch(e){}
+  document.getElementById('monthEndBanner')?.remove();
+  showToast('✅ 月末スナップショットを保存しました。来月から差分が自動計算されます。','#34D399');
+  renderMain();
+}
+function showToast(msg,color){
+  const t=document.createElement('div');
+  t.style.cssText=`position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#1a2235;border:1px solid ${color||'var(--em)'};color:${color||'var(--em)'};padding:10px 20px;border-radius:8px;font-size:12px;font-weight:600;z-index:10000;box-shadow:0 4px 20px rgba(0,0,0,.4);pointer-events:none`;
+  t.textContent=msg;
+  document.body.appendChild(t);
+  setTimeout(()=>t.remove(),4000);
+}
+function renderAlerts(el){
+  const today=new Date();
+  function daysSince(dateStr){if(!dateStr)return 999;const d=new Date(dateStr);return isNaN(d)?999:Math.floor((today-d)/(86400000));}
+  function statusColor(days,warn,danger){return days<=warn?'var(--em)':days<=danger?'var(--gd)':'var(--rs)';}
+  function statusLabel(days,warn,danger){return days<=warn?'✅ 正常':days<=danger?'⚠ 要確認':'🚨 停止中';}
+  function statusBg(days,warn,danger){return days<=warn?'rgba(52,211,153,.08)':days<=danger?'rgba(240,200,70,.08)':'rgba(251,113,133,.08)';}
+  // 月末バナー表示
+  setTimeout(showMonthEndBanner,300);
+  // 自動スナップショット後のトースト
+  if(window._autoSnapped){const m=window._autoSnapped;window._autoSnapped=null;setTimeout(()=>showToast(`📅 ${m} の口コミ数を先月末として自動保存しました`,'#F0C846'),600);}
+
+  const rows=stores.map(s=>{
+    const hs=hpbStatsByStore[s.name]||{};
+    const bd=daysSince(hs.lastBlogDate);const rd=daysSince(hs.lastReviewDate);
+    const freq=hs.blogFreqDays||2;
+    const blogAlert=bd>(freq*3);const reviewAlert=rd>14;
+    return {name:s.name,hs,bd,rd,freq,blogAlert,reviewAlert};
+  });
+
+  const alertCount=rows.filter(r=>r.blogAlert||r.reviewAlert).length;
+
+  el.innerHTML=`<div class="fade">
+  <div class="ph"><div><div class="pt">⚠ HPB更新アラート</div><div class="pd">ブログ・口コミの更新状況を管理</div></div></div>
+  ${statusHTML()}
+  <div class="stb" style="margin-bottom:20px;border-color:${alertCount>0?'rgba(251,113,133,.3)':'rgba(52,211,153,.3)'}">
+    <div class="sd" style="background:${alertCount>0?'var(--rs)':'var(--em)'}"></div>
+    <span style="font-weight:600;color:${alertCount>0?'var(--rs)':'var(--em)'}">${alertCount>0?`⚠ ${alertCount}店舗でアラートが発生しています`:'✅ 全店舗の更新状況は正常です'}</span>
+    <span style="margin-left:auto;font-size:10px;color:var(--txd)">最終確認日から算出</span>
+  </div>
+  <div style="display:flex;flex-direction:column;gap:12px">
+  ${rows.map(r=>{
+    const revDiff=(r.hs.reviews||0)-(r.hs.reviewsPrev!=null?r.hs.reviewsPrev:r.hs.reviews||0);
+    const revBadge=revDiff>0?'<span style="font-size:10px;font-weight:700;background:rgba(52,211,153,.15);color:#34D399;border-radius:4px;padding:1px 5px;margin-left:5px">+'+revDiff+'件↑</span>':revDiff<0?'<span style="font-size:10px;font-weight:700;background:rgba(251,113,133,.15);color:#FB7185;border-radius:4px;padding:1px 5px;margin-left:5px">'+revDiff+'件↓</span>':'<span style="font-size:10px;color:var(--txd);margin-left:5px">±0</span>';
+    const bc=statusColor(r.bd,r.freq*2,r.freq*5);
+    const rc=statusColor(r.rd,7,14);
+    const bg=r.blogAlert||r.reviewAlert?'rgba(251,113,133,.04)':'var(--sf)';
+    const border=r.blogAlert||r.reviewAlert?'rgba(251,113,133,.25)':'var(--bd)';
+    return `<div class="cd" style="background:${bg};border-color:${border}">
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:14px">
+        <div style="display:flex;align-items:center;gap:8px">
+          <span style="font-size:14px;font-weight:700">${r.name}</span>
+          ${r.blogAlert||r.reviewAlert?'<span style="font-size:10px;background:rgba(251,113,133,.15);color:var(--rs);padding:2px 8px;border-radius:4px;font-weight:600">要確認</span>':'<span style="font-size:10px;background:rgba(52,211,153,.12);color:var(--em);padding:2px 8px;border-radius:4px;font-weight:600">正常</span>'}
+        </div>
+        <div style="display:flex;gap:6px">
+          <a href="${r.hs.salonUrl||'#'}" target="_blank" class="btn" style="font-size:10px;text-decoration:none">↗ HPBページ確認</a>
+          <button class="btn" style="font-size:10px" onclick="markChecked('${r.name}')">✓ 確認済み</button>
+        </div>
+      </div>
+      <div style="display:flex;gap:12px;flex-wrap:wrap">
+        <div style="flex:1;min-width:140px;background:${statusBg(r.bd,r.freq*2,r.freq*5)};border:1px solid var(--bd);border-radius:var(--rr);padding:12px 14px">
+          <div style="font-size:9px;color:var(--txd);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;font-weight:600">📝 ブログ更新</div>
+          <div style="font-family:'Outfit';font-size:20px;font-weight:700;color:${bc};line-height:1">${r.bd===0?'本日':`${r.bd}日前`}</div>
+          <div style="font-size:10px;color:var(--txm);margin-top:4px">目安：${r.freq<=1?'毎日':`${r.freq}日に1回`} &nbsp;${statusLabel(r.bd,r.freq*2,r.freq*5)}</div>
+        </div>
+        <div style="flex:1;min-width:140px;background:${statusBg(r.rd,7,14)};border:1px solid var(--bd);border-radius:var(--rr);padding:12px 14px">
+          <div style="font-size:9px;color:var(--txd);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;font-weight:600">⭐ 口コミ更新</div>
+          <div style="font-family:'Outfit';font-size:20px;font-weight:700;color:${rc};line-height:1">${r.rd===0?'本日':`${r.rd}日前`}</div>
+          <div style="font-size:10px;color:var(--txm);margin-top:4px">目安：7日以内 &nbsp;${statusLabel(r.rd,7,14)}</div>
+        </div>
+        <div style="flex:1;min-width:160px;background:var(--sf2);border:1px solid var(--bd);border-radius:var(--rr);padding:12px 14px">
+          <div style="font-size:9px;color:var(--txd);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;font-weight:600">⭐ 口コミカウンター</div>
+          <div style="display:flex;align-items:baseline;gap:6px;margin-bottom:6px">
+            <span style="font-family:'Outfit';font-size:24px;font-weight:700;color:#F472B6;line-height:1">${r.hs.reviews||0}</span>
+            <span style="font-size:11px;color:var(--txm)">件</span>
+            ${revBadge}
+          </div>
+          <div style="font-size:10px;color:var(--txd);margin-bottom:8px">★${r.hs.rating||0} &nbsp;|&nbsp; 先月末: ${r.hs.reviewsPrev!=null?r.hs.reviewsPrev:'—'}件</div>
+          <div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:6px">
+            <button onclick="adjReview('${r.name}',1)" style="background:rgba(52,211,153,.15);color:#34D399;border:1px solid rgba(52,211,153,.3);border-radius:6px;padding:4px 8px;font-size:11px;font-weight:700;cursor:pointer">＋1</button>
+            <button onclick="adjReview('${r.name}',2)" style="background:rgba(52,211,153,.15);color:#34D399;border:1px solid rgba(52,211,153,.3);border-radius:6px;padding:4px 8px;font-size:11px;font-weight:700;cursor:pointer">＋2</button>
+            <button onclick="adjReview('${r.name}',5)" style="background:rgba(52,211,153,.15);color:#34D399;border:1px solid rgba(52,211,153,.3);border-radius:6px;padding:4px 8px;font-size:11px;font-weight:700;cursor:pointer">＋5</button>
+            <button onclick="adjReview('${r.name}',-1)" style="background:rgba(251,113,133,.1);color:#FB7185;border:1px solid rgba(251,113,133,.25);border-radius:6px;padding:4px 8px;font-size:11px;font-weight:700;cursor:pointer">－1</button>
+          </div>
+          <button onclick="resetMonthlyReviews('${r.name}')" style="width:100%;background:rgba(255,255,255,.04);color:var(--txd);border:1px solid var(--bd);border-radius:6px;padding:4px;font-size:9px;cursor:pointer;letter-spacing:.5px">📅 月初リセット（現在値を先月末に保存）</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('')}
+  </div>
+  <div style="margin-top:14px;padding:12px 16px;background:var(--sf2);border-radius:var(--rr);border:1px solid var(--bd);font-size:10px;color:var(--txd);line-height:1.8">
+    ⓘ HPBのブログ・口コミページにアクセスし「UP」マークを確認 → 「✓ 確認済み」を押すと本日の日付で記録されます。<br>
+    アラート基準：ブログ＝目安頻度×3倍以上 経過 / 口コミ＝14日以上 経過
+  </div>
+  </div>`;
+}
+function adjReview(storeName,delta){
+  if(!hpbStatsByStore[storeName])return;
+  const hs=hpbStatsByStore[storeName];
+  if(hs.reviewsPrev==null)hs.reviewsPrev=hs.reviews||0;
+  hs.reviews=Math.max(0,(hs.reviews||0)+delta);
+  try{localStorage.setItem('hpb_dashboard_config',JSON.stringify({stores,apiKey,hpbStatsByStore}));}catch(e){}
+  renderMain();
+}
+function resetMonthlyReviews(storeName){
+  if(!hpbStatsByStore[storeName])return;
+  const hs=hpbStatsByStore[storeName];
+  if(!confirm(`「${storeName}」の現在の口コミ数 ${hs.reviews}件 を先月末の値として保存します。\n月初リセットを実行しますか？`))return;
+  hs.reviewsPrev=hs.reviews||0;
+  try{localStorage.setItem('hpb_dashboard_config',JSON.stringify({stores,apiKey,hpbStatsByStore}));}catch(e){}
+  renderMain();
+}
+function markChecked(storeName){
+  const today=new Date().toISOString().slice(0,10);
+  if(!hpbStatsByStore[storeName])hpbStatsByStore[storeName]={};
+  hpbStatsByStore[storeName].lastBlogDate=today;
+  hpbStatsByStore[storeName].lastReviewDate=today;
+  try{localStorage.setItem('hpb_dashboard_config',JSON.stringify({stores,apiKey,hpbStatsByStore}));}catch(e){}
+  renderMain();
+}
+function yearBtns(){return`<div class="yr-sel">${YEARS.map(y=>`<button class="yr-btn ${y===curYear?'on':''}" onclick="setYear(${y})">${y}年</button>`).join('')}</div>`;}
+function monthBtns(){const avail=getAvailableMonths();if(!avail.length)return'';return`<span style="display:flex;gap:3px;flex-wrap:wrap;align-items:center;margin-left:4px"><span style="color:var(--txd);font-size:9px;letter-spacing:.5px">月：</span><button class="yr-btn ${!curFilterMonth?'on':''}" onclick="setFilterMonth(null)">全月</button>${avail.map(m=>`<button class="yr-btn ${curFilterMonth===m?'on':''}" onclick="setFilterMonth('${m}')">${m}</button>`).join('')}</span>`;}
+function statusHTML(){const n=liveStores.size;if(n>0)return`<div class="stb"><span class="sd lv"></span>ライブデータ接続中：${n}店舗<button class="yr-btn" onclick="refreshData(this)" style="margin-left:8px">↺ 手動更新</button>${monthBtns()}${yearBtns()}</div>`;return`<div class="stb"><span class="sd dm"></span>データ未取得 — ⚙ 店舗管理からAPI連携を設定してください${yearBtns()}</div>`;}
+
+// KPI card config: key, label, description, color
+const KPI_CH=[
+  {k:'HPB',label:'HPB',desc:'ホットペッパー',color:'#FF6B4A'},
+  {k:'HP',label:'HP',desc:'ホームページ',color:'#3ECFB4'},
+  {k:'チラシ',label:'チラシ',desc:'チラシ経由',color:'#F0C846'},
+  {k:'メタ広告',label:'メタ広告',desc:'Meta広告経由',color:'#8B7CF6'},
+  {k:'紹介',label:'紹介',desc:'紹介経由',color:'#F472B6'},
+  {k:'MEO',label:'MEO',desc:'MEO経由',color:'#60A5FA'},
+  {k:'Gマップ',label:'Gマップ',desc:'Googleマップ経由',color:'#FBBF24'}
+];
+function buildKpiCards(monthlyArr,totalAll,prefix){
+  let h='';
+  KPI_CH.forEach(ch=>{
+    const t=monthlyArr.reduce((s,m)=>s+(m[ch.k]||0),0);
+    const avg=monthlyArr.length?(t/monthlyArr.length).toFixed(1):'0';
+    const pct=totalAll?((t/totalAll)*100).toFixed(1)+'%':'—';
+    h+=`<div class="kp" style="--kc:${ch.color}"><div class="kl">${ch.label} ${prefix}</div><div class="kv" style="color:${ch.color}">${t}<span style="font-size:13px;color:var(--txm);margin-left:6px">(${pct})</span></div><div class="kn">${ch.desc}｜月平均 ${avg}人</div></div>`;
+  });
+  h+=`<div class="kp" style="--kc:var(--em)"><div class="kl">全経路 ${prefix}</div><div class="kv" style="color:var(--em)">${totalAll}</div><div class="kn">新規来院者総数</div></div>`;
+  return h;
+}
+function reviewRatingRankAll(){
+  const ranked=stores.map(s=>({name:s.name,rating:parseFloat((hpbStatsByStore[s.name]||{}).rating)||0,reviews:(hpbStatsByStore[s.name]||{}).reviews||0})).sort((a,b)=>b.rating-a.rating);
+  const medals=['🥇','🥈','🥉'];
+  const storeColors=['#FF6B4A','#3ECFB4','#F0C846','#8B7CF6','#F472B6','#38BDF8','#FBBF24','#A3E635'];
+  // スコアバーは4.5〜5.0のレンジで表示（差が見やすいよう）
+  const minR=4.5,maxR=5.0;
+  return ranked.map((r,i)=>{
+    const pct=Math.max(Math.min((r.rating-minR)/(maxR-minR)*100,100),4);
+    const col=storeColors[i%storeColors.length];
+    const medal=i<3?medals[i]:`<span style="font-size:11px;font-weight:700;color:var(--txd);width:20px;display:inline-block;text-align:center">${i+1}</span>`;
+    const stars='★'.repeat(Math.floor(r.rating))+(r.rating%1>=0.5?'½':'');
+    return `<div class="ri" style="align-items:center;padding:6px 0;border-bottom:1px solid var(--bd)">
+      <span style="font-size:${i<3?'16':'13'}px;width:24px;text-align:center;flex-shrink:0">${medal}</span>
+      <span style="font-size:12px;font-weight:600;width:80px;flex-shrink:0;color:var(--tx)">${r.name}</span>
+      <div style="flex:1;position:relative;height:22px;background:rgba(255,255,255,.04);border-radius:4px;overflow:hidden">
+        <div style="position:absolute;left:0;top:0;height:100%;width:${pct}%;background:${col}22;border-radius:4px;transition:width .4s ease"></div>
+        <div style="position:absolute;left:0;top:0;height:100%;width:${pct}%;background:${col}55;clip-path:inset(0 0 0 0);border-right:2px solid ${col};border-radius:4px"></div>
+        <span style="position:absolute;left:8px;top:50%;transform:translateY(-50%);font-size:11px;font-weight:700;color:${col}">★${r.rating.toFixed(2)}</span>
+      </div>
+      <span style="font-size:10px;color:var(--txd);width:48px;text-align:right;flex-shrink:0">${r.reviews}件</span>
+    </div>`;
+  }).join('');
+}
+function rankMedal(i){return i===0?'🥇':i===1?'🥈':i===2?'🥉':`<span style="font-size:11px;font-weight:700;color:var(--txd);display:inline-block;width:20px;text-align:center">${i+1}</span>`;}
+function rankCol(i){const c=['#FF6B4A','#3ECFB4','#F0C846','#8B7CF6','#F472B6','#38BDF8','#FBBF24','#A3E635','#6EE7B7','#FCA5A5'];return c[i%c.length];}
+function hpbRank(key,unit,top){
+  const ranked=stores.map(s=>({name:s.name,val:(hpbStatsByStore[s.name]||{})[key]||0})).sort((a,b)=>b.val-a.val).slice(0,top||3);
+  const max=ranked[0]?.val||1;
+  return ranked.map((r,i)=>`<div class="ri"><span style="font-size:${i<3?'14':'11'}px;width:20px;text-align:center;flex-shrink:0">${rankMedal(i)}</span><span class="rn" style="font-size:12px;font-weight:600">${r.name}</span><div class="rbt"><div class="rb" style="width:${Math.max(r.val/max*100,12)}%;background:${rankCol(i)}30;color:${rankCol(i)};font-size:11px">${r.val}${unit}</div></div></div>`).join('');
+}
+function blogFreqRank(top){
+  const ranked=stores.map(s=>({name:s.name,freq:(hpbStatsByStore[s.name]||{}).blogFreqDays||99})).sort((a,b)=>a.freq-b.freq).slice(0,top||3);
+  const min=ranked[0]?.freq||1;
+  return ranked.map((r,i)=>{
+    const lbl=r.freq<=1?'毎日':r.freq===2?'2日に1回':r.freq===3?'3日に1回':`${r.freq}日に1回`;
+    const pct=Math.max(min/r.freq*100,12);
+    return `<div class="ri"><span style="font-size:${i<3?'14':'11'}px;width:20px;text-align:center;flex-shrink:0">${rankMedal(i)}</span><span class="rn" style="font-size:12px;font-weight:600">${r.name}</span><div class="rbt"><div class="rb" style="width:${pct}%;background:${rankCol(i)}30;color:${rankCol(i)};font-size:11px">${lbl}</div></div></div>`;
+  }).join('');
+}
+function renderAll(el){const a=aggAll();const aT=a.reduce((s,m)=>s+m.total,0);el.innerHTML=`<div class="fade"><div class="ph"><div><div class="pt">📊 全店舗 合計レポート</div><div class="pd">全${stores.length}店舗（${curYear}年）</div></div></div>${statusHTML()}<div class="kr">${buildKpiCards(a,aT,'全店合計')}</div><div class="gf"><div class="cd"><div class="ct"><span class="cdot" style="background:var(--ac)"></span>月別 経路別来店数（全店合計）</div><div class="csu">${curYear}年 HPB / HP / チラシ / メタ広告 / 紹介 / MEO・Gマップ</div><div class="cb" style="height:280px"><canvas id="cAM"></canvas></div></div></div><div class="g2"><div class="cd"><div class="ct"><span class="cdot" style="background:var(--tl)"></span>集客経路シェア</div><div class="csu">${curYear}年 全店累計</div><div class="cb" style="height:280px"><canvas id="cAP"></canvas></div></div><div class="cd"><div class="ct"><span class="cdot" style="background:var(--bl)"></span>経路別 月次推移</div><div class="csu">主要経路</div><div class="cb" style="height:280px"><canvas id="cAL"></canvas></div></div></div><div class="gf"><div class="cd"><div class="ct"><span class="cdot" style="background:var(--gd)"></span>店舗別 HPBランキング</div><div class="csu">${curYear}年</div><div id="rankAll" style="margin-top:6px"></div></div></div><div class="gf"><div class="cd"><div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:16px"><div><div class="ct"><span class="cdot" style="background:#F0C846"></span>口コミ総合点ランキング（全店舗）</div><div class="csu">HPB評価スコア順 ― 全${stores.length}店舗</div></div><div style="font-size:10px;color:var(--txd);text-align:right;line-height:1.8">バー幅は ★4.5〜5.0 のレンジで表示<br>右端の数字は口コミ件数</div></div><div style="display:flex;flex-direction:column;gap:2px">${reviewRatingRankAll()}</div></div></div><div class="g2"><div class="cd"><div class="ct"><span class="cdot" style="background:#F472B6"></span>口コミ件数ランキング（全店舗）</div><div class="csu">HPB口コミ数 全${stores.length}店舗</div><div class="rl" style="margin-top:12px">${hpbRank('reviews','件',stores.length)}</div></div><div class="cd"><div class="ct"><span class="cdot" style="background:#3ECFB4"></span>ブログ更新頻度ランキング（全店舗）</div><div class="csu">HPBブログ投稿ペース 全${stores.length}店舗</div><div class="rl" style="margin-top:12px">${blogFreqRank(stores.length)}</div></div></div></div>`;}
+
+function getCmpStores(){if(!selectedCompareStores||selectedCompareStores.length===0)return stores.map((_,i)=>i);return stores.map((s,i)=>selectedCompareStores.includes(s.name)?i:-1).filter(i=>i>=0);}
+function toggleCompareStore(name){if(!selectedCompareStores)selectedCompareStores=stores.map(s=>s.name);const idx=selectedCompareStores.indexOf(name);if(idx>=0){if(selectedCompareStores.length>1)selectedCompareStores.splice(idx,1);}else{selectedCompareStores.push(name);}renderCmpStoreSelector();destroyCharts();requestAnimationFrame(()=>initCharts());}
+function selectAllCompareStores(){selectedCompareStores=null;renderCmpStoreSelector();destroyCharts();requestAnimationFrame(()=>initCharts());}
+function renderCmpStoreSelector(){const el=document.getElementById('cmpStoreSelector');if(!el)return;const active=getCmpStores();el.innerHTML=`<button class="pl ${!selectedCompareStores?'on':''}" onclick="selectAllCompareStores()" style="margin-right:4px;font-weight:700">全店舗</button>`+stores.map((s,i)=>{const sel=active.includes(i);return`<button class="pl ${sel?'on':''}" onclick="toggleCompareStore('${s.name}')" style="${sel?`background:${SC[i%SC.length]}25;color:${SC[i%SC.length]};border-color:${SC[i%SC.length]}60`:''}"><span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:${SC[i%SC.length]};margin-right:4px;vertical-align:middle"></span>${s.name}</button>`}).join('')+`<span style="font-size:10px;color:var(--txd);margin-left:8px">${active.length}店舗を表示中</span>`;}
+function renderCompare(el){const ms=getMonths();el.innerHTML=`<div class="fade"><div class="ph"><div><div class="pt">🔄 店舗比較</div><div class="pd">${curYear}年</div></div></div>${statusHTML()}<div class="cd" style="margin-bottom:12px"><div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px"><span style="font-size:11px;font-weight:600;color:var(--txm)">比較店舗を選択：</span></div><div id="cmpStoreSelector" class="mp" style="gap:6px"></div></div><div class="gf"><div class="cd"><div class="ct"><span class="cdot" style="background:var(--ac)"></span>HPB来店数 — 店舗別月次比較</div><div class="csu">${curYear}年</div><div class="cb" style="height:350px"><canvas id="cCB"></canvas></div></div></div><div class="gf"><div class="cd"><div class="ct"><span class="cdot" style="background:var(--tl)"></span>HPB累計 店舗ランキング</div><div class="csu">${curYear}年</div><div id="rankCmp"></div></div></div><div class="gf"><div class="cd"><div class="ct"><span class="cdot" style="background:var(--vt)"></span>全経路 月次比較テーブル</div><div class="csu">月を選択</div><div class="mp" id="cmpPills"></div><div class="tw" id="cmpTbl"></div></div></div></div>`;renderCmpStoreSelector();renderCmpPills(ms);}
+function renderCmpPills(ms){const el=document.getElementById('cmpPills');if(!el)return;if(!ms.includes(curMonth))curMonth=ms[0]||'1月';el.innerHTML=ms.map(m=>`<button class="pl ${m===curMonth?'on':''}" onclick="curMonth='${m}';renderCmpPills([${ms.map(x=>"'"+x+"'").join(',')}]);renderCmpTbl();">${m}</button>`).join('');renderCmpTbl();}
+function renderCmpTbl(){const el=document.getElementById('cmpTbl');if(!el)return;const idxs=getCmpStores();let h=`<table><thead><tr><th>店舗</th>`;CH.forEach(k=>h+=`<th>${k}</th>`);h+=`<th>合計</th></tr></thead><tbody>`;idxs.forEach(i=>{const s=stores[i];const d=getStoreYear(i,curYear),m=d?d.monthly.find(x=>x.month===curMonth):null;h+=`<tr><td style="font-weight:600"><span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:${SC[i%SC.length]};margin-right:5px"></span>${s.name}</td>`;CH.forEach(k=>{const v=m?(m[k]||0):0;h+=`<td class="${v>0?'hl':'dm'}">${v}</td>`;});h+=`<td style="font-weight:600">${m?m.total:0}</td></tr>`;});h+=`</tbody></table>`;el.innerHTML=h;}
+
+function renderStore(el,idx){const s=stores[idx],d=getStoreYear(idx,curYear);if(!d){el.innerHTML=`<div class="fade"><div class="pt">${s.name}</div>${statusHTML()}<p style="color:var(--txm);margin-top:14px">${curYear}年のデータがありません。スプレッドシートIDが設定されている場合は、⚙ 店舗管理から「保存してデータ取得」を実行してください。</p></div>`;return;}const c=SC[idx%SC.length];const monthly=curFilterMonth?d.monthly.filter(m=>m.month===curFilterMonth):d.monthly;const aT=monthly.reduce((a,m)=>a+m.total,0);const lm=d.monthly.length?d.monthly[d.monthly.length-1].month:'';const dms=Object.keys(d.daily);const isLive=liveStores.has(idx);const periodLabel=curFilterMonth?`${curYear}年 ${curFilterMonth}`:`${curYear}年1月〜${lm}`;el.innerHTML=`<div class="fade"><div class="ph"><div><div class="pt"><span style="width:10px;height:10px;border-radius:50%;background:${c};display:inline-block"></span> ${s.name}</div><div class="pd">${periodLabel}${isLive?' — <span style="color:var(--em)">● ライブデータ</span>':''}</div></div></div>${statusHTML()}<div class="kr">${buildKpiCards(monthly,aT,'合計')}</div><div class="gf"><div class="cd"><div class="ct"><span class="cdot" style="background:${c}"></span>月別 経路別来店数</div><div class="csu">${curYear}年 HPB / HP / チラシ / メタ広告 / 紹介 / MEO・Gマップ</div><div class="cb" style="height:260px"><canvas id="cSM"></canvas></div></div></div><div class="g2"><div class="cd"><div class="ct"><span class="cdot" style="background:var(--tl)"></span>集客経路シェア</div><div class="csu">${curYear}年 累計</div><div class="cb" style="height:260px"><canvas id="cSP"></canvas></div></div><div class="cd"><div class="ct"><span class="cdot" style="background:var(--bl)"></span>経路別 月次推移</div><div class="csu">主要経路</div><div class="cb" style="height:260px"><canvas id="cSL"></canvas></div></div></div><div class="gf"><div class="cd"><div class="ct"><span class="cdot" style="background:var(--gd)"></span>日別 詳細データ</div><div class="csu">${curYear}年</div><div class="mp" id="sPills"></div><div class="tw" id="sTbl"></div></div></div></div>`;renderStorePills(dms,idx);}
+function renderStorePills(ms,idx){const el=document.getElementById('sPills');if(!el)return;if(!ms.includes(curMonth))curMonth=ms[0]||'1月';el.innerHTML=ms.map(m=>`<button class="pl ${m===curMonth?'on':''}" onclick="curMonth='${m}';renderStorePills([${ms.map(x=>"'"+x+"'").join(',')}],${idx});renderStoreTbl(${idx});">${m}</button>`).join('');renderStoreTbl(idx);}
+function renderStoreTbl(idx){const el=document.getElementById('sTbl');if(!el)return;const days=getStoreYear(idx,curYear)?.daily?.[curMonth];if(!days){el.innerHTML='<p class="dm" style="padding:10px">データなし</p>';return;}let h=`<table><thead><tr><th>日</th><th>曜</th>`;CH.forEach(k=>h+=`<th>${k}</th>`);h+=`<th>合計</th></tr></thead><tbody>`;days.forEach(r=>{h+=`<tr><td>${r.day}</td><td class="dm">${r.dayName}</td>`;CH.forEach(k=>{const v=r[k]||0;h+=`<td class="${v>0?'hl':'dm'}">${v}</td>`;});h+=`<td style="font-weight:600">${r.total}</td></tr>`;});const tots={};CH.forEach(k=>tots[k]=days.reduce((s,r)=>s+(r[k]||0),0));const gt=days.reduce((s,r)=>s+r.total,0);h+=`<tr class="rws"><td colspan="2">合計</td>`;CH.forEach(k=>h+=`<td class="hl">${tots[k]}</td>`);h+=`<td>${gt}</td></tr></tbody></table>`;el.innerHTML=h;}
+
+function initCharts(){if(curView==='all')initAllC();else if(curView==='compare')initCmpC();else if(curView==='hpb')initHPBC();else initStoreC(curView);}
+function initAllC(){const a=aggAll();mkBar('cAM',a.map(m=>m.month),[{label:'HPB',data:a.map(m=>m.HPB),backgroundColor:'rgba(255,107,74,.75)',borderColor:'#FF6B4A',borderWidth:1,borderRadius:4,barPercentage:.85,categoryPercentage:.8},{label:'HP',data:a.map(m=>m.HP||0),backgroundColor:'rgba(62,207,180,.75)',borderColor:'#3ECFB4',borderWidth:1,borderRadius:4,barPercentage:.85,categoryPercentage:.8},{label:'チラシ',data:a.map(m=>m['チラシ']||0),backgroundColor:'rgba(240,200,70,.75)',borderColor:'#F0C846',borderWidth:1,borderRadius:4,barPercentage:.85,categoryPercentage:.8},{label:'メタ広告',data:a.map(m=>m['メタ広告']||0),backgroundColor:'rgba(139,124,246,.75)',borderColor:'#8B7CF6',borderWidth:1,borderRadius:4,barPercentage:.85,categoryPercentage:.8},{label:'紹介',data:a.map(m=>m['紹介']||0),backgroundColor:'rgba(244,114,182,.75)',borderColor:'#F472B6',borderWidth:1,borderRadius:4,barPercentage:.85,categoryPercentage:.8},{label:'MEO/Gマップ',data:a.map(m=>(m['MEO']||0)+(m['Gマップ']||0)),backgroundColor:'rgba(251,191,36,.75)',borderColor:'#FBBF24',borderWidth:1,borderRadius:4,barPercentage:.85,categoryPercentage:.8}]);const tots={};CH.forEach(k=>tots[k]=a.reduce((s,m)=>s+(m[k]||0),0));const nz=CH.filter(k=>tots[k]>0);mkDoughnut('cAP',nz,nz.map(k=>tots[k]),nz.map(k=>CC[CH.indexOf(k)]));const t5=['HPB','HP','チラシ','minimo','紹介'];mkLine('cAL',a.map(m=>m.month),t5.map(k=>({label:k,data:a.map(m=>m[k]||0),borderColor:CC[CH.indexOf(k)],backgroundColor:'transparent',borderWidth:2,pointRadius:3,pointBackgroundColor:CC[CH.indexOf(k)],tension:.3})));renderRank('rankAll');}
+function initCmpC(){const ms=getMonths();const idxs=getCmpStores();const cLine=document.getElementById('cCB');if(cLine){charts['cCB']=new Chart(cLine,{type:'line',data:{labels:ms,datasets:idxs.map(i=>({label:stores[i].name,data:ms.map(m=>{const d=getStoreYear(i,curYear);const mm=d?d.monthly.find(x=>x.month===m):null;return mm?mm.HPB:0;}),borderColor:SC[i%SC.length],backgroundColor:SC[i%SC.length]+'20',borderWidth:2.5,pointRadius:5,pointBackgroundColor:SC[i%SC.length],pointBorderColor:'#0D1117',pointBorderWidth:2,pointHoverRadius:7,tension:.35,fill:false}))},options:{...CO,plugins:{...CO.plugins,datalabels:{display:true,color:ctx=>SC[idxs[ctx.datasetIndex]%SC.length]+'EE',font:{weight:'bold',size:10,family:'Outfit'},anchor:'top',align:'top',offset:3,formatter:v=>v>0?v:''}}}});}renderRank('rankCmp');}
+function initStoreC(idx){const d=getStoreYear(idx,curYear);if(!d)return;const monthly=curFilterMonth?d.monthly.filter(m=>m.month===curFilterMonth):d.monthly;const c=SC[idx%SC.length];mkBar('cSM',monthly.map(m=>m.month),[{label:'HPB',data:monthly.map(m=>m.HPB),backgroundColor:'rgba(255,107,74,.75)',borderColor:'#FF6B4A',borderWidth:1,borderRadius:4,barPercentage:.85,categoryPercentage:.8},{label:'HP',data:monthly.map(m=>m.HP||0),backgroundColor:'rgba(62,207,180,.75)',borderColor:'#3ECFB4',borderWidth:1,borderRadius:4,barPercentage:.85,categoryPercentage:.8},{label:'チラシ',data:monthly.map(m=>m['チラシ']||0),backgroundColor:'rgba(240,200,70,.75)',borderColor:'#F0C846',borderWidth:1,borderRadius:4,barPercentage:.85,categoryPercentage:.8},{label:'メタ広告',data:monthly.map(m=>m['メタ広告']||0),backgroundColor:'rgba(139,124,246,.75)',borderColor:'#8B7CF6',borderWidth:1,borderRadius:4,barPercentage:.85,categoryPercentage:.8},{label:'紹介',data:monthly.map(m=>m['紹介']||0),backgroundColor:'rgba(244,114,182,.75)',borderColor:'#F472B6',borderWidth:1,borderRadius:4,barPercentage:.85,categoryPercentage:.8},{label:'MEO/Gマップ',data:monthly.map(m=>(m['MEO']||0)+(m['Gマップ']||0)),backgroundColor:'rgba(251,191,36,.75)',borderColor:'#FBBF24',borderWidth:1,borderRadius:4,barPercentage:.85,categoryPercentage:.8}]);const tots={};CH.forEach(k=>tots[k]=monthly.reduce((s,m)=>s+(m[k]||0),0));const nz=CH.filter(k=>tots[k]>0);mkDoughnut('cSP',nz,nz.map(k=>tots[k]),nz.map(k=>CC[CH.indexOf(k)]));const t5=['HPB','HP','チラシ','minimo','紹介'];mkLine('cSL',monthly.map(m=>m.month),t5.map(k=>({label:k,data:monthly.map(m=>m[k]||0),borderColor:CC[CH.indexOf(k)],backgroundColor:'transparent',borderWidth:2,pointRadius:3,pointBackgroundColor:CC[CH.indexOf(k)],tension:.3})));}
+function renderRank(id){const el=document.getElementById(id);if(!el)return;const ranked=stores.map((s,i)=>{const d=getStoreYear(i,curYear);return{name:s.name,hpb:d?d.monthly.reduce((a,m)=>a+m.HPB,0):0,color:SC[i%SC.length],live:liveStores.has(i)};}).sort((a,b)=>b.hpb-a.hpb);const max=ranked[0]?.hpb||1;el.innerHTML=`<div class="rl">${ranked.map((s,i)=>`<div class="ri"><span class="rp">${i+1}</span><span class="rn">${s.name}${s.live?' <span style="color:var(--em);font-size:7px">●</span>':''}</span><div class="rbt"><div class="rb" style="width:${Math.max((s.hpb/max*100),8).toFixed(1)}%;background:${s.color}">${s.hpb}</div></div></div>`).join('')}</div>`;}
+
+// ===== ホットペッパーマーケティング ページ =====
+function getHpbMonthly(){const map={};const idxs=curHpbStore?[stores.findIndex(s=>s.name===curHpbStore)].filter(i=>i>=0):stores.map((_,i)=>i);idxs.forEach(i=>{const d=getStoreYear(i,curYear);if(!d)return;const months=curFilterMonth?d.monthly.filter(m=>m.month===curFilterMonth):d.monthly;months.forEach(m=>{map[m.month]=(map[m.month]||0)+m.HPB;});});return MO.filter(m=>map[m]!==undefined&&map[m]>=0).map(m=>({month:m,hpb:map[m]||0})).filter((_,i,a)=>a.some(x=>x.hpb>0));}
+
+function renderHPB(el){
+  if(!hpbStatsByStore[curHpbStore])curHpbStore=stores[0]?.name||'大森院';
+  const hs=hpbStatsByStore[curHpbStore]||{reviews:0,rating:0,blogs:0,ranking:0,rankingKeyword:'',rankingUrl:'',salonUrl:'',lastUpdated:'—'};
+  const monthly=getHpbMonthly().filter(x=>x.hpb>0);
+  const total=monthly.reduce((s,x)=>s+x.hpb,0);
+  const avg=monthly.length?(total/monthly.length).toFixed(1):'0';
+  const maxObj=monthly.reduce((a,b)=>b.hpb>a.hpb?b:a,{month:'—',hpb:0});
+  const periodLabel=curFilterMonth?`${curYear}年 ${curFilterMonth}`:`${curYear}年`;
+  const storeTabs=stores.map(s=>`<button class="pl${curHpbStore===s.name?' on':''}" onclick="curHpbStore='${s.name}';renderMain()">${s.name}</button>`).join('');
+  el.innerHTML=`<div class="fade">
+  <div class="ph"><div><div class="pt">🔥 ホットペッパーマーケティング</div><div class="pd">${periodLabel} — NAORU整体 ${curHpbStore}</div></div></div>
+  ${statusHTML()}
+  <div class="mp" style="margin-bottom:16px">${storeTabs}</div>
+  <div class="kr">
+    <div class="kp" style="--kc:#FF6B4A"><div class="kl">HPB来店 合計</div><div class="kv" style="color:#FF6B4A">${total}<span style="font-size:13px;color:var(--txm);margin-left:6px">人</span></div><div class="kn">月平均 ${avg}人</div></div>
+    <div class="kp" style="--kc:#F472B6"><div class="kl">口コミ数</div><div class="kv" style="color:#F472B6">${hs.reviews}<span style="font-size:13px;color:var(--txm);margin-left:6px">件</span></div><div class="kn">評価 ★${hs.rating}</div></div>
+    <div class="kp" style="--kc:#3ECFB4"><div class="kl">ブログ投稿数</div><div class="kv" style="color:#3ECFB4">${hs.blogs}<span style="font-size:13px;color:var(--txm);margin-left:6px">件</span></div><div class="kn">最終確認 ${hs.lastUpdated}</div></div>
+    <div class="kp" style="--kc:#F0C846"><div class="kl">最多来院月</div><div class="kv" style="color:#F0C846">${maxObj.month}</div><div class="kn">${maxObj.hpb}人来院</div></div>
+    <div class="kp" style="--kc:#38BDF8"><div class="kl">掲載順位（${hs.rankingKeyword||curHpbStore}）</div><div class="kv" style="color:#38BDF8">${hs.ranking?hs.ranking+'<span style="font-size:13px;color:var(--txm);margin-left:4px">位</span>':'<span style="font-size:18px;color:var(--txd)">圏外</span>'}</div><div class="kn">最終確認 ${hs.lastUpdated}</div></div>
+  </div>
+  <div class="gf"><div class="cd">
+    <div class="ct"><span class="cdot" style="background:#FF6B4A"></span>月別 HPB来店数</div>
+    <div class="csu">${curYear}年 ホットペッパー経由 月次推移 — ${curHpbStore}</div>
+    <div class="cb" style="height:280px"><canvas id="cHM"></canvas></div>
+  </div></div>
+  <div class="gf"><div class="cd">
+    <div class="ct"><span class="cdot" style="background:#F0C846"></span>月別 HPB来店数 詳細</div>
+    <div class="csu">${curYear}年 月次データ（前月比・累計）— ${curHpbStore}</div>
+    <div class="tw" id="hpbTbl"></div>
+  </div></div>
+  <div class="gf"><div class="cd">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;flex-wrap:wrap;gap:8px">
+      <div>
+        <div class="ct"><span class="cdot" style="background:#F472B6"></span>ホットペッパー サイト情報 — ${curHpbStore}</div>
+        <div class="csu">最終確認：${hs.lastUpdated}</div>
+      </div>
+      <button id="hpbEditBtn" class="btn" onclick="toggleHpbEdit()" style="font-size:11px">✏ 編集</button>
+    </div>
+    <div id="hpbStatsDisplay" style="display:flex;gap:14px;flex-wrap:wrap">
+      <div style="flex:1;min-width:140px;background:var(--sf2);border:1px solid var(--bd);border-radius:var(--rr);padding:16px 18px;border-top:2px solid #F472B6">
+        <div style="font-size:9px;color:var(--txd);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;font-weight:600">口コミ数</div>
+        <div style="font-family:'Outfit';font-size:26px;font-weight:700;color:#F472B6;line-height:1">${hs.reviews}<span style="font-size:13px;color:var(--txm);margin-left:5px">件</span></div>
+        <div style="font-size:11px;color:var(--txm);margin-top:5px">評価 ★${hs.rating}</div>
+      </div>
+      <div style="flex:1;min-width:140px;background:var(--sf2);border:1px solid var(--bd);border-radius:var(--rr);padding:16px 18px;border-top:2px solid #3ECFB4">
+        <div style="font-size:9px;color:var(--txd);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;font-weight:600">ブログ投稿数</div>
+        <div style="font-family:'Outfit';font-size:26px;font-weight:700;color:#3ECFB4;line-height:1">${hs.blogs}<span style="font-size:13px;color:var(--txm);margin-left:5px">件</span></div>
+        <div style="margin-top:5px"><a href="${(hs.salonUrl||'#').replace(/\/?$/,'/')}blog/" target="_blank" style="font-size:10px;color:var(--tl);text-decoration:none">↗ ブログを確認</a></div>
+      </div>
+      <div style="flex:1;min-width:140px;background:var(--sf2);border:1px solid var(--bd);border-radius:var(--rr);padding:16px 18px;border-top:2px solid #38BDF8">
+        <div style="font-size:9px;color:var(--txd);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;font-weight:600">掲載順位（${hs.rankingKeyword||curHpbStore}）</div>
+        <div style="font-family:'Outfit';font-size:26px;font-weight:700;color:#38BDF8;line-height:1">${hs.ranking?hs.ranking+'<span style="font-size:13px;color:var(--txm);margin-left:5px">位</span>':'<span style="font-size:18px;color:var(--txd)">圏外</span>'}</div>
+        <div style="margin-top:5px"><a href="${hs.rankingUrl||'#'}" target="_blank" style="font-size:10px;color:var(--tl);text-decoration:none">↗ 検索結果を確認</a></div>
+      </div>
+      <div style="flex:1;min-width:140px;background:var(--sf2);border:1px solid var(--bd);border-radius:var(--rr);padding:16px 18px;border-top:2px solid var(--txd)">
+        <div style="font-size:9px;color:var(--txd);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;font-weight:600">サロンページ</div>
+        <div style="font-size:11px;color:var(--txm);line-height:1.6">NAORU整体 ${curHpbStore}</div>
+        <div style="margin-top:8px"><a href="${hs.salonUrl||'#'}" target="_blank" style="font-size:10px;color:var(--tl);text-decoration:none">↗ サロンページを確認</a></div>
+      </div>
+    </div>
+    <div id="hpbEditForm" style="display:none;margin-top:20px;padding-top:18px;border-top:1px solid var(--bd)">
+      <div style="font-size:11px;color:var(--txm);margin-bottom:12px">${curHpbStore} の数値を確認・入力して「保存」を押してください。</div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px">
+        <div class="fg" style="flex:1;min-width:130px"><label class="fl">口コミ数（件）</label><input class="fi" id="hpbReviews" type="number" value="${hs.reviews}" /></div>
+        <div class="fg" style="flex:1;min-width:130px"><label class="fl">前月口コミ数（件）</label><input class="fi" id="hpbReviewsPrev" type="number" value="${hs.reviewsPrev||hs.reviews}" /><div style="font-size:9px;color:var(--txd);margin-top:3px">先月末時点の口コミ数を入力</div></div>
+        <div class="fg" style="flex:1;min-width:130px"><label class="fl">評価スコア（★）</label><input class="fi" id="hpbRating" type="number" step="0.01" value="${hs.rating}" /></div>
+        <div class="fg" style="flex:1;min-width:130px"><label class="fl">ブログ投稿数（件）</label><input class="fi" id="hpbBlogs" type="number" value="${hs.blogs}" /></div>
+        <div class="fg" style="flex:1;min-width:130px"><label class="fl">掲載順位</label><input class="fi" id="hpbRanking" type="number" value="${hs.ranking}" /></div>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <button class="btn btn-p" onclick="saveHpbStats()">保存</button>
+        <button class="btn" onclick="toggleHpbEdit()">キャンセル</button>
+        <div id="hpbSaveMsg" style="font-size:11px;display:none;color:var(--em)"></div>
+      </div>
+    </div>
+  </div></div>
+  </div>`;
+  renderHpbTable(monthly);
+}
+
+function renderHpbTable(monthly){
+  const el=document.getElementById('hpbTbl');if(!el)return;
+  let h=`<table><thead><tr><th>月</th><th>HPB来店数</th><th>前月比</th><th>累計</th></tr></thead><tbody>`;
+  let cum=0;
+  monthly.forEach((x,i)=>{
+    cum+=x.hpb;
+    const prev=i>0?monthly[i-1].hpb:null;
+    let diff='—',dc='var(--txm)';
+    if(prev!==null){const d=x.hpb-prev;diff=(d>=0?'+':'')+d;dc=d>0?'var(--em)':d<0?'var(--rs)':'var(--txm)';}
+    h+=`<tr><td style="font-weight:600">${x.month}</td><td class="hl">${x.hpb}</td><td style="color:${dc};font-weight:600">${diff}</td><td style="color:var(--txm)">${cum}</td></tr>`;
+  });
+  const tot=monthly.reduce((s,x)=>s+x.hpb,0);
+  h+=`<tr class="rws"><td colspan="2">合計</td><td></td><td class="hl">${tot}</td></tr>`;
+  h+=`</tbody></table>`;
+  el.innerHTML=h;
+}
+
+function initHPBC(){
+  const monthly=getHpbMonthly().filter(x=>x.hpb>0);
+  if(!monthly.length)return;
+  const c=document.getElementById('cHM');if(!c)return;
+  charts['cHM']=new Chart(c,{
+    type:'line',
+    data:{
+      labels:monthly.map(x=>x.month),
+      datasets:[{
+        label:'HPB来店数',
+        data:monthly.map(x=>x.hpb),
+        borderColor:'#FF6B4A',
+        backgroundColor:'rgba(255,107,74,.12)',
+        borderWidth:3,
+        pointRadius:6,
+        pointBackgroundColor:'#FF6B4A',
+        pointBorderColor:'#0D1117',
+        pointBorderWidth:2,
+        pointHoverRadius:8,
+        tension:.35,
+        fill:true
+      }]
+    },
+    options:{
+      ...CO,
+      plugins:{
+        ...CO.plugins,
+        datalabels:{
+          display:true,
+          color:'#fff',
+          font:{weight:'bold',size:11,family:'Outfit'},
+          anchor:'top',
+          align:'top',
+          offset:4,
+          formatter:(v)=>v+'人',
+          textShadowColor:'rgba(0,0,0,0.8)',
+          textShadowBlur:4
+        }
+      }
+    }
+  });
+}
+
+function toggleHpbEdit(){
+  const form=document.getElementById('hpbEditForm');
+  const btn=document.getElementById('hpbEditBtn');
+  if(!form||!btn)return;
+  const opening=form.style.display==='none';
+  form.style.display=opening?'block':'none';
+  btn.textContent=opening?'✕ 閉じる':'✏ 編集';
+}
+function saveHpbStats(){
+  const reviews=parseInt(document.getElementById('hpbReviews')?.value)||0;
+  const reviewsPrev=parseInt(document.getElementById('hpbReviewsPrev')?.value)||reviews;
+  const rating=parseFloat(document.getElementById('hpbRating')?.value)||0;
+  const blogs=parseInt(document.getElementById('hpbBlogs')?.value)||0;
+  const ranking=parseInt(document.getElementById('hpbRanking')?.value)||0;
+  const today=new Date().toISOString().slice(0,10);
+  if(!hpbStatsByStore[curHpbStore])hpbStatsByStore[curHpbStore]={};
+  Object.assign(hpbStatsByStore[curHpbStore],{reviews,reviewsPrev,rating,blogs,ranking,lastUpdated:today});
+  try{localStorage.setItem('hpb_dashboard_config',JSON.stringify({stores,apiKey,hpbStatsByStore}));}catch(e){}
+  const msg=document.getElementById('hpbSaveMsg');
+  if(msg){msg.style.display='block';msg.textContent='✓ '+curHpbStore+' を保存しました（'+today+'）';}
+  setTimeout(()=>renderMain(),800);
+}
+// ===== ここまで =====
+
+function openSettings(){document.getElementById('settingsModal').classList.add('show');document.getElementById('mApiKey').value=apiKey;renderStoreEdit();}
+function closeSettings(){document.getElementById('settingsModal').classList.remove('show');}
+function renderStoreEdit(){const el=document.getElementById('storeListEdit');el.innerHTML=stores.map((s,i)=>`<div class="se-row"><input class="fi se-nm" value="${s.name}" data-idx="${i}" placeholder="店舗名" /><input class="fi" value="${s.id}" data-idx="${i}" placeholder="スプレッドシートID" /><button class="del-b" onclick="delStore(${i})">削除</button></div>`).join('');}
+function addStoreRow(){stores.push({name:'',id:''});renderStoreEdit();}
+function delStore(i){if(stores.length<=1)return;stores.splice(i,1);storeData={};liveStores.clear();renderStoreEdit();}
+function saveSettings(){apiKey=document.getElementById('mApiKey').value.trim();document.querySelectorAll('.se-row').forEach(row=>{const inputs=row.querySelectorAll('input');const idx=parseInt(inputs[0].dataset.idx);if(stores[idx]){stores[idx].name=inputs[0].value.trim();stores[idx].id=inputs[1].value.trim();}});try{localStorage.setItem('hpb_dashboard_config',JSON.stringify({stores,apiKey,hpbStatsByStore}));}catch(e){}fetchAllStores();}
+async function refreshData(btn){if(btn){btn.disabled=true;btn.textContent='更新中…';}storeData={};liveStores.clear();await fetchAllStores();if(btn){btn.disabled=false;btn.textContent='↺ 手動更新';}}
+
+renderSidebar();renderMain();
+// Auto-fetch on page load for stores with configured spreadsheet IDs
+if(stores.some(s=>s.id)&&apiKey){setTimeout(()=>{const el=document.getElementById('mainC');el.innerHTML='<div class="fade" style="display:flex;align-items:center;justify-content:center;min-height:60vh;flex-direction:column;gap:12px"><div style="width:24px;height:24px;border:2px solid var(--bd);border-top:2px solid var(--ac);border-radius:50%;animation:spin .8s linear infinite"></div><div style="color:var(--txm);font-size:13px">スプレッドシートからデータを取得中…</div></div>';fetchAllStores();},300);}
+</script>
+</body>
+</html>
