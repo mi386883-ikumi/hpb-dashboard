@@ -469,7 +469,6 @@ function renderSales(el){
   <div class="ph"><div><div class="pt" style="color:#F0C846">💰 売上管理</div><div class="pd">${curYear}年 全店舗の売上推移</div></div></div>
   ${statusHTML()}
   <div class="kr">
-    <div class="kp" style="--kc:#F0C846;grid-column:span 2"><div class="kl">${dispLabel}</div><div class="kv" style="color:#F0C846;font-size:28px">¥${dispTotal.toLocaleString()}</div><div class="kn">${dispSub}</div></div>
     ${stores.map((s,i)=>{
       const v=curFilterMonth?(storeMonthly[i]?.[curFilterMonth]||0):(ms.reduce((a,m)=>a+(storeMonthly[i]?.[m]||0),0));
       if(!storeMonthly[i])return'';
