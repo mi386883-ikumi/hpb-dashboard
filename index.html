@@ -480,10 +480,8 @@ function renderSales(el){
     }).join('')}
     <div class="kp" style="--kc:#F0C846"><div class="kl">${curFilterMonth?curFilterMonth+'　合計売上':'合計売上（年商）'}</div><div class="kv" style="color:#F0C846;font-size:16px">¥${dispTotal.toLocaleString()}</div><div class="kn">${dispSub}　全${activeStores.length}店舗</div></div>
   </div>
-  <div class="g2">
-    <div class="cd"><div class="ct"><span class="cdot" style="background:#F0C846"></span>月別売上推移</div><div class="csu">全店舗合計の月次売上</div><div class="cb" style="height:280px"><canvas id="cSalesBar"></canvas></div></div>
-    <div class="cd"><div class="ct"><span class="cdot" style="background:#8B7CF6"></span>店舗別売上推移</div><div class="csu">店舗ごとの月次推移</div><div class="cb" style="height:280px"><canvas id="cSalesLine"></canvas></div></div>
-  </div>
+  <div class="gf"><div class="cd"><div class="ct"><span class="cdot" style="background:#8B7CF6"></span>店舗別売上推移</div><div class="csu">店舗ごとの月次推移</div><div class="cb" style="height:420px"><canvas id="cSalesLine"></canvas></div></div></div>
+  <div class="gf"><div class="cd"><div class="ct"><span class="cdot" style="background:#F0C846"></span>月別売上推移</div><div class="csu">全店舗合計の月次売上</div><div class="cb" style="height:380px"><canvas id="cSalesBar"></canvas></div></div></div>
   <div class="cd" style="margin-bottom:16px"><div class="ct"><span class="cdot" style="background:#F0C846"></span>店舗別 月次売上一覧</div><div class="csu">各店舗の月ごとの売上金額</div>
   <div class="tw"><table><thead><tr><th>店舗名</th>${ms.map(m=>`<th>${m}</th>`).join('')}<th>年間合計</th></tr></thead><tbody>
   ${stores.map((s,i)=>{
@@ -507,7 +505,7 @@ function initSalesC(){
   const storeMonthly={};
   stores.forEach((s,i)=>{const d=getStoreYear(i,curYear);if(!d)return;storeMonthly[i]={};d.monthly.forEach(m=>{storeMonthly[i][m.month]=m.sales||0;});});
   const monthTotals=ms.map(m=>{let t=0;stores.forEach((_,i)=>{t+=(storeMonthly[i]?.[m]||0);});return t;});
-  mkBar('cSalesBar',ms,[{label:'売上合計',data:monthTotals,backgroundColor:'rgba(240,200,70,.75)',borderColor:'#F0C846',borderWidth:1,borderRadius:6,barPercentage:.7,categoryPercentage:.8}]);
+  mkLine('cSalesBar',ms,[{label:'売上合計',data:monthTotals,borderColor:'#F0C846',backgroundColor:'rgba(240,200,70,.12)',borderWidth:2.5,pointRadius:5,pointBackgroundColor:'#F0C846',pointBorderColor:'#0D1117',pointBorderWidth:2,tension:.35,fill:true}]);
   const activeIdx=stores.map((_,i)=>i).filter(i=>storeMonthly[i]&&Object.values(storeMonthly[i]).some(v=>v>0));
   mkLine('cSalesLine',ms,activeIdx.map(i=>({label:stores[i].name,data:ms.map(m=>storeMonthly[i]?.[m]||0),borderColor:SC[i%SC.length],backgroundColor:'transparent',borderWidth:2,pointRadius:4,pointBackgroundColor:SC[i%SC.length],tension:.35})));
 }
