@@ -435,7 +435,7 @@ function renderRank(id){const el=document.getElementById(id);if(!el)return;const
 
 // ===== HPマーケティング ページ =====
 let curHpStore='大森院';
-function getHpMonthly(){const map={};const idxs=curHpStore?[stores.findIndex(s=>s.name===curHpStore)].filter(i=>i>=0):stores.map((_,i)=>i);idxs.forEach(i=>{const d=getStoreYear(i,curYear);if(!d)return;const months=curFilterMonth?d.monthly.filter(m=>m.month===curFilterMonth):d.monthly;months.forEach(m=>{map[m.month]=(map[m.month]||0)+(m.HP||0);});});return MO.filter(m=>map[m]!==undefined&&map[m]>=0).map(m=>({month:m,hp:map[m]||0})).filter((_,i,a)=>a.some(x=>x.hp>0));}
+function getHpMonthly(yearOverride){const yr=yearOverride||curYear;const map={};const idxs=curHpStore?[stores.findIndex(s=>s.name===curHpStore)].filter(i=>i>=0):stores.map((_,i)=>i);idxs.forEach(i=>{const d=getStoreYear(i,yr);if(!d)return;const months=curFilterMonth?d.monthly.filter(m=>m.month===curFilterMonth):d.monthly;months.forEach(m=>{map[m.month]=(map[m.month]||0)+(m.HP||0);});});return MO.filter(m=>map[m]!==undefined&&map[m]>=0).map(m=>({month:m,hp:map[m]||0})).filter((_,i,a)=>a.some(x=>x.hp>0));}
 function renderHPPage(el){
   const monthly=getHpMonthly().filter(x=>x.hp>0);
   const totalHp=monthly.reduce((s,m)=>s+m.hp,0);
@@ -450,7 +450,7 @@ function renderHPPage(el){
     <div class="kp" style="--kc:#F0C846"><div class="kl">最多来院月</div><div class="kv" style="color:#F0C846">${peakMonth}</div><div class="kn">${curYear}年</div></div>
   </div>
   <div class="g2">
-    <div class="cd"><div class="ct"><span class="cdot" style="background:#3ECFB4"></span>HP来店 月別推移</div><div class="csu">HP+MEO+Gマップ 合算</div><div class="cb" style="height:260px"><canvas id="cHPM"></canvas></div></div>
+    <div class="cd"><div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px"><div><div class="ct"><span class="cdot" style="background:#3ECFB4"></span>HP来店 月別推移</div><div class="csu">HP+MEO+Gマップ 合算 — ${curHpStore}</div></div><div style="display:flex;gap:4px"><button class="yr-btn ${!window._hpCompare?'on':''}" onclick="window._hpCompare=false;renderMain()">${curYear}年のみ</button><button class="yr-btn ${window._hpCompare?'on':''}" onclick="window._hpCompare=true;renderMain()">年比較</button></div></div><div class="cb" style="height:260px"><canvas id="cHPM"></canvas></div></div>
     <div class="cd"><div class="ct"><span class="cdot" style="background:#60A5FA"></span>全店舗 HP来店比較</div><div class="csu">${curYear}年 累計</div><div id="rankHP"></div></div>
   </div>
   <div class="cd"><div class="ct"><span class="cdot" style="background:#3ECFB4"></span>HP来店 月別データ</div><div class="csu">${curHpStore} — ${curYear}年</div><div class="tw"><table><thead><tr><th>月</th><th>HP来店数</th><th>前月比</th></tr></thead><tbody>${monthly.map((m,i)=>{const prev=i>0?monthly[i-1].hp:0;const diff=i>0?m.hp-prev:0;const diffStr=i>0?(diff>=0?`<span style="color:#34D399">+${diff}</span>`:`<span style="color:#FB7185">${diff}</span>`):'—';return`<tr><td>${m.month}</td><td class="hl">${m.hp}</td><td>${diffStr}</td></tr>`;}).join('')}<tr class="rws"><td>合計</td><td>${totalHp}</td><td></td></tr></tbody></table></div></div>
@@ -461,10 +461,16 @@ function renderHPPage(el){
   const rankEl=document.getElementById('rankHP');
   if(rankEl)rankEl.innerHTML=`<div class="rl">${ranked.map((s,i)=>`<div class="ri"><span class="rp">${i+1}</span><span class="rn">${s.name}</span><div class="rbt"><div class="rb" style="width:${Math.max((s.hp/maxHp*100),8).toFixed(1)}%;background:${s.color}">${s.hp}</div></div></div>`).join('')}</div>`;
 }
-function initHPC(){const m=getHpMonthly().filter(x=>x.hp>0);mkLine('cHPM',m.map(x=>x.month),[{label:'HP来店',data:m.map(x=>x.hp),borderColor:'#3ECFB4',backgroundColor:'rgba(62,207,180,.15)',borderWidth:2.5,pointRadius:5,pointBackgroundColor:'#3ECFB4',pointBorderColor:'#0D1117',pointBorderWidth:2,tension:.35,fill:true}]);}
+function initHPC(){
+  const m=getHpMonthly().filter(x=>x.hp>0);
+  const ds=[{label:curYear+'年 HP来店',data:MO.map(mo=>{const f=m.find(x=>x.month===mo);return f?f.hp:null;}),borderColor:'#3ECFB4',backgroundColor:'rgba(62,207,180,.15)',borderWidth:2.5,pointRadius:5,pointBackgroundColor:'#3ECFB4',pointBorderColor:'#0D1117',pointBorderWidth:2,tension:.35,fill:true,spanGaps:true}];
+  if(window._hpCompare){const otherYr=curYear===2026?2025:2026;const m2=getHpMonthly(otherYr);ds.push({label:otherYr+'年 HP来店',data:MO.map(mo=>{const f=m2.find(x=>x.month===mo);return f?f.hp:null;}),borderColor:'rgba(62,207,180,.35)',backgroundColor:'transparent',borderWidth:2,borderDash:[6,4],pointRadius:4,pointBackgroundColor:'rgba(62,207,180,.5)',pointBorderColor:'#0D1117',pointBorderWidth:1,tension:.35,fill:false,spanGaps:true});}
+  const labels=MO.filter(mo=>ds.some(d=>d.data[MO.indexOf(mo)]!=null));const filtered=ds.map(d=>({...d,data:labels.map(mo=>d.data[MO.indexOf(mo)])}));
+  mkLine('cHPM',labels,filtered);
+}
 
 // ===== ホットペッパーマーケティング ページ =====
-function getHpbMonthly(){const map={};const idxs=curHpbStore?[stores.findIndex(s=>s.name===curHpbStore)].filter(i=>i>=0):stores.map((_,i)=>i);idxs.forEach(i=>{const d=getStoreYear(i,curYear);if(!d)return;const months=curFilterMonth?d.monthly.filter(m=>m.month===curFilterMonth):d.monthly;months.forEach(m=>{map[m.month]=(map[m.month]||0)+m.HPB;});});return MO.filter(m=>map[m]!==undefined&&map[m]>=0).map(m=>({month:m,hpb:map[m]||0})).filter((_,i,a)=>a.some(x=>x.hpb>0));}
+function getHpbMonthly(yearOverride){const yr=yearOverride||curYear;const map={};const idxs=curHpbStore?[stores.findIndex(s=>s.name===curHpbStore)].filter(i=>i>=0):stores.map((_,i)=>i);idxs.forEach(i=>{const d=getStoreYear(i,yr);if(!d)return;const months=curFilterMonth?d.monthly.filter(m=>m.month===curFilterMonth):d.monthly;months.forEach(m=>{map[m.month]=(map[m.month]||0)+m.HPB;});});return MO.filter(m=>map[m]!==undefined&&map[m]>=0).map(m=>({month:m,hpb:map[m]||0})).filter((_,i,a)=>a.some(x=>x.hpb>0));}
 
 function renderHPB(el){
   if(!hpbStatsByStore[curHpbStore])curHpbStore=stores[0]?.name||'大森院';
@@ -487,8 +493,10 @@ function renderHPB(el){
     <div class="kp" style="--kc:#38BDF8"><div class="kl">掲載順位（${hs.rankingKeyword||curHpbStore}）</div><div class="kv" style="color:#38BDF8">${hs.ranking?hs.ranking+'<span style="font-size:13px;color:var(--txm);margin-left:4px">位</span>':'<span style="font-size:18px;color:var(--txd)">圏外</span>'}</div><div class="kn">最終確認 ${hs.lastUpdated}</div></div>
   </div>
   <div class="gf"><div class="cd">
-    <div class="ct"><span class="cdot" style="background:#FF6B4A"></span>月別 HPB来店数</div>
-    <div class="csu">${curYear}年 ホットペッパー経由 月次推移 — ${curHpbStore}</div>
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px">
+      <div><div class="ct"><span class="cdot" style="background:#FF6B4A"></span>月別 HPB来店数</div><div class="csu">ホットペッパー経由 月次推移 — ${curHpbStore}</div></div>
+      <div style="display:flex;gap:4px"><button class="yr-btn ${!window._hpbCompare?'on':''}" onclick="window._hpbCompare=false;renderMain()">${curYear}年のみ</button><button class="yr-btn ${window._hpbCompare?'on':''}" onclick="window._hpbCompare=true;renderMain()">年比較</button></div>
+    </div>
     <div class="cb" style="height:280px"><canvas id="cHM"></canvas></div>
   </div></div>
   <div class="gf"><div class="cd">
@@ -567,25 +575,12 @@ function initHPBC(){
   const monthly=getHpbMonthly().filter(x=>x.hpb>0);
   if(!monthly.length)return;
   const c=document.getElementById('cHM');if(!c)return;
+  const ds=[{label:curYear+'年 HPB来店数',data:MO.map(mo=>{const f=monthly.find(x=>x.month===mo);return f?f.hpb:null;}),borderColor:'#FF6B4A',backgroundColor:'rgba(255,107,74,.12)',borderWidth:3,pointRadius:6,pointBackgroundColor:'#FF6B4A',pointBorderColor:'#0D1117',pointBorderWidth:2,pointHoverRadius:8,tension:.35,fill:true,spanGaps:true}];
+  if(window._hpbCompare){const otherYr=curYear===2026?2025:2026;const m2=getHpbMonthly(otherYr);ds.push({label:otherYr+'年 HPB来店数',data:MO.map(mo=>{const f=m2.find(x=>x.month===mo);return f?f.hpb:null;}),borderColor:'rgba(255,107,74,.35)',backgroundColor:'transparent',borderWidth:2,borderDash:[6,4],pointRadius:4,pointBackgroundColor:'rgba(255,107,74,.5)',pointBorderColor:'#0D1117',pointBorderWidth:1,tension:.35,fill:false,spanGaps:true});}
+  const labels=MO.filter(mo=>ds.some(d=>d.data[MO.indexOf(mo)]!=null));const filtered=ds.map(d=>({...d,data:labels.map(mo=>d.data[MO.indexOf(mo)])}));
   charts['cHM']=new Chart(c,{
     type:'line',
-    data:{
-      labels:monthly.map(x=>x.month),
-      datasets:[{
-        label:'HPB来店数',
-        data:monthly.map(x=>x.hpb),
-        borderColor:'#FF6B4A',
-        backgroundColor:'rgba(255,107,74,.12)',
-        borderWidth:3,
-        pointRadius:6,
-        pointBackgroundColor:'#FF6B4A',
-        pointBorderColor:'#0D1117',
-        pointBorderWidth:2,
-        pointHoverRadius:8,
-        tension:.35,
-        fill:true
-      }]
-    },
+    data:{labels,datasets:filtered},
     options:{
       ...CO,
       plugins:{
@@ -597,7 +592,7 @@ function initHPBC(){
           anchor:'top',
           align:'top',
           offset:4,
-          formatter:(v)=>v+'人',
+          formatter:(v)=>v!=null?v+'人':'',
           textShadowColor:'rgba(0,0,0,0.8)',
           textShadowBlur:4
         }
