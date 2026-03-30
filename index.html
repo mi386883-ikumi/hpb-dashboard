@@ -281,7 +281,7 @@ function renderAlerts(el){
         <div style="flex:1;min-width:160px;background:var(--sf2);border:1px solid var(--bd);border-radius:var(--rr);padding:12px 14px">
           <div style="font-size:9px;color:var(--txd);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;font-weight:600">⭐ 口コミカウンター</div>
           <div style="display:flex;align-items:baseline;gap:6px;margin-bottom:6px">
-            <span style="font-family:'Outfit';font-size:24px;font-weight:700;color:#F472B6;line-height:1">${r.hs.reviews||0}</span>
+            <span onclick="editReviewCount('${r.name}')" style="font-family:'Outfit';font-size:24px;font-weight:700;color:#F472B6;line-height:1;cursor:pointer;border-bottom:1px dashed rgba(244,114,182,.4)" title="クリックで直接入力">${r.hs.reviews||0}</span>
             <span style="font-size:11px;color:var(--txm)">件</span>
             ${revBadge}
           </div>
@@ -303,6 +303,18 @@ function renderAlerts(el){
     アラート基準：ブログ＝目安頻度×3倍以上 経過 / 口コミ＝14日以上 経過
   </div>
   </div>`;
+}
+function editReviewCount(storeName){
+  if(!hpbStatsByStore[storeName])return;
+  const hs=hpbStatsByStore[storeName];
+  const val=prompt(`「${storeName}」の口コミ数を入力してください：`,hs.reviews||0);
+  if(val===null)return;
+  const num=parseInt(val);
+  if(isNaN(num)||num<0){alert('正しい数字を入力してください');return;}
+  if(hs.reviewsPrev==null)hs.reviewsPrev=hs.reviews||0;
+  hs.reviews=num;
+  try{localStorage.setItem('hpb_dashboard_config',JSON.stringify({stores,apiKey,hpbStatsByStore}));}catch(e){}
+  renderMain();
 }
 function adjReview(storeName,delta){
   if(!hpbStatsByStore[storeName])return;
