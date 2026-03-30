@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>集客レポート — 全店舗統合ダッシュボード</title>
+<title>武田グループ管理画面</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;600;700;900&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
@@ -28,7 +28,7 @@
 <body>
 <button class="mt" onclick="document.querySelector('.sb').classList.toggle('open')">☰</button>
 <div class="shell">
-<nav class="sb" id="sidebar"><div class="sb-hd"><div class="sb-brand">集客レポート</div><div class="sb-sub">全店舗統合ダッシュボード</div></div><div class="sb-nav" id="sbNav"></div><div class="sb-ft"><button class="sb-btn" onclick="openSettings()">⚙ 店舗管理・API設定</button></div></nav>
+<nav class="sb" id="sidebar"><div class="sb-hd"><div class="sb-brand">武田グループ</div><div class="sb-sub">管理画面</div></div><div class="sb-nav" id="sbNav"></div><div class="sb-ft"><button class="sb-btn" onclick="openSettings()">⚙ 店舗管理・API設定</button></div></nav>
 <div class="mn" id="mainC"></div>
 </div>
 <div class="mo" id="settingsModal"><div class="ml"><h2>店舗管理・API設定</h2><div class="ml-sub">APIキーは全店舗共通。各店舗のスプレッドシートIDを入力してください。<br>スプレッドシートは「リンクを知っている全員が閲覧可」にしてください。</div><div class="fg"><label class="fl">Google Sheets APIキー</label><input class="fi" id="mApiKey" placeholder="AIza..." /></div><div class="fg"><label class="fl">HPB自動取得 GASエンドポイントURL（任意）</label><input class="fi" id="mGasEndpoint" placeholder="https://script.google.com/macros/s/.../exec" /><div style="font-size:10px;color:var(--txd);margin-top:4px">Google Apps ScriptをWebアプリとして公開したURLを入力すると、HPBの口コミ数・評価・ブログ数を自動取得できます。</div></div><div class="fg"><label class="fl">店舗一覧</label><div class="sl-edit" id="storeListEdit"></div><button class="btn" onclick="addStoreRow()" style="margin-top:5px">＋ 店舗を追加</button></div><div class="ma"><button class="btn" onclick="closeSettings()">キャンセル</button><button class="btn btn-p" onclick="saveSettings()">保存してデータ取得</button></div><div id="sStatus" style="margin-top:10px;font-size:11px;display:none"></div></div></div>
@@ -105,17 +105,17 @@ async function fetchStore(idx){
     for(const year of YEARS){
       const data={monthly:[],daily:{}};
       const ranges=[];const monthMap=[];
-      // 名前付きシート（日報 202501 等）
+      // 名前付きシート（日報 202501 等）— 各3レンジ：summary+daily+sales
       for(let m=1;m<=12;m++){
         const name=`日報 ${year}${String(m).padStart(2,'0')}`;
         if(!titles.includes(name))continue;
-        ranges.push(`'${name}'!B38:N38`);ranges.push(`'${name}'!A3:N33`);
+        ranges.push(`'${name}'!B38:N38`);ranges.push(`'${name}'!A3:N33`);ranges.push(`'${name}'!AA38`);
         monthMap.push({month:MO[m-1],m});
       }
-      // 「日報」シート（当月分）
+      // 「日報」シート（当月分）— 4レンジ：probe+summary+daily+sales
       let nippoIdx=-1;
       if(titles.includes('日報')&&year===new Date().getFullYear()){
-        ranges.push(`'日報'!A3`);ranges.push(`'日報'!B38:N38`);ranges.push(`'日報'!A3:N33`);
+        ranges.push(`'日報'!A3`);ranges.push(`'日報'!B38:N38`);ranges.push(`'日報'!A3:N33`);ranges.push(`'日報'!AA38`);
         nippoIdx=monthMap.length;
       }
       if(ranges.length===0)continue;
@@ -125,23 +125,24 @@ async function fetchStore(idx){
       if(!batchRes.ok)continue;
       const vrs=(await batchRes.json()).valueRanges||[];
       const fetchedMs=new Set();
-      // 名前付きシートを処理（各2レンジ：summary+daily）
+      function parseSalesCell(vr){const raw=vr?.values?.[0]?.[0];return parseInt(String(raw||'').replace(/[¥￥,\s]/g,''))||0;}
+      // 名前付きシートを処理（各3レンジ：summary+daily+sales）
       for(let i=0;i<monthMap.length;i++){
-        const sv=vrs[i*2]?.values?.[0];
-        if(sv){const v=sv.map(x=>parseInt(String(x).replace(/,/g,''))||0);data.monthly.push({month:monthMap[i].month,...parseRow38(v)});fetchedMs.add(monthMap[i].m);}
-        const dv=vrs[i*2+1]?.values;
+        const sv=vrs[i*3]?.values?.[0];
+        if(sv){const v=sv.map(x=>parseInt(String(x).replace(/,/g,''))||0);const sales=parseSalesCell(vrs[i*3+2]);data.monthly.push({month:monthMap[i].month,sales,...parseRow38(v)});fetchedMs.add(monthMap[i].m);}
+        const dv=vrs[i*3+1]?.values;
         if(dv)data.daily[monthMap[i].month]=parseDailyRows(dv);
       }
-      // 「日報」シートを処理（3レンジ：probe+summary+daily）
+      // 「日報」シートを処理（4レンジ：probe+summary+daily+sales）
       if(nippoIdx>=0){
-        const base=nippoIdx*2;
+        const base=nippoIdx*3;
         const probeVal=vrs[base]?.values?.[0]?.[0]?.toString()||'';
         const mm=probeVal.match(/^(\d{1,2})\//);
         if(mm){
           const curM=parseInt(mm[1]);
           if(!fetchedMs.has(curM)){
             const sv=vrs[base+1]?.values?.[0];
-            if(sv){const v=sv.map(x=>parseInt(String(x).replace(/,/g,''))||0);data.monthly.push({month:MO[curM-1],...parseRow38(v)});}
+            if(sv){const v=sv.map(x=>parseInt(String(x).replace(/,/g,''))||0);const sales=parseSalesCell(vrs[base+3]);data.monthly.push({month:MO[curM-1],sales,...parseRow38(v)});}
             const dv=vrs[base+2]?.values;
             if(dv)data.daily[MO[curM-1]]=parseDailyRows(dv);
           }
@@ -159,7 +160,7 @@ function getStoreYear(idx,year){return storeData[idx]?.[year]||null;}
 function aggAll(){const map={};stores.forEach((_,i)=>{const d=getStoreYear(i,curYear);if(!d)return;const months=curFilterMonth?d.monthly.filter(m=>m.month===curFilterMonth):d.monthly;months.forEach(m=>{if(!map[m.month]){map[m.month]={month:m.month,total:0};CH.forEach(k=>map[m.month][k]=0);}CH.forEach(k=>map[m.month][k]+=(m[k]||0));map[m.month].total+=m.total;});});return MO.filter(m=>map[m]).map(m=>map[m]);}
 function getMonths(){const s=new Set();stores.forEach((_,i)=>{const d=getStoreYear(i,curYear);if(d)d.monthly.forEach(m=>s.add(m.month));});return MO.filter(m=>s.has(m));}
 
-function renderSidebar(){let h=`<div class="sb-sec">総合</div><div class="ni sp ${curView==='all'?'on':''}" onclick="nav('all')"><span class="nd"></span>全店舗 合計</div><div class="ni cp ${curView==='compare'?'on':''}" onclick="nav('compare')"><span class="nd"></span>店舗比較</div><div class="ni ${curView==='hpb'?'on':''}" onclick="nav('hpb')" style="color:#FF6B4A"><span class="nd" style="background:#FF6B4A"></span>ホットペッパーマーケティング</div><div class="ni ${curView==='hp'?'on':''}" onclick="nav('hp')" style="color:#3ECFB4"><span class="nd" style="background:#3ECFB4"></span>HPマーケティング</div><div class="ni ${curView==='alerts'?'on':''}" onclick="nav('alerts')" style="color:#FB7185"><span class="nd" style="background:#FB7185"></span>⚠ HPB更新アラート</div><div class="sb-sec">店舗別</div>`;stores.forEach((s,i)=>{const lv=liveStores.has(i);h+=`<div class="ni ${curView===i?'on':''}" onclick="nav(${i})"><span class="nd" style="background:${SC[i%SC.length]}"></span>${s.name}${lv?'<span class="live-dot">●</span>':''}</div>`;});document.getElementById('sbNav').innerHTML=h;}
+function renderSidebar(){let h=`<div class="sb-sec">総合</div><div class="ni sp ${curView==='all'?'on':''}" onclick="nav('all')"><span class="nd"></span>全店舗 合計</div><div class="ni cp ${curView==='compare'?'on':''}" onclick="nav('compare')"><span class="nd"></span>店舗比較</div><div class="ni ${curView==='sales'?'on':''}" onclick="nav('sales')" style="color:#F0C846"><span class="nd" style="background:#F0C846"></span>売上管理</div><div class="ni ${curView==='hpb'?'on':''}" onclick="nav('hpb')" style="color:#FF6B4A"><span class="nd" style="background:#FF6B4A"></span>ホットペッパーマーケティング</div><div class="ni ${curView==='hp'?'on':''}" onclick="nav('hp')" style="color:#3ECFB4"><span class="nd" style="background:#3ECFB4"></span>HPマーケティング</div><div class="ni ${curView==='alerts'?'on':''}" onclick="nav('alerts')" style="color:#FB7185"><span class="nd" style="background:#FB7185"></span>⚠ HPB更新アラート</div><div class="sb-sec">店舗別</div>`;stores.forEach((s,i)=>{const lv=liveStores.has(i);h+=`<div class="ni ${curView===i?'on':''}" onclick="nav(${i})"><span class="nd" style="background:${SC[i%SC.length]}"></span>${s.name}${lv?'<span class="live-dot">●</span>':''}</div>`;});document.getElementById('sbNav').innerHTML=h;}
 function nav(v){curView=v;renderSidebar();renderMain();document.querySelector('.sb').classList.remove('open');}
 function setYear(y){curYear=y;curFilterMonth=null;renderMain();}
 function setFilterMonth(m){curFilterMonth=m;renderMain();}
@@ -172,7 +173,7 @@ function mkBar(id,labels,ds){const c=document.getElementById(id);if(!c)return;ch
 function mkLine(id,labels,ds){const c=document.getElementById(id);if(!c)return;charts[id]=new Chart(c,{type:'line',data:{labels,datasets:ds},options:CO});}
 function mkDoughnut(id,labels,data,colors){const c=document.getElementById(id);if(!c)return;const total=data.reduce((a,b)=>a+b,0);charts[id]=new Chart(c,{type:'doughnut',data:{labels,datasets:[{data,backgroundColor:colors,borderColor:'#0D1117',borderWidth:3}]},options:{responsive:true,maintainAspectRatio:false,cutout:'58%',plugins:{legend:{position:'right',labels:{color:'#7D8CA1',font:{family:'Noto Sans JP',size:10},padding:10,boxWidth:10}},tooltip:CO.plugins.tooltip,datalabels:{display:true,color:'#fff',font:{weight:'bold',size:11,family:'Noto Sans JP'},formatter:(v)=>{if(!total||v===0)return '';const p=(v/total*100).toFixed(1);return parseFloat(p)<5?'':p+'%';},textShadowColor:'rgba(0,0,0,0.7)',textShadowBlur:4}}}});}
 
-function renderMain(){destroyCharts();const el=document.getElementById('mainC');if(curView==='all')renderAll(el);else if(curView==='compare')renderCompare(el);else if(curView==='hpb')renderHPB(el);else if(curView==='hp')renderHPPage(el);else if(curView==='alerts')renderAlerts(el);else renderStore(el,curView);requestAnimationFrame(()=>initCharts());}
+function renderMain(){destroyCharts();const el=document.getElementById('mainC');if(curView==='all')renderAll(el);else if(curView==='compare')renderCompare(el);else if(curView==='sales')renderSales(el);else if(curView==='hpb')renderHPB(el);else if(curView==='hp')renderHPPage(el);else if(curView==='alerts')renderAlerts(el);else renderStore(el,curView);requestAnimationFrame(()=>initCharts());}
 function showMonthEndBanner(){
   // 月末（25日以降）に登録フォームバナーを表示
   const day=new Date().getDate();
@@ -430,11 +431,75 @@ function renderStore(el,idx){const s=stores[idx],d=getStoreYear(idx,curYear);if(
 function renderStorePills(ms,idx){const el=document.getElementById('sPills');if(!el)return;if(!ms.includes(curMonth))curMonth=ms[0]||'1月';el.innerHTML=ms.map(m=>`<button class="pl ${m===curMonth?'on':''}" onclick="curMonth='${m}';renderStorePills([${ms.map(x=>"'"+x+"'").join(',')}],${idx});renderStoreTbl(${idx});">${m}</button>`).join('');renderStoreTbl(idx);}
 function renderStoreTbl(idx){const el=document.getElementById('sTbl');if(!el)return;const days=getStoreYear(idx,curYear)?.daily?.[curMonth];if(!days){el.innerHTML='<p class="dm" style="padding:10px">データなし</p>';return;}let h=`<table><thead><tr><th>日</th><th>曜</th>`;CH.forEach(k=>h+=`<th>${k}</th>`);h+=`<th>合計</th></tr></thead><tbody>`;days.forEach(r=>{h+=`<tr><td>${r.day}</td><td class="dm">${r.dayName}</td>`;CH.forEach(k=>{const v=r[k]||0;h+=`<td class="${v>0?'hl':'dm'}">${v}</td>`;});h+=`<td style="font-weight:600">${r.total}</td></tr>`;});const tots={};CH.forEach(k=>tots[k]=days.reduce((s,r)=>s+(r[k]||0),0));const gt=days.reduce((s,r)=>s+r.total,0);h+=`<tr class="rws"><td colspan="2">合計</td>`;CH.forEach(k=>h+=`<td class="hl">${tots[k]}</td>`);h+=`<td>${gt}</td></tr></tbody></table>`;el.innerHTML=h;}
 
-function initCharts(){if(curView==='all')initAllC();else if(curView==='compare')initCmpC();else if(curView==='hpb')initHPBC();else if(curView==='hp')initHPC();else initStoreC(curView);}
+function initCharts(){if(curView==='all')initAllC();else if(curView==='compare')initCmpC();else if(curView==='sales')initSalesC();else if(curView==='hpb')initHPBC();else if(curView==='hp')initHPC();else initStoreC(curView);}
 function initAllC(){const a=aggAll();mkBar('cAM',a.map(m=>m.month),[{label:'HPB',data:a.map(m=>m.HPB),backgroundColor:'rgba(255,107,74,.75)',borderColor:'#FF6B4A',borderWidth:1,borderRadius:4,barPercentage:.85,categoryPercentage:.8},{label:'HP',data:a.map(m=>m.HP||0),backgroundColor:'rgba(62,207,180,.75)',borderColor:'#3ECFB4',borderWidth:1,borderRadius:4,barPercentage:.85,categoryPercentage:.8},{label:'チラシ',data:a.map(m=>m['チラシ']||0),backgroundColor:'rgba(240,200,70,.75)',borderColor:'#F0C846',borderWidth:1,borderRadius:4,barPercentage:.85,categoryPercentage:.8},{label:'メタ広告',data:a.map(m=>m['メタ広告']||0),backgroundColor:'rgba(139,124,246,.75)',borderColor:'#8B7CF6',borderWidth:1,borderRadius:4,barPercentage:.85,categoryPercentage:.8},{label:'紹介',data:a.map(m=>m['紹介']||0),backgroundColor:'rgba(244,114,182,.75)',borderColor:'#F472B6',borderWidth:1,borderRadius:4,barPercentage:.85,categoryPercentage:.8}]);const tots={};CH.forEach(k=>tots[k]=a.reduce((s,m)=>s+(m[k]||0),0));const nz=CH.filter(k=>tots[k]>0);mkDoughnut('cAP',nz,nz.map(k=>tots[k]),nz.map(k=>CC[CH.indexOf(k)]));const t5=['HPB','HP','チラシ','minimo','紹介'];mkLine('cAL',a.map(m=>m.month),t5.map(k=>({label:k,data:a.map(m=>m[k]||0),borderColor:CC[CH.indexOf(k)],backgroundColor:'transparent',borderWidth:2,pointRadius:3,pointBackgroundColor:CC[CH.indexOf(k)],tension:.3})));renderRank('rankAll');}
 function initCmpC(){const ms=getMonths();const idxs=getCmpStores();const ch=window._cmpChannel||'HPB';const chLabel=ch==='total'?'全経路合計':ch;const cLine=document.getElementById('cCB');if(cLine){charts['cCB']=new Chart(cLine,{type:'line',data:{labels:ms,datasets:idxs.map(i=>({label:stores[i].name,data:ms.map(m=>{const d=getStoreYear(i,curYear);const mm=d?d.monthly.find(x=>x.month===m):null;return mm?(ch==='total'?mm.total:(mm[ch]||0)):0;}),borderColor:SC[i%SC.length],backgroundColor:SC[i%SC.length]+'20',borderWidth:2.5,pointRadius:5,pointBackgroundColor:SC[i%SC.length],pointBorderColor:'#0D1117',pointBorderWidth:2,pointHoverRadius:7,tension:.35,fill:false}))},options:{...CO,plugins:{...CO.plugins,datalabels:{display:true,color:ctx=>SC[idxs[ctx.datasetIndex]%SC.length]+'EE',font:{weight:'bold',size:10,family:'Outfit'},anchor:'top',align:'top',offset:3,formatter:v=>v>0?v:''}}}});}const ctEl=document.querySelector('#mainC .ct .cdot[style*="var(--ac)"]');if(ctEl){ctEl.parentElement.innerHTML=`<span class="cdot" style="background:var(--ac)"></span>${chLabel}来店数 — 店舗別月次比較`;}renderRank('rankCmp');}
 function initStoreC(idx){const d=getStoreYear(idx,curYear);if(!d)return;const monthly=curFilterMonth?d.monthly.filter(m=>m.month===curFilterMonth):d.monthly;const c=SC[idx%SC.length];mkBar('cSM',monthly.map(m=>m.month),[{label:'HPB',data:monthly.map(m=>m.HPB),backgroundColor:'rgba(255,107,74,.75)',borderColor:'#FF6B4A',borderWidth:1,borderRadius:4,barPercentage:.85,categoryPercentage:.8},{label:'HP',data:monthly.map(m=>m.HP||0),backgroundColor:'rgba(62,207,180,.75)',borderColor:'#3ECFB4',borderWidth:1,borderRadius:4,barPercentage:.85,categoryPercentage:.8},{label:'チラシ',data:monthly.map(m=>m['チラシ']||0),backgroundColor:'rgba(240,200,70,.75)',borderColor:'#F0C846',borderWidth:1,borderRadius:4,barPercentage:.85,categoryPercentage:.8},{label:'メタ広告',data:monthly.map(m=>m['メタ広告']||0),backgroundColor:'rgba(139,124,246,.75)',borderColor:'#8B7CF6',borderWidth:1,borderRadius:4,barPercentage:.85,categoryPercentage:.8},{label:'紹介',data:monthly.map(m=>m['紹介']||0),backgroundColor:'rgba(244,114,182,.75)',borderColor:'#F472B6',borderWidth:1,borderRadius:4,barPercentage:.85,categoryPercentage:.8}]);const tots={};CH.forEach(k=>tots[k]=monthly.reduce((s,m)=>s+(m[k]||0),0));const nz=CH.filter(k=>tots[k]>0);mkDoughnut('cSP',nz,nz.map(k=>tots[k]),nz.map(k=>CC[CH.indexOf(k)]));const t5=['HPB','HP','チラシ','minimo','紹介'];mkLine('cSL',monthly.map(m=>m.month),t5.map(k=>({label:k,data:monthly.map(m=>m[k]||0),borderColor:CC[CH.indexOf(k)],backgroundColor:'transparent',borderWidth:2,pointRadius:3,pointBackgroundColor:CC[CH.indexOf(k)],tension:.3})));}
 function renderRank(id){const el=document.getElementById(id);if(!el)return;const ranked=stores.map((s,i)=>{const d=getStoreYear(i,curYear);return{name:s.name,hpb:d?d.monthly.reduce((a,m)=>a+m.HPB,0):0,color:SC[i%SC.length],live:liveStores.has(i)};}).sort((a,b)=>b.hpb-a.hpb);const max=ranked[0]?.hpb||1;el.innerHTML=`<div class="rl">${ranked.map((s,i)=>`<div class="ri"><span class="rp">${i+1}</span><span class="rn">${s.name}${s.live?' <span style="color:var(--em);font-size:7px">●</span>':''}</span><div class="rbt"><div class="rb" style="width:${Math.max((s.hpb/max*100),8).toFixed(1)}%;background:${s.color}">${s.hpb}</div></div></div>`).join('')}</div>`;}
+
+// ===== 売上管理ページ =====
+function renderSales(el){
+  const ms=getMonths();
+  // 店舗ごと月別売上
+  const storeMonthly={};
+  stores.forEach((s,i)=>{
+    const d=getStoreYear(i,curYear);if(!d)return;
+    storeMonthly[i]={};
+    d.monthly.forEach(m=>{storeMonthly[i][m.month]=m.sales||0;});
+  });
+  // 月別合計
+  const monthTotals={};
+  ms.forEach(m=>{monthTotals[m]=0;stores.forEach((_,i)=>{monthTotals[m]+=(storeMonthly[i]?.[m]||0);});});
+  const grandTotal=Object.values(monthTotals).reduce((a,b)=>a+b,0);
+  const activeStores=stores.filter((_,i)=>storeMonthly[i]&&Object.values(storeMonthly[i]).some(v=>v>0));
+  const avgPerStore=activeStores.length>0?Math.round(grandTotal/activeStores.length):0;
+  const latestMonth=ms[ms.length-1]||'';
+  const latestTotal=monthTotals[latestMonth]||0;
+  const prevMonth=ms.length>=2?ms[ms.length-2]:'';
+  const prevTotal=prevMonth?monthTotals[prevMonth]:0;
+  const diff=prevTotal>0?((latestTotal-prevTotal)/prevTotal*100).toFixed(1):'-';
+  const fmt=v=>v>=10000?(v/10000).toFixed(1)+'万':v.toLocaleString();
+
+  el.innerHTML=`<div class="fade">
+  <div class="ph"><div><div class="pt" style="color:#F0C846">💰 売上管理</div><div class="pd">${curYear}年 全店舗の売上推移</div></div></div>
+  ${statusHTML()}
+  <div class="kr">
+    <div class="kp" style="--kc:#F0C846"><div class="kl">年間売上合計</div><div class="kv" style="color:#F0C846">¥${grandTotal.toLocaleString()}</div><div class="kn">${curYear}年${ms.length>0?ms[0]+'〜'+ms[ms.length-1]:''}</div></div>
+    <div class="kp" style="--kc:#3ECFB4"><div class="kl">店舗平均（年間）</div><div class="kv" style="color:#3ECFB4">¥${avgPerStore.toLocaleString()}</div><div class="kn">${activeStores.length}店舗で算出</div></div>
+    <div class="kp" style="--kc:#FF6B4A"><div class="kl">${latestMonth||'-'} 売上</div><div class="kv" style="color:#FF6B4A">¥${latestTotal.toLocaleString()}</div><div class="kn">${diff!=='-'?(diff>=0?'前月比 +'+diff+'%':'前月比 '+diff+'%'):'前月データなし'}</div></div>
+    <div class="kp" style="--kc:#8B7CF6"><div class="kl">月平均売上</div><div class="kv" style="color:#8B7CF6">¥${ms.length>0?Math.round(grandTotal/ms.length).toLocaleString():'0'}</div><div class="kn">${ms.length}ヶ月間</div></div>
+  </div>
+  <div class="g2">
+    <div class="cd"><div class="ct"><span class="cdot" style="background:#F0C846"></span>月別売上推移</div><div class="csu">全店舗合計の月次売上</div><div class="cb" style="height:280px"><canvas id="cSalesBar"></canvas></div></div>
+    <div class="cd"><div class="ct"><span class="cdot" style="background:#8B7CF6"></span>店舗別売上推移</div><div class="csu">店舗ごとの月次推移</div><div class="cb" style="height:280px"><canvas id="cSalesLine"></canvas></div></div>
+  </div>
+  <div class="cd" style="margin-bottom:16px"><div class="ct"><span class="cdot" style="background:#F0C846"></span>店舗別 月次売上一覧</div><div class="csu">各店舗の月ごとの売上金額</div>
+  <div class="tw"><table><thead><tr><th>店舗名</th>${ms.map(m=>`<th>${m}</th>`).join('')}<th>年間合計</th></tr></thead><tbody>
+  ${stores.map((s,i)=>{
+    if(!storeMonthly[i])return'';
+    const yr=ms.reduce((a,m)=>a+(storeMonthly[i][m]||0),0);
+    if(yr===0)return'';
+    return`<tr><td style="font-weight:600">${s.name}</td>${ms.map(m=>{const v=storeMonthly[i][m]||0;return`<td class="${v>0?'hl':'dm'}">¥${v.toLocaleString()}</td>`;}).join('')}<td style="font-weight:700;color:#F0C846">¥${yr.toLocaleString()}</td></tr>`;
+  }).join('')}
+  <tr class="rws"><td>全店舗合計</td>${ms.map(m=>`<td class="hl">¥${(monthTotals[m]||0).toLocaleString()}</td>`).join('')}<td style="color:#F0C846;font-weight:700">¥${grandTotal.toLocaleString()}</td></tr>
+  </tbody></table></div></div>
+  <div class="cd"><div class="ct"><span class="cdot" style="background:#3ECFB4"></span>店舗別 年間売上ランキング</div><div class="csu">${curYear}年 売上高順</div><div id="rankSales"></div></div>
+  </div>`;
+  // ランキング描画
+  const ranked=stores.map((s,i)=>{const yr=ms.reduce((a,m)=>a+(storeMonthly[i]?.[m]||0),0);return{name:s.name,sales:yr,color:SC[i%SC.length]};}).filter(r=>r.sales>0).sort((a,b)=>b.sales-a.sales);
+  const maxS=ranked[0]?.sales||1;
+  const rEl=document.getElementById('rankSales');
+  if(rEl)rEl.innerHTML=`<div class="rl">${ranked.map((s,i)=>`<div class="ri"><span class="rp">${i+1}</span><span class="rn">${s.name}</span><div class="rbt"><div class="rb" style="width:${Math.max((s.sales/maxS*100),8).toFixed(1)}%;background:${s.color}">¥${s.sales>=10000?(s.sales/10000).toFixed(0)+'万':s.sales.toLocaleString()}</div></div></div>`).join('')}</div>`;
+}
+function initSalesC(){
+  const ms=getMonths();
+  const storeMonthly={};
+  stores.forEach((s,i)=>{const d=getStoreYear(i,curYear);if(!d)return;storeMonthly[i]={};d.monthly.forEach(m=>{storeMonthly[i][m.month]=m.sales||0;});});
+  const monthTotals=ms.map(m=>{let t=0;stores.forEach((_,i)=>{t+=(storeMonthly[i]?.[m]||0);});return t;});
+  mkBar('cSalesBar',ms,[{label:'売上合計',data:monthTotals,backgroundColor:'rgba(240,200,70,.75)',borderColor:'#F0C846',borderWidth:1,borderRadius:6,barPercentage:.7,categoryPercentage:.8}]);
+  const activeIdx=stores.map((_,i)=>i).filter(i=>storeMonthly[i]&&Object.values(storeMonthly[i]).some(v=>v>0));
+  mkLine('cSalesLine',ms,activeIdx.map(i=>({label:stores[i].name,data:ms.map(m=>storeMonthly[i]?.[m]||0),borderColor:SC[i%SC.length],backgroundColor:'transparent',borderWidth:2,pointRadius:4,pointBackgroundColor:SC[i%SC.length],tension:.35})));
+}
 
 // ===== HPマーケティング ページ =====
 let curHpStore='大森院';
