@@ -31,17 +31,18 @@
 <nav class="sb" id="sidebar"><div class="sb-hd"><div class="sb-brand">集客レポート</div><div class="sb-sub">全店舗統合ダッシュボード</div></div><div class="sb-nav" id="sbNav"></div><div class="sb-ft"><button class="sb-btn" onclick="openSettings()">⚙ 店舗管理・API設定</button></div></nav>
 <div class="mn" id="mainC"></div>
 </div>
-<div class="mo" id="settingsModal"><div class="ml"><h2>店舗管理・API設定</h2><div class="ml-sub">APIキーは全店舗共通。各店舗のスプレッドシートIDを入力してください。<br>スプレッドシートは「リンクを知っている全員が閲覧可」にしてください。</div><div class="fg"><label class="fl">Google Sheets APIキー</label><input class="fi" id="mApiKey" placeholder="AIza..." /></div><div class="fg"><label class="fl">店舗一覧</label><div class="sl-edit" id="storeListEdit"></div><button class="btn" onclick="addStoreRow()" style="margin-top:5px">＋ 店舗を追加</button></div><div class="ma"><button class="btn" onclick="closeSettings()">キャンセル</button><button class="btn btn-p" onclick="saveSettings()">保存してデータ取得</button></div><div id="sStatus" style="margin-top:10px;font-size:11px;display:none"></div></div></div>
+<div class="mo" id="settingsModal"><div class="ml"><h2>店舗管理・API設定</h2><div class="ml-sub">APIキーは全店舗共通。各店舗のスプレッドシートIDを入力してください。<br>スプレッドシートは「リンクを知っている全員が閲覧可」にしてください。</div><div class="fg"><label class="fl">Google Sheets APIキー</label><input class="fi" id="mApiKey" placeholder="AIza..." /></div><div class="fg"><label class="fl">HPB自動取得 GASエンドポイントURL（任意）</label><input class="fi" id="mGasEndpoint" placeholder="https://script.google.com/macros/s/.../exec" /><div style="font-size:10px;color:var(--txd);margin-top:4px">Google Apps ScriptをWebアプリとして公開したURLを入力すると、HPBの口コミ数・評価・ブログ数を自動取得できます。</div></div><div class="fg"><label class="fl">店舗一覧</label><div class="sl-edit" id="storeListEdit"></div><button class="btn" onclick="addStoreRow()" style="margin-top:5px">＋ 店舗を追加</button></div><div class="ma"><button class="btn" onclick="closeSettings()">キャンセル</button><button class="btn btn-p" onclick="saveSettings()">保存してデータ取得</button></div><div id="sStatus" style="margin-top:10px;font-size:11px;display:none"></div></div></div>
 <script>
 const MO=['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'];
 const CH=['HPB','HP','チラシ','メタ広告','minimo','紹介','骨Fix','その他'];
 const CC=['#FF6B4A','#3ECFB4','#F0C846','#8B7CF6','#A3E635','#F472B6','#60A5FA','#7D8CA1'];
 const SC=['#FF6B4A','#3ECFB4','#F0C846','#8B7CF6','#F472B6','#60A5FA','#A3E635','#38BDF8','#FB7185','#FBBF24','#34D399'];
 const YEARS=[2025,2026];
-let stores=[{name:'大森院',id:'1J5hKWFNcg6O5_xSLlJTKHwDycyEEfldOtsTlD4MgAS4'},{name:'京都花園院',id:'1EqUPDKIxIDQXxv3XzIwQ4kGIVk1MZLk-sCPiLXTzV3c'},{name:'人形町院',id:'1go7qwhsbIg7u3YhjfQOjPeZ9cg5gg9cmplJObfNNZ1Y'},{name:'札幌丸山院',id:'1hweX9VNupsLabLz5srF54YBkG4fpZdmDYKJhvonW8aY'},{name:'新馬場院',id:'1OhRZlpVMhc3rNY72YOwxlsnvqU3jvQPa6JrxTZ9Rmr0'},{name:'神戸住吉院',id:'1B6dGyVM96fNmo2QR71H4eVWS1UJpfbxCa6MEh_IANdA'},{name:'中野院',id:'1BPSi-HNmOn6fiyetVmz8612roavCt9s4vMFZamu2r98'},{name:'大里院',id:'1TOT3uDMxUR8S_cL2bvaELrLkw7U5qskfJOdWQUbPow4'},{name:'日暮里院',id:'1Pm7v9c7yjuEiTuPOCaexsGY_5IaTM0wUj2724xKIB1o'}];
+let stores=[{name:'大森院',id:'1J5hKWFNcg6O5_xSLlJTKHwDycyEEfldOtsTlD4MgAS4'},{name:'京都花園院',id:'1EqUPDKIxIDQXxv3XzIwQ4kGIVk1MZLk-sCPiLXTzV3c'},{name:'人形町院',id:'1go7qwhsbIg7u3YhjfQOjPeZ9cg5gg9cmplJObfNNZ1Y'},{name:'札幌丸山院',id:'1hweX9VNupsLabLz5srF54YBkG4fpZdmDYKJhvonW8aY'},{name:'新馬場院',id:'1OhRZlpVMhc3rNY72YOwxlsnvqU3jvQPa6JrxTZ9Rmr0'},{name:'神戸住吉院',id:'1B6dGyVM96fNmo2QR71H4eVWS1UJpfbxCa6MEh_IANdA'},{name:'中野院',id:'1BPSi-HNmOn6fiyetVmz8612roavCt9s4vMFZamu2r98'},{name:'大里院',id:'1TOT3uDMxUR8S_cL2bvaELrLkw7U5qskfJOdWQUbPow4'},{name:'日暮里院',id:'1Pm7v9c7yjuEiTuPOCaexsGY_5IaTM0wUj2724xKIB1o'},{name:'浦添院',id:'1utHOcbI8GefOjf5xL8aYh05Dahm1gixRMHF_EfcsEHk'}];
 let apiKey='AIzaSyBx1s4wOTZ0kQNEFaxU4982tiUtGVEqrPA';
 let storeData={};let liveStores=new Set();let curView='all';let curYear=2025;let curMonth='1月';let curFilterMonth=null;let charts={};let selectedCompareStores=null;
 let curHpbStore='大森院';
+let gasEndpoint='';
 let hpbStatsByStore={
   '大森院':{reviews:150,reviewsPrev:145,rating:4.75,blogs:598,ranking:9,rankingKeyword:'大森 整体',rankingUrl:'https://beauty.hotpepper.jp/genre/kgkw011/stc0290015/',salonUrl:'https://beauty.hotpepper.jp/kr/slnH000551938/',lastUpdated:'2026-03-28',lastBlogDate:'2026-03-29',lastReviewDate:'2026-03-29',blogFreqDays:2},
   '京都花園院':{reviews:119,reviewsPrev:119,rating:4.94,blogs:466,ranking:1,rankingKeyword:'京都花園 整体',rankingUrl:'https://beauty.hotpepper.jp/genre/kgkw011/stc2206645/',salonUrl:'https://beauty.hotpepper.jp/kr/slnH000655277/',lastUpdated:'2026-03-29',lastBlogDate:'2026-03-29',lastReviewDate:'2026-03-29',blogFreqDays:2},
@@ -51,7 +52,8 @@ let hpbStatsByStore={
   '神戸住吉院':{reviews:64,reviewsPrev:64,rating:4.91,blogs:1044,ranking:9,rankingKeyword:'住吉 整体',rankingUrl:'https://beauty.hotpepper.jp/genre/kgkw011/stc2201110/',salonUrl:'https://beauty.hotpepper.jp/kr/slnH000625102/',lastUpdated:'2026-03-29',lastBlogDate:'2026-03-29',lastReviewDate:'2026-03-29',blogFreqDays:1},
   '中野院':{reviews:47,reviewsPrev:47,rating:4.78,blogs:200,ranking:9,rankingKeyword:'中野 整体',rankingUrl:'https://beauty.hotpepper.jp/genre/kgkw011/stc0040005/',salonUrl:'https://beauty.hotpepper.jp/kr/slnH000717232/',lastUpdated:'2026-03-29',lastBlogDate:'2026-03-29',lastReviewDate:'2026-03-29',blogFreqDays:2},
   '大里院':{reviews:39,reviewsPrev:39,rating:4.96,blogs:665,ranking:28,rankingKeyword:'沖縄 整体',rankingUrl:'https://beauty.hotpepper.jp/genre/kgkw011/pre47/',salonUrl:'https://beauty.hotpepper.jp/kr/slnH000708947/',lastUpdated:'2026-03-29',lastBlogDate:'2026-03-29',lastReviewDate:'2026-03-29',blogFreqDays:1},
-  '日暮里院':{reviews:494,reviewsPrev:494,rating:4.75,blogs:1118,ranking:0,rankingKeyword:'日暮里 整体',rankingUrl:'https://beauty.hotpepper.jp/genre/kgkw011/stc0290055/',salonUrl:'https://beauty.hotpepper.jp/kr/slnH000601402/',lastUpdated:'2026-03-30',lastBlogDate:'2026-03-28',lastReviewDate:'2026-03-30',blogFreqDays:1}
+  '日暮里院':{reviews:494,reviewsPrev:494,rating:4.75,blogs:1118,ranking:0,rankingKeyword:'日暮里 整体',rankingUrl:'https://beauty.hotpepper.jp/genre/kgkw011/stc0290055/',salonUrl:'https://beauty.hotpepper.jp/kr/slnH000601402/',lastUpdated:'2026-03-30',lastBlogDate:'2026-03-28',lastReviewDate:'2026-03-30',blogFreqDays:1},
+  '浦添院':{reviews:30,reviewsPrev:30,rating:4.60,blogs:1100,ranking:0,rankingKeyword:'沖縄 整体',rankingUrl:'https://beauty.hotpepper.jp/genre/kgkw011/pre47/',salonUrl:'https://beauty.hotpepper.jp/kr/slnH000606251/',lastUpdated:'2026-03-30',lastBlogDate:'2026-03-30',lastReviewDate:'2026-03-30',blogFreqDays:2}
 };
 // ブラウザに保存された設定を読み込む
 (function(){
@@ -62,6 +64,7 @@ let hpbStatsByStore={
       if(c.stores&&c.stores.length>0)stores=c.stores;
       if(c.apiKey)apiKey=c.apiKey;
       if(c.hpbStatsByStore){Object.keys(c.hpbStatsByStore).forEach(k=>{const saved=Object.fromEntries(Object.entries(c.hpbStatsByStore[k]).filter(([,v])=>v!==''&&v!==null&&v!==undefined));hpbStatsByStore[k]=Object.assign({},hpbStatsByStore[k]||{},saved);});}
+      if(c.gasEndpoint)gasEndpoint=c.gasEndpoint;
     }
   }catch(e){}
 
@@ -241,7 +244,7 @@ function renderAlerts(el){
   const alertCount=rows.filter(r=>r.blogAlert||r.reviewAlert).length;
 
   el.innerHTML=`<div class="fade">
-  <div class="ph"><div><div class="pt">⚠ HPB更新アラート</div><div class="pd">ブログ・口コミの更新状況を管理</div></div></div>
+  <div class="ph"><div><div class="pt">⚠ HPB更新アラート</div><div class="pd">ブログ・口コミの更新状況を管理</div></div><button class="btn btn-p" onclick="fetchHpbData(this)" style="font-size:11px">HPBデータ自動取得</button></div>
   ${statusHTML()}
   <div class="stb" style="margin-bottom:20px;border-color:${alertCount>0?'rgba(251,113,133,.3)':'rgba(52,211,153,.3)'}">
     <div class="sd" style="background:${alertCount>0?'var(--rs)':'var(--em)'}"></div>
@@ -625,12 +628,37 @@ function saveHpbStats(){
 }
 // ===== ここまで =====
 
-function openSettings(){document.getElementById('settingsModal').classList.add('show');document.getElementById('mApiKey').value=apiKey;renderStoreEdit();}
+function openSettings(){document.getElementById('settingsModal').classList.add('show');document.getElementById('mApiKey').value=apiKey;document.getElementById('mGasEndpoint').value=gasEndpoint;renderStoreEdit();}
 function closeSettings(){document.getElementById('settingsModal').classList.remove('show');}
 function renderStoreEdit(){const el=document.getElementById('storeListEdit');el.innerHTML=stores.map((s,i)=>`<div class="se-row"><input class="fi se-nm" value="${s.name}" data-idx="${i}" placeholder="店舗名" /><input class="fi" value="${s.id}" data-idx="${i}" placeholder="スプレッドシートID" /><button class="del-b" onclick="delStore(${i})">削除</button></div>`).join('');}
 function addStoreRow(){stores.push({name:'',id:''});renderStoreEdit();}
 function delStore(i){if(stores.length<=1)return;stores.splice(i,1);storeData={};liveStores.clear();renderStoreEdit();}
-function saveSettings(){apiKey=document.getElementById('mApiKey').value.trim();document.querySelectorAll('.se-row').forEach(row=>{const inputs=row.querySelectorAll('input');const idx=parseInt(inputs[0].dataset.idx);if(stores[idx]){stores[idx].name=inputs[0].value.trim();stores[idx].id=inputs[1].value.trim();}});try{localStorage.setItem('hpb_dashboard_config',JSON.stringify({stores,apiKey,hpbStatsByStore}));}catch(e){}fetchAllStores();}
+function saveSettings(){apiKey=document.getElementById('mApiKey').value.trim();gasEndpoint=document.getElementById('mGasEndpoint').value.trim();document.querySelectorAll('.se-row').forEach(row=>{const inputs=row.querySelectorAll('input');const idx=parseInt(inputs[0].dataset.idx);if(stores[idx]){stores[idx].name=inputs[0].value.trim();stores[idx].id=inputs[1].value.trim();}});try{localStorage.setItem('hpb_dashboard_config',JSON.stringify({stores,apiKey,hpbStatsByStore,gasEndpoint}));}catch(e){}fetchAllStores();}
+async function fetchHpbData(btn){
+  if(!gasEndpoint){alert('GASエンドポイントURLが設定されていません。\n⚙ 店舗管理・API設定 から入力してください。');return;}
+  if(btn){btn.disabled=true;btn.textContent='取得中…';}
+  const today=new Date().toISOString().slice(0,10);
+  let ok=0,ng=0;
+  for(const s of stores){
+    const hs=hpbStatsByStore[s.name];
+    if(!hs||!hs.salonUrl)continue;
+    const m=hs.salonUrl.match(/\/(sln[A-Z0-9]+)\//i);
+    if(!m)continue;
+    try{
+      const res=await fetch(gasEndpoint+'?salonId='+m[1]);
+      if(!res.ok){ng++;continue;}
+      const d=await res.json();
+      if(d.reviews!=null)hs.reviews=d.reviews;
+      if(d.rating!=null)hs.rating=d.rating;
+      if(d.blogs!=null)hs.blogs=d.blogs;
+      hs.lastUpdated=today;ok++;
+    }catch(e){ng++;}
+  }
+  try{localStorage.setItem('hpb_dashboard_config',JSON.stringify({stores,apiKey,hpbStatsByStore,gasEndpoint}));}catch(e){}
+  if(btn){btn.disabled=false;btn.textContent='HPBデータ自動取得';}
+  showToast('✅ '+ok+'店舗のHPBデータを更新しました'+(ng>0?' ('+ng+'件エラー)':''),'#34D399');
+  renderMain();
+}
 async function refreshData(btn){if(btn){btn.disabled=true;btn.textContent='更新中…';}storeData={};liveStores.clear();await fetchAllStores();if(btn){btn.disabled=false;btn.textContent='↺ 手動更新';}}
 
 renderSidebar();renderMain();
