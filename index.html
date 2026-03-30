@@ -285,7 +285,7 @@ function renderAlerts(el){
             <span style="font-size:11px;color:var(--txm)">件</span>
             ${revBadge}
           </div>
-          <div style="font-size:10px;color:var(--txd);margin-bottom:8px">★${r.hs.rating||0} &nbsp;|&nbsp; 先月末: ${r.hs.reviewsPrev!=null?r.hs.reviewsPrev:'—'}件</div>
+          <div style="font-size:10px;color:var(--txd);margin-bottom:8px"><span onclick="editRating('${r.name}')" style="cursor:pointer;border-bottom:1px dashed rgba(255,255,255,.3)" title="クリックで評価を入力">★${r.hs.rating||0}</span> &nbsp;|&nbsp; 先月末: ${r.hs.reviewsPrev!=null?r.hs.reviewsPrev:'—'}件</div>
           <div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:6px">
             <button onclick="adjReview('${r.name}',1)" style="background:rgba(52,211,153,.15);color:#34D399;border:1px solid rgba(52,211,153,.3);border-radius:6px;padding:4px 8px;font-size:11px;font-weight:700;cursor:pointer">＋1</button>
             <button onclick="adjReview('${r.name}',2)" style="background:rgba(52,211,153,.15);color:#34D399;border:1px solid rgba(52,211,153,.3);border-radius:6px;padding:4px 8px;font-size:11px;font-weight:700;cursor:pointer">＋2</button>
@@ -303,6 +303,17 @@ function renderAlerts(el){
     アラート基準：ブログ＝目安頻度×3倍以上 経過 / 口コミ＝14日以上 経過
   </div>
   </div>`;
+}
+function editRating(storeName){
+  if(!hpbStatsByStore[storeName])return;
+  const hs=hpbStatsByStore[storeName];
+  const val=prompt(`「${storeName}」の口コミ評価（★）を入力してください：`,hs.rating||0);
+  if(val===null)return;
+  const num=parseFloat(val);
+  if(isNaN(num)||num<0||num>5){alert('0〜5.0の範囲で入力してください');return;}
+  hs.rating=Math.round(num*100)/100;
+  try{localStorage.setItem('hpb_dashboard_config',JSON.stringify({stores,apiKey,hpbStatsByStore}));}catch(e){}
+  renderMain();
 }
 function editReviewCount(storeName){
   if(!hpbStatsByStore[storeName])return;
