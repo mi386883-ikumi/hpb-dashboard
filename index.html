@@ -478,6 +478,7 @@ function renderSales(el){
       const d2=prev>0?((v-prev)/prev*100).toFixed(1):null;
       return`<div class="kp" style="--kc:${c}"><div class="kl">${s.name}</div><div class="kv" style="color:${c};font-size:18px">¥${v>=10000?(v/10000).toFixed(1)+'万':v.toLocaleString()}</div><div class="kn">${curFilterMonth?curFilterMonth:'年間合計'}${d2!==null?'　'+(d2>=0?'▲+'+d2:'▼'+d2)+'%':''}</div></div>`;
     }).join('')}
+    <div class="kp" style="--kc:#F0C846"><div class="kl">${curFilterMonth?curFilterMonth+'　合計売上':'合計売上（年商）'}</div><div class="kv" style="color:#F0C846;font-size:18px">¥${dispTotal>=10000?(dispTotal/10000).toFixed(1)+'万':dispTotal.toLocaleString()}</div><div class="kn">${dispSub}　全${activeStores.length}店舗</div></div>
   </div>
   <div class="g2">
     <div class="cd"><div class="ct"><span class="cdot" style="background:#F0C846"></span>月別売上推移</div><div class="csu">全店舗合計の月次売上</div><div class="cb" style="height:280px"><canvas id="cSalesBar"></canvas></div></div>
