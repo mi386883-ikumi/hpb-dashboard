@@ -358,12 +358,10 @@ function statusHTML(){const n=liveStores.size;if(n>0)return`<div class="stb"><sp
 // KPI card config: key, label, description, color
 const KPI_CH=[
   {k:'HPB',label:'HPB',desc:'ホットペッパー',color:'#FF6B4A'},
-  {k:'HP',label:'HP',desc:'ホームページ',color:'#3ECFB4'},
+  {k:'HP',label:'HP',desc:'HP+MEO+Gマップ',color:'#3ECFB4'},
   {k:'チラシ',label:'チラシ',desc:'チラシ経由',color:'#F0C846'},
   {k:'メタ広告',label:'メタ広告',desc:'Meta広告経由',color:'#8B7CF6'},
-  {k:'紹介',label:'紹介',desc:'紹介経由',color:'#F472B6'},
-  {k:'MEO',label:'MEO',desc:'MEO経由',color:'#60A5FA'},
-  {k:'Gマップ',label:'Gマップ',desc:'Googleマップ経由',color:'#FBBF24'}
+  {k:'紹介',label:'紹介',desc:'紹介経由',color:'#F472B6'}
 ];
 function buildKpiCards(monthlyArr,totalAll,prefix){
   let h='';
@@ -463,7 +461,7 @@ function renderHPPage(el){
   const rankEl=document.getElementById('rankHP');
   if(rankEl)rankEl.innerHTML=`<div class="rl">${ranked.map((s,i)=>`<div class="ri"><span class="rp">${i+1}</span><span class="rn">${s.name}</span><div class="rbt"><div class="rb" style="width:${Math.max((s.hp/maxHp*100),8).toFixed(1)}%;background:${s.color}">${s.hp}</div></div></div>`).join('')}</div>`;
 }
-function initHPC(){const m=getHpMonthly().filter(x=>x.hp>0);mkBar('cHPM',m.map(x=>x.month),[{label:'HP来店',data:m.map(x=>x.hp),backgroundColor:'rgba(62,207,180,.75)',borderColor:'#3ECFB4',borderWidth:1,borderRadius:6,barPercentage:.6,categoryPercentage:.7}]);}
+function initHPC(){const m=getHpMonthly().filter(x=>x.hp>0);mkLine('cHPM',m.map(x=>x.month),[{label:'HP来店',data:m.map(x=>x.hp),borderColor:'#3ECFB4',backgroundColor:'rgba(62,207,180,.15)',borderWidth:2.5,pointRadius:5,pointBackgroundColor:'#3ECFB4',pointBorderColor:'#0D1117',pointBorderWidth:2,tension:.35,fill:true}]);}
 
 // ===== ホットペッパーマーケティング ページ =====
 function getHpbMonthly(){const map={};const idxs=curHpbStore?[stores.findIndex(s=>s.name===curHpbStore)].filter(i=>i>=0):stores.map((_,i)=>i);idxs.forEach(i=>{const d=getStoreYear(i,curYear);if(!d)return;const months=curFilterMonth?d.monthly.filter(m=>m.month===curFilterMonth):d.monthly;months.forEach(m=>{map[m.month]=(map[m.month]||0)+m.HPB;});});return MO.filter(m=>map[m]!==undefined&&map[m]>=0).map(m=>({month:m,hpb:map[m]||0})).filter((_,i,a)=>a.some(x=>x.hpb>0));}
