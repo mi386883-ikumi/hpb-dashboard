@@ -23,6 +23,7 @@
 .mp{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:12px;}.pl{padding:4px 11px;border-radius:5px;font-size:10px;font-weight:500;border:1px solid var(--bd);background:transparent;color:var(--txm);cursor:pointer;font-family:inherit;transition:all .2s;}.pl.on{background:var(--ac);color:#fff;border-color:var(--ac);}.pl:hover:not(.on){border-color:var(--bdh);color:var(--tx);}
 .mo{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:1000;display:none;align-items:center;justify-content:center;backdrop-filter:blur(4px);}.mo.show{display:flex;}.ml{background:var(--sf);border:1px solid var(--bd);border-radius:var(--r);padding:26px;width:600px;max-width:94vw;max-height:85vh;overflow-y:auto;}.ml h2{font-family:'Outfit';font-size:17px;font-weight:700;margin-bottom:4px;}.ml-sub{font-size:11px;color:var(--txm);margin-bottom:18px;}.fg{margin-bottom:12px;}.fl{font-size:9px;color:var(--txm);font-weight:600;text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px;display:block;}.fi{width:100%;padding:8px 11px;background:var(--bg);border:1px solid var(--bd);border-radius:var(--rr);color:var(--tx);font-size:12px;font-family:'Outfit',monospace;outline:none;transition:border-color .2s;}.fi:focus{border-color:var(--ac);}.sl-edit{margin-bottom:14px;max-height:300px;overflow-y:auto;}.se-row{display:flex;gap:5px;align-items:center;padding:6px 0;border-bottom:1px solid var(--bd);font-size:11px;}.se-row input{flex:1;min-width:0;}.se-nm{width:90px;flex-shrink:0;}.del-b{background:transparent;border:1px solid rgba(251,113,133,.3);color:var(--rs);border-radius:4px;padding:4px 8px;cursor:pointer;font-size:9px;font-family:inherit;}.del-b:hover{background:rgba(251,113,133,.1);}.ma{display:flex;gap:6px;justify-content:flex-end;margin-top:18px;}.btn{padding:7px 14px;border-radius:var(--rr);font-size:11px;font-weight:600;border:1px solid var(--bd);background:var(--sf2);color:var(--txm);cursor:pointer;font-family:inherit;transition:all .2s;}.btn:hover{background:var(--sf3);color:var(--tx);}.btn-p{background:var(--ac);color:#fff;border-color:var(--ac);}.btn-p:hover{box-shadow:0 4px 16px var(--acs);opacity:.9;}
 @media(max-width:900px){.sb{transform:translateX(-100%);}.sb.open{transform:translateX(0);}.mn{margin-left:0;padding:16px 12px 36px;}.g2{grid-template-columns:1fr;}.mt{display:flex!important;}}.mt{display:none;position:fixed;top:8px;left:8px;z-index:200;background:var(--sf2);border-radius:var(--rr);padding:6px 10px;cursor:pointer;color:var(--tx);font-size:15px;border:none;}@keyframes fadeIn{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}.fade{animation:fadeIn .3s ease forwards;}
+.staff-row{cursor:pointer;user-select:none;}.staff-row:hover td{background:rgba(167,139,250,.05)!important;}.staff-row.expanded td{background:rgba(167,139,250,.04);}.staff-chart-row td{padding:0!important;border-bottom:1px solid var(--bd);}.staff-chart-wrap{height:240px;padding:12px 12px 10px;background:rgba(167,139,250,.04);animation:fadeIn .25s ease forwards;}
 </style>
 </head>
 <body>
@@ -68,9 +69,11 @@ const STAFF_LIST=[
   {store:'札幌丸山院',staff:['五十嵐','南雲','奥田']},
   {store:'中野院',   staff:[]}
 ];
-// staffProdData[店舗名][スタッフ名][月] = {prod, members, cancel, newM, rate, hpbR, hpR}
+// staffProdData[店舗名][スタッフ名][年][月] = {prod, members, cancel, newM, rate, hpbR, hpR}
 let staffProdData={};
 let curProdMonth='1月';
+let expandedStaff={};// key:'店舗|スタッフ' → true/false
+function sanitizeId(s){return s.replace(/[^a-zA-Z0-9]/g,'_');}
 // ブラウザに保存された設定を読み込む
 (function(){
   try{
@@ -447,7 +450,7 @@ function renderStore(el,idx){const s=stores[idx],d=getStoreYear(idx,curYear);if(
 function renderStorePills(ms,idx){const el=document.getElementById('sPills');if(!el)return;if(!ms.includes(curMonth))curMonth=ms[0]||'1月';el.innerHTML=ms.map(m=>`<button class="pl ${m===curMonth?'on':''}" onclick="curMonth='${m}';renderStorePills([${ms.map(x=>"'"+x+"'").join(',')}],${idx});renderStoreTbl(${idx});">${m}</button>`).join('');renderStoreTbl(idx);}
 function renderStoreTbl(idx){const el=document.getElementById('sTbl');if(!el)return;const days=getStoreYear(idx,curYear)?.daily?.[curMonth];if(!days){el.innerHTML='<p class="dm" style="padding:10px">データなし</p>';return;}let h=`<table><thead><tr><th>日</th><th>曜</th>`;CH.forEach(k=>h+=`<th>${k}</th>`);h+=`<th>合計</th></tr></thead><tbody>`;days.forEach(r=>{h+=`<tr><td>${r.day}</td><td class="dm">${r.dayName}</td>`;CH.forEach(k=>{const v=r[k]||0;h+=`<td class="${v>0?'hl':'dm'}">${v}</td>`;});h+=`<td style="font-weight:600">${r.total}</td></tr>`;});const tots={};CH.forEach(k=>tots[k]=days.reduce((s,r)=>s+(r[k]||0),0));const gt=days.reduce((s,r)=>s+r.total,0);h+=`<tr class="rws"><td colspan="2">合計</td>`;CH.forEach(k=>h+=`<td class="hl">${tots[k]}</td>`);h+=`<td>${gt}</td></tr></tbody></table>`;el.innerHTML=h;}
 
-function initCharts(){if(curView==='all')initAllC();else if(curView==='compare')initCmpC();else if(curView==='sales')initSalesC();else if(curView==='hpb')initHPBC();else if(curView==='hp')initHPC();else initStoreC(curView);}
+function initCharts(){if(curView==='all')initAllC();else if(curView==='compare')initCmpC();else if(curView==='sales')initSalesC();else if(curView==='hpb')initHPBC();else if(curView==='hp')initHPC();else if(curView==='productivity')initProductivityCharts();else if(curView==='alerts'){/* no charts */}else initStoreC(curView);}
 function initAllC(){const a=aggAll();mkBar('cAM',a.map(m=>m.month),[{label:'HPB',data:a.map(m=>m.HPB),backgroundColor:'rgba(255,107,74,.75)',borderColor:'#FF6B4A',borderWidth:1,borderRadius:4,barPercentage:.85,categoryPercentage:.8},{label:'HP',data:a.map(m=>m.HP||0),backgroundColor:'rgba(62,207,180,.75)',borderColor:'#3ECFB4',borderWidth:1,borderRadius:4,barPercentage:.85,categoryPercentage:.8},{label:'チラシ',data:a.map(m=>m['チラシ']||0),backgroundColor:'rgba(240,200,70,.75)',borderColor:'#F0C846',borderWidth:1,borderRadius:4,barPercentage:.85,categoryPercentage:.8},{label:'メタ広告',data:a.map(m=>m['メタ広告']||0),backgroundColor:'rgba(139,124,246,.75)',borderColor:'#8B7CF6',borderWidth:1,borderRadius:4,barPercentage:.85,categoryPercentage:.8},{label:'紹介',data:a.map(m=>m['紹介']||0),backgroundColor:'rgba(244,114,182,.75)',borderColor:'#F472B6',borderWidth:1,borderRadius:4,barPercentage:.85,categoryPercentage:.8}]);const tots={};CH.forEach(k=>tots[k]=a.reduce((s,m)=>s+(m[k]||0),0));const nz=CH.filter(k=>tots[k]>0);mkDoughnut('cAP',nz,nz.map(k=>tots[k]),nz.map(k=>CC[CH.indexOf(k)]));const t5=['HPB','HP','チラシ','minimo','紹介'];mkLine('cAL',a.map(m=>m.month),t5.map(k=>({label:k,data:a.map(m=>m[k]||0),borderColor:CC[CH.indexOf(k)],backgroundColor:'transparent',borderWidth:2,pointRadius:3,pointBackgroundColor:CC[CH.indexOf(k)],tension:.3})));renderRank('rankAll');}
 function initCmpC(){const ms=getMonths();const idxs=getCmpStores();const ch=window._cmpChannel||'HPB';const chLabel=ch==='total'?'全経路合計':ch;const cLine=document.getElementById('cCB');if(cLine){charts['cCB']=new Chart(cLine,{type:'line',data:{labels:ms,datasets:idxs.map(i=>({label:stores[i].name,data:ms.map(m=>{const d=getStoreYear(i,curYear);const mm=d?d.monthly.find(x=>x.month===m):null;return mm?(ch==='total'?mm.total:(mm[ch]||0)):0;}),borderColor:SC[i%SC.length],backgroundColor:SC[i%SC.length]+'20',borderWidth:2.5,pointRadius:5,pointBackgroundColor:SC[i%SC.length],pointBorderColor:'#0D1117',pointBorderWidth:2,pointHoverRadius:7,tension:.35,fill:false}))},options:{...CO,plugins:{...CO.plugins,datalabels:{display:true,color:ctx=>SC[idxs[ctx.datasetIndex]%SC.length]+'EE',font:{weight:'bold',size:10,family:'Outfit'},anchor:'top',align:'top',offset:3,formatter:v=>v>0?v:''}}}});}const ctEl=document.querySelector('#mainC .ct .cdot[style*="var(--ac)"]');if(ctEl){ctEl.parentElement.innerHTML=`<span class="cdot" style="background:var(--ac)"></span>${chLabel}来店数 — 店舗別月次比較`;}renderRank('rankCmp');}
 function initStoreC(idx){const d=getStoreYear(idx,curYear);if(!d)return;const monthly=curFilterMonth?d.monthly.filter(m=>m.month===curFilterMonth):d.monthly;const c=SC[idx%SC.length];mkBar('cSM',monthly.map(m=>m.month),[{label:'HPB',data:monthly.map(m=>m.HPB),backgroundColor:'rgba(255,107,74,.75)',borderColor:'#FF6B4A',borderWidth:1,borderRadius:4,barPercentage:.85,categoryPercentage:.8},{label:'HP',data:monthly.map(m=>m.HP||0),backgroundColor:'rgba(62,207,180,.75)',borderColor:'#3ECFB4',borderWidth:1,borderRadius:4,barPercentage:.85,categoryPercentage:.8},{label:'チラシ',data:monthly.map(m=>m['チラシ']||0),backgroundColor:'rgba(240,200,70,.75)',borderColor:'#F0C846',borderWidth:1,borderRadius:4,barPercentage:.85,categoryPercentage:.8},{label:'メタ広告',data:monthly.map(m=>m['メタ広告']||0),backgroundColor:'rgba(139,124,246,.75)',borderColor:'#8B7CF6',borderWidth:1,borderRadius:4,barPercentage:.85,categoryPercentage:.8},{label:'紹介',data:monthly.map(m=>m['紹介']||0),backgroundColor:'rgba(244,114,182,.75)',borderColor:'#F472B6',borderWidth:1,borderRadius:4,barPercentage:.85,categoryPercentage:.8}]);const tots={};CH.forEach(k=>tots[k]=monthly.reduce((s,m)=>s+(m[k]||0),0));const nz=CH.filter(k=>tots[k]>0);mkDoughnut('cSP',nz,nz.map(k=>tots[k]),nz.map(k=>CC[CH.indexOf(k)]));const t5=['HPB','HP','チラシ','minimo','紹介'];mkLine('cSL',monthly.map(m=>m.month),t5.map(k=>({label:k,data:monthly.map(m=>m[k]||0),borderColor:CC[CH.indexOf(k)],backgroundColor:'transparent',borderWidth:2,pointRadius:3,pointBackgroundColor:CC[CH.indexOf(k)],tension:.3})));}
@@ -719,36 +722,48 @@ function saveHpbStats(){
 // ===== ここまで =====
 
 // ===== 個人生産性管理 ページ =====
+const PROD_METRICS=[
+  {key:'prod',   label:'生産性',     fmt:v=>'¥'+Number(v).toLocaleString(), color:'#F0C846', scale:v=>Math.round(v/10000)},
+  {key:'members',label:'会員数',     fmt:v=>v+'名',  color:'#3ECFB4', scale:v=>v},
+  {key:'cancel', label:'退会数',     fmt:v=>v+'名',  color:'#FB7185', scale:v=>v},
+  {key:'newM',   label:'新規数',     fmt:v=>v+'名',  color:'#60A5FA', scale:v=>v},
+  {key:'rate',   label:'成約率',     fmt:v=>v+'%',   color:'#8B7CF6', scale:v=>v},
+  {key:'hpbR',   label:'口コミ(HPB)',fmt:v=>v+'件',  color:'#FF6B4A', scale:v=>v},
+  {key:'hpR',    label:'口コミ(HP)', fmt:v=>v+'件',  color:'#A3E635', scale:v=>v}
+];
+function toggleStaffChart(store,name){
+  const key=store+'|'+name;
+  expandedStaff[key]=!expandedStaff[key];
+  renderMain();
+}
 function renderProductivity(el){
-  const PROD_METRICS=[
-    {key:'prod',   label:'生産性',    fmt:v=>'¥'+v.toLocaleString()},
-    {key:'members',label:'会員数',    fmt:v=>v+'名'},
-    {key:'cancel', label:'退会数',    fmt:v=>v+'名'},
-    {key:'newM',   label:'新規数',    fmt:v=>v+'名'},
-    {key:'rate',   label:'成約率',    fmt:v=>v+'%'},
-    {key:'hpbR',   label:'口コミ(HPB)',fmt:v=>v+'件'},
-    {key:'hpR',    label:'口コミ(HP)', fmt:v=>v+'件'}
-  ];
   const activeList=STAFF_LIST.filter(g=>g.staff.length>0);
   const storeCards=activeList.map(g=>{
     const ci=stores.findIndex(s=>s.name===g.store);
     const color=ci>=0?SC[ci%SC.length]:'#7D8CA1';
-    const rows=g.staff.map(name=>{
-      const d=staffProdData?.[g.store]?.[name]?.[curProdMonth]||{};
+    let rows='';
+    g.staff.forEach(name=>{
+      const d=staffProdData?.[g.store]?.[name]?.[curYear]?.[curProdMonth]||{};
       const cells=PROD_METRICS.map(m=>{
-        const v=d[m.key];
-        const hasVal=v!=null&&v!=='';
+        const v=d[m.key];const hasVal=v!=null&&v!=='';
         return`<td class="${hasVal?'hl':'dm'}">${hasVal?m.fmt(v):'-'}</td>`;
       }).join('');
-      return`<tr><td style="font-weight:600;color:#E6EDF3">${name}</td>${cells}</tr>`;
-    }).join('');
+      const key=g.store+'|'+name;
+      const isExp=!!expandedStaff[key];
+      const cid='sc-'+sanitizeId(g.store)+'-'+sanitizeId(name);
+      const esc=s=>s.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+      rows+=`<tr class="staff-row${isExp?' expanded':''}" onclick="toggleStaffChart('${esc(g.store)}','${esc(name)}')">
+        <td style="font-weight:600;color:#E6EDF3"><span style="display:inline-block;width:14px;font-size:9px;color:var(--txd);transition:transform .2s;transform:rotate(${isExp?90:0}deg)">▶</span> ${name}</td>${cells}
+      </tr>`;
+      if(isExp){rows+=`<tr class="staff-chart-row"><td colspan="8"><div class="staff-chart-wrap"><canvas id="${cid}"></canvas></div></td></tr>`;}
+    });
     const totRow=PROD_METRICS.map(m=>{
-      const sum=g.staff.reduce((a,n)=>{const v=staffProdData?.[g.store]?.[n]?.[curProdMonth]?.[m.key];return a+(v!=null?Number(v):0);},0);
+      const sum=g.staff.reduce((a,n)=>{const v=staffProdData?.[g.store]?.[n]?.[curYear]?.[curProdMonth]?.[m.key];return a+(v!=null?Number(v):0);},0);
       return`<td style="font-weight:700;color:${color}">${sum>0?m.fmt(sum):'-'}</td>`;
     }).join('');
     return`<div class="cd" style="margin-bottom:16px">
       <div class="ct"><span class="cdot" style="background:${color}"></span>${g.store}</div>
-      <div class="csu">${curYear}年 ${curProdMonth} — ${g.staff.length}名</div>
+      <div class="csu">${curYear}年 ${curProdMonth} — ${g.staff.length}名 ／ 行をタップでグラフ展開</div>
       <div class="tw"><table>
         <thead><tr><th>スタッフ</th>${PROD_METRICS.map(m=>`<th>${m.label}</th>`).join('')}</tr></thead>
         <tbody>${rows}<tr class="rws"><td>店舗合計</td>${totRow}</tr></tbody>
@@ -760,6 +775,24 @@ function renderProductivity(el){
     <div class="mp">${MO.map(m=>`<button class="pl ${curProdMonth===m?'on':''}" onclick="curProdMonth='${m}';renderMain()">${m}</button>`).join('')}</div>
     ${storeCards}
   </div>`;
+}
+function initProductivityCharts(){
+  Object.keys(expandedStaff).forEach(key=>{
+    if(!expandedStaff[key])return;
+    const sep=key.indexOf('|');
+    const store=key.slice(0,sep);const name=key.slice(sep+1);
+    const cid='sc-'+sanitizeId(store)+'-'+sanitizeId(name);
+    if(!document.getElementById(cid)||charts[cid])return;
+    const labels=[];
+    [2025,2026].forEach(y=>MO.forEach(m=>labels.push(y+'/'+m)));
+    const datasets=PROD_METRICS.map(metric=>({
+      label:metric.label,
+      data:[2025,2026].flatMap(y=>MO.map(m=>{const v=staffProdData?.[store]?.[name]?.[y]?.[m]?.[metric.key];return v!=null?metric.scale(v):null;})),
+      borderColor:metric.color,backgroundColor:'transparent',borderWidth:2,
+      pointRadius:3,pointBackgroundColor:metric.color,tension:.35,spanGaps:true
+    }));
+    mkLine(cid,labels,datasets);
+  });
 }
 
 function openSettings(){document.getElementById('settingsModal').classList.add('show');document.getElementById('mApiKey').value=apiKey;document.getElementById('mGasEndpoint').value=gasEndpoint;renderStoreEdit();}
