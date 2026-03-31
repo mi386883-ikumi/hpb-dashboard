@@ -102,6 +102,7 @@ async function fetchStore(idx){
     if(!metaRes.ok)return null;
     const titles=(await metaRes.json()).sheets.map(sh=>sh.properties.title);
     const result={};
+    const salesCell=s.name==='浦添院'?'AB38':'AA38';
     for(const year of YEARS){
       const data={monthly:[],daily:{}};
       const ranges=[];const monthMap=[];
@@ -109,13 +110,13 @@ async function fetchStore(idx){
       for(let m=1;m<=12;m++){
         const name=`日報 ${year}${String(m).padStart(2,'0')}`;
         if(!titles.includes(name))continue;
-        ranges.push(`'${name}'!B38:N38`);ranges.push(`'${name}'!A3:N33`);ranges.push(`'${name}'!AA38`);
+        ranges.push(`'${name}'!B38:N38`);ranges.push(`'${name}'!A3:N33`);ranges.push(`'${name}'!${salesCell}`);
         monthMap.push({month:MO[m-1],m});
       }
       // 「日報」シート（当月分）— 4レンジ：probe+summary+daily+sales
       let nippoIdx=-1;
       if(titles.includes('日報')&&year===new Date().getFullYear()){
-        ranges.push(`'日報'!A3`);ranges.push(`'日報'!B38:N38`);ranges.push(`'日報'!A3:N33`);ranges.push(`'日報'!AA38`);
+        ranges.push(`'日報'!A3`);ranges.push(`'日報'!B38:N38`);ranges.push(`'日報'!A3:N33`);ranges.push(`'日報'!${salesCell}`);
         nippoIdx=monthMap.length;
       }
       if(ranges.length===0)continue;
