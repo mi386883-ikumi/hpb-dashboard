@@ -100,9 +100,9 @@ function fetchProdData(btnEl){
         const store=STORE_MAP[sn];if(!store)return;
         const sl=STAFF_LIST.find(g=>g.store===store)?.staff||[];
         const staff=matchStaff(fn,sl);if(!staff)return;
-        if(!nd[store])nd[store]={};if(!nd[store][staff])nd[store][staff]={};if(!nd[store][staff][year])nd[store][staff][year]={};
+        if(!nd[store])nd[store]={};if(!nd[store][staff])nd[store][staff]={};const yk=year+'年';if(!nd[store][staff][yk])nd[store][staff][yk]={};
         const rate=(r.c[45]?.v!=null?r.c[45].v:r.c[5]?.v);
-        nd[store][staff][year][ms]={
+        nd[store][staff][yk][ms]={
           prod:r.c[14]?.v??null,members:r.c[8]?.v??null,cancel:r.c[9]?.v??null,newM:r.c[4]?.v??null,
           rate:rate!=null?Math.round(rate*100):null,
           hpbR:(r.c[13]?.v??r.c[43]?.v)??null,hpR:(r.c[12]?.v??r.c[42]?.v)??null
@@ -787,7 +787,7 @@ function renderProductivity(el){
     const color=ci>=0?SC[ci%SC.length]:'#7D8CA1';
     let rows='';
     g.staff.forEach(name=>{
-      const d=staffProdData?.[g.store]?.[name]?.[curYear]?.[curProdMonth]||{};
+      const d=staffProdData?.[g.store]?.[name]?.[curYear+'年']?.[curProdMonth]||{};
       const cells=PROD_METRICS.map(m=>{
         const v=d[m.key];const hasVal=v!=null&&v!=='';
         return`<td class="${hasVal?'hl':'dm'}">${hasVal?m.fmt(v):'-'}</td>`;
@@ -802,7 +802,7 @@ function renderProductivity(el){
       if(isExp){rows+=`<tr class="staff-chart-row"><td colspan="8"><div class="staff-chart-wrap"><canvas id="${cid}"></canvas></div></td></tr>`;}
     });
     const totRow=PROD_METRICS.map(m=>{
-      const sum=g.staff.reduce((a,n)=>{const v=staffProdData?.[g.store]?.[n]?.[curYear]?.[curProdMonth]?.[m.key];return a+(v!=null?Number(v):0);},0);
+      const sum=g.staff.reduce((a,n)=>{const v=staffProdData?.[g.store]?.[n]?.[curYear+'年']?.[curProdMonth]?.[m.key];return a+(v!=null?Number(v):0);},0);
       return`<td style="font-weight:700;color:${color}">${sum>0?m.fmt(sum):'-'}</td>`;
     }).join('');
     return`<div class="cd" style="margin-bottom:16px">
@@ -836,7 +836,7 @@ function initProductivityCharts(){
     [2025,2026].forEach(y=>MO.forEach(m=>labels.push(y+'/'+m)));
     const datasets=PROD_METRICS.map(metric=>({
       label:metric.label,
-      data:[2025,2026].flatMap(y=>MO.map(m=>{const v=staffProdData?.[store]?.[name]?.[y]?.[m]?.[metric.key];return v!=null?metric.scale(v):null;})),
+      data:[2025,2026].flatMap(y=>MO.map(m=>{const v=staffProdData?.[store]?.[name]?.[y+'年']?.[m]?.[metric.key];return v!=null?metric.scale(v):null;})),
       borderColor:metric.color,backgroundColor:'transparent',borderWidth:2,
       pointRadius:3,pointBackgroundColor:metric.color,tension:.35,spanGaps:true
     }));
