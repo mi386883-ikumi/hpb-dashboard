@@ -125,7 +125,7 @@ function fetchProdData(btnEl){
     const saved=localStorage.getItem('hpb_dashboard_config');
     if(saved){
       const c=JSON.parse(saved);
-      if(c.stores&&c.stores.length>0){stores=c.stores;const defaultStores=[{name:'大森院',id:'1J5hKWFNcg6O5_xSLlJTKHwDycyEEfldOtsTlD4MgAS4'},{name:'京都花園院',id:'1EqUPDKIxIDQXxv3XzIwQ4kGIVk1MZLk-sCPiLXTzV3c'},{name:'人形町院',id:'1go7qwhsbIg7u3YhjfQOjPeZ9cg5gg9cmplJObfNNZ1Y'},{name:'札幌丸山院',id:'1hweX9VNupsLabLz5srF54YBkG4fpZdmDYKJhvonW8aY'},{name:'新馬場院',id:'1OhRZlpVMhc3rNY72YOwxlsnvqU3jvQPa6JrxTZ9Rmr0'},{name:'神戸住吉院',id:'1B6dGyVM96fNmo2QR71H4eVWS1UJpfbxCa6MEh_IANdA'},{name:'中野院',id:'1BPSi-HNmOn6fiyetVmz8612roavCt9s4vMFZamu2r98'},{name:'大里院',id:'1TOT3uDMxUR8S_cL2bvaELrLkw7U5qskfJOdWQUbPow4'},{name:'日暮里院',id:'1Pm7v9c7yjuEiTuPOCaexsGY_5IaTM0wUj2724xKIB1o'},{name:'浦添院',id:'1utHOcbI8GefOjf5xL8aYh05Dahm1gixRMHF_EfcsEHk'}];defaultStores.forEach(ds=>{if(!stores.find(s=>s.name===ds.name))stores.push(ds);});}
+      if(c.stores&&c.stores.length>0){stores=c.stores;const defaultStores=[{name:'大森院',id:'1J5hKWFNcg6O5_xSLlJTKHwDycyEEfldOtsTlD4MgAS4'},{name:'京都花園院',id:'1EqUPDKIxIDQXxv3XzIwQ4kGIVk1MZLk-sCPiLXTzV3c'},{name:'人形町院',id:'1go7qwhsbIg7u3YhjfQOjPeZ9cg5gg9cmplJObfNNZ1Y'},{name:'札幌丸山院',id:'1hweX9VNupsLabLz5srF54YBkG4fpZdmDYKJhvonW8aY'},{name:'新馬場院',id:'1OhRZlpVMhc3rNY72YOwxlsnvqU3jvQPa6JrxTZ9Rmr0'},{name:'神戸住吉院',id:'1B6dGyVM96fNmo2QR71H4eVWS1UJpfbxCa6MEh_IANdA'},{name:'中野院',id:'1BPSi-HNmOn6fiyetVmz8612roavCt9s4vMFZamu2r98'},{name:'大里院',id:'1TOT3uDMxUR8S_cL2bvaELrLkw7U5qskfJOdWQUbPow4'},{name:'日暮里院',id:'1Pm7v9c7yjuEiTuPOCaexsGY_5IaTM0wUj2724xKIB1o'},{name:'浦添院',id:'1utHOcbI8GefOjf5xL8aYh05Dahm1gixRMHF_EfcsEHk'}];defaultStores.forEach(ds=>{const ex=stores.find(s=>s.name===ds.name);if(!ex)stores.push(ds);else if(!ex.id&&ds.id)ex.id=ds.id;});}
       if(c.apiKey)apiKey=c.apiKey;
       if(c.hpbStatsByStore){Object.keys(c.hpbStatsByStore).forEach(k=>{const saved=Object.fromEntries(Object.entries(c.hpbStatsByStore[k]).filter(([,v])=>v!==''&&v!==null&&v!==undefined));hpbStatsByStore[k]=Object.assign({},hpbStatsByStore[k]||{},saved);});}
       if(c.gasEndpoint)gasEndpoint=c.gasEndpoint;
@@ -534,9 +534,10 @@ function renderSales(el){
   ${statusHTML()}
   <div class="kr">
     ${stores.map((s,i)=>{
-      const v=curFilterMonth?(storeMonthly[i]?.[curFilterMonth]||0):(ms.reduce((a,m)=>a+(storeMonthly[i]?.[m]||0),0));
-      if(!storeMonthly[i])return'';
+      if(!s.id)return'';
       const c=SC[i%SC.length];
+      if(!storeMonthly[i])return`<div class="kp" style="--kc:${c}"><div class="kl">${s.name}</div><div class="kv" style="color:var(--txd);font-size:14px">取得中…</div><div class="kn" style="color:var(--txd)">データ読み込み中</div></div>`;
+      const v=curFilterMonth?(storeMonthly[i]?.[curFilterMonth]||0):(ms.reduce((a,m)=>a+(storeMonthly[i]?.[m]||0),0));
       const prevM=ms.length>=2?ms[ms.length-2]:'';
       const prev=prevM&&!curFilterMonth?0:(curFilterMonth&&prevM?(storeMonthly[i]?.[prevM]||0):0);
       const d2=prev>0?((v-prev)/prev*100).toFixed(1):null;
