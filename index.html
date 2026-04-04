@@ -224,7 +224,7 @@ function getStoreYear(idx,year){return storeData[idx]?.[year]||null;}
 function aggAll(){const map={};stores.forEach((_,i)=>{const d=getStoreYear(i,curYear);if(!d)return;const months=curFilterMonth?d.monthly.filter(m=>m.month===curFilterMonth):d.monthly;months.forEach(m=>{if(!map[m.month]){map[m.month]={month:m.month,total:0};CH.forEach(k=>map[m.month][k]=0);}CH.forEach(k=>map[m.month][k]+=(m[k]||0));map[m.month].total+=m.total;});});return MO.filter(m=>map[m]).map(m=>map[m]);}
 function getMonths(){const s=new Set();stores.forEach((_,i)=>{const d=getStoreYear(i,curYear);if(d)d.monthly.forEach(m=>s.add(m.month));});return MO.filter(m=>s.has(m));}
 
-function renderSidebar(){let h=`<div class="sb-sec">総合</div><div class="ni sp ${curView==='all'?'on':''}" onclick="nav('all')"><span class="nd"></span>全店舗 合計</div><div class="ni cp ${curView==='compare'?'on':''}" onclick="nav('compare')"><span class="nd"></span>店舗比較</div><div class="ni ${curView==='sales'?'on':''}" onclick="nav('sales')" style="color:#F0C846"><span class="nd" style="background:#F0C846"></span>売上管理</div><div class="ni ${curView==='hpb'?'on':''}" onclick="nav('hpb')" style="color:#FF6B4A"><span class="nd" style="background:#FF6B4A"></span>ホットペッパーマーケティング</div><div class="ni ${curView==='hp'?'on':''}" onclick="nav('hp')" style="color:#3ECFB4"><span class="nd" style="background:#3ECFB4"></span>HPマーケティング</div><div class="ni ${curView==='alerts'?'on':''}" onclick="nav('alerts')" style="color:#FB7185"><span class="nd" style="background:#FB7185"></span>⚠ HPB更新アラート</div><div class="ni ${curView==='productivity'?'on':''}" onclick="nav('productivity')" style="color:#A78BFA"><span class="nd" style="background:#A78BFA"></span>📊 個人生産性管理</div><div class="sb-sec">店舗別</div>`;stores.forEach((s,i)=>{const lv=liveStores.has(i);h+=`<div class="ni ${curView===i?'on':''}" onclick="nav(${i})"><span class="nd" style="background:${SC[i%SC.length]}"></span>${s.name}${lv?'<span class="live-dot">●</span>':''}</div>`;});document.getElementById('sbNav').innerHTML=h;}
+function renderSidebar(){let h=`<div class="sb-sec">総合</div><div class="ni sp ${curView==='all'?'on':''}" onclick="nav('all')"><span class="nd"></span>全店舗 合計</div><div class="ni cp ${curView==='compare'?'on':''}" onclick="nav('compare')"><span class="nd"></span>店舗比較</div><div class="ni ${curView==='sales'?'on':''}" onclick="nav('sales')" style="color:#F0C846"><span class="nd" style="background:#F0C846"></span>売上管理</div><div class="ni ${curView==='hpb'?'on':''}" onclick="nav('hpb')" style="color:#FF6B4A"><span class="nd" style="background:#FF6B4A"></span>ホットペッパーマーケティング</div><div class="ni ${curView==='hp'?'on':''}" onclick="nav('hp')" style="color:#3ECFB4"><span class="nd" style="background:#3ECFB4"></span>HPマーケティング</div><div class="ni ${curView==='alerts'?'on':''}" onclick="nav('alerts')" style="color:#F472B6"><span class="nd" style="background:#F472B6"></span>💬 口コミ数値管理</div><div class="ni ${curView==='productivity'?'on':''}" onclick="nav('productivity')" style="color:#A78BFA"><span class="nd" style="background:#A78BFA"></span>📊 個人生産性管理</div><div class="sb-sec">店舗別</div>`;stores.forEach((s,i)=>{const lv=liveStores.has(i);h+=`<div class="ni ${curView===i?'on':''}" onclick="nav(${i})"><span class="nd" style="background:${SC[i%SC.length]}"></span>${s.name}${lv?'<span class="live-dot">●</span>':''}</div>`;});document.getElementById('sbNav').innerHTML=h;}
 function nav(v){curView=v;renderSidebar();renderMain();document.querySelector('.sb').classList.remove('open');}
 function setYear(y){curYear=y;curFilterMonth=null;renderMain();}
 function setFilterMonth(m){curFilterMonth=m;renderMain();}
@@ -288,88 +288,74 @@ function showToast(msg,color){
   setTimeout(()=>t.remove(),4000);
 }
 function renderAlerts(el){
-  const today=new Date();
-  function daysSince(dateStr){if(!dateStr)return 999;const d=new Date(dateStr);return isNaN(d)?999:Math.floor((today-d)/(86400000));}
-  function statusColor(days,warn,danger){return days<=warn?'var(--em)':days<=danger?'var(--gd)':'var(--rs)';}
-  function statusLabel(days,warn,danger){return days<=warn?'✅ 正常':days<=danger?'⚠ 要確認':'🚨 停止中';}
-  function statusBg(days,warn,danger){return days<=warn?'rgba(52,211,153,.08)':days<=danger?'rgba(240,200,70,.08)':'rgba(251,113,133,.08)';}
-  // 月末バナー表示
-  setTimeout(showMonthEndBanner,300);
-  // 自動スナップショット後のトースト
-  if(window._autoSnapped){const m=window._autoSnapped;window._autoSnapped=null;setTimeout(()=>showToast(`📅 ${m} の口コミ数を先月末として自動保存しました`,'#F0C846'),600);}
-
-  const rows=stores.map(s=>{
-    const hs=hpbStatsByStore[s.name]||{};
-    const bd=daysSince(hs.lastBlogDate);const rd=daysSince(hs.lastReviewDate);
-    const freq=hs.blogFreqDays||2;
-    const blogAlert=bd>(freq*3);const reviewAlert=rd>14;
-    return {name:s.name,hs,bd,rd,freq,blogAlert,reviewAlert};
+  const activeList=STAFF_LIST.filter(g=>g.staff.length>0);
+  // 全スタッフの口コミデータを収集
+  const allKuchikomi=[];
+  activeList.forEach(g=>{
+    const ci=stores.findIndex(s=>s.name===g.store);
+    const color=ci>=0?SC[ci%SC.length]:'#7D8CA1';
+    g.staff.forEach(name=>{
+      const d=staffProdData?.[g.store]?.[name]?.[curProdYear+'年']?.[curProdMonth]||{};
+      allKuchikomi.push({store:g.store,name,color,google:d.hpR!=null?d.hpR:0,hpb:d.hpbR!=null?d.hpbR:0,hasData:d.hpR!=null||d.hpbR!=null});
+    });
   });
-
-  const alertCount=rows.filter(r=>r.blogAlert||r.reviewAlert).length;
-
-  el.innerHTML=`<div class="fade">
-  <div class="ph"><div><div class="pt">⚠ HPB更新アラート</div><div class="pd">ブログ・口コミの更新状況を管理</div></div><button class="btn btn-p" onclick="fetchHpbData(this)" style="font-size:11px">HPBデータ自動取得</button></div>
-  ${statusHTML()}
-  <div class="stb" style="margin-bottom:20px;border-color:${alertCount>0?'rgba(251,113,133,.3)':'rgba(52,211,153,.3)'}">
-    <div class="sd" style="background:${alertCount>0?'var(--rs)':'var(--em)'}"></div>
-    <span style="font-weight:600;color:${alertCount>0?'var(--rs)':'var(--em)'}">${alertCount>0?`⚠ ${alertCount}店舗でアラートが発生しています`:'✅ 全店舗の更新状況は正常です'}</span>
-    <span style="margin-left:auto;font-size:10px;color:var(--txd)">最終確認日から算出</span>
-  </div>
-  <div style="display:flex;flex-direction:column;gap:12px">
-  ${rows.map(r=>{
-    const revDiff=(r.hs.reviews||0)-(r.hs.reviewsPrev!=null?r.hs.reviewsPrev:r.hs.reviews||0);
-    const revBadge=revDiff>0?'<span style="font-size:10px;font-weight:700;background:rgba(52,211,153,.15);color:#34D399;border-radius:4px;padding:1px 5px;margin-left:5px">+'+revDiff+'件↑</span>':revDiff<0?'<span style="font-size:10px;font-weight:700;background:rgba(251,113,133,.15);color:#FB7185;border-radius:4px;padding:1px 5px;margin-left:5px">'+revDiff+'件↓</span>':'<span style="font-size:10px;color:var(--txd);margin-left:5px">±0</span>';
-    const bc=statusColor(r.bd,r.freq*2,r.freq*5);
-    const rc=statusColor(r.rd,7,14);
-    const bg=r.blogAlert||r.reviewAlert?'rgba(251,113,133,.04)':'var(--sf)';
-    const border=r.blogAlert||r.reviewAlert?'rgba(251,113,133,.25)':'var(--bd)';
-    return `<div class="cd" style="background:${bg};border-color:${border}">
-      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:14px">
-        <div style="display:flex;align-items:center;gap:8px">
-          <span style="font-size:14px;font-weight:700">${r.name}</span>
-          ${r.blogAlert||r.reviewAlert?'<span style="font-size:10px;background:rgba(251,113,133,.15);color:var(--rs);padding:2px 8px;border-radius:4px;font-weight:600">要確認</span>':'<span style="font-size:10px;background:rgba(52,211,153,.12);color:var(--em);padding:2px 8px;border-radius:4px;font-weight:600">正常</span>'}
-        </div>
-        <div style="display:flex;gap:6px">
-          <a href="${r.hs.salonUrl||'#'}" target="_blank" class="btn" style="font-size:10px;text-decoration:none">↗ HPBページ確認</a>
-          <button class="btn" style="font-size:10px" onclick="markChecked('${r.name}')">✓ 確認済み</button>
-        </div>
-      </div>
-      <div style="display:flex;gap:12px;flex-wrap:wrap">
-        <div style="flex:1;min-width:140px;background:${statusBg(r.bd,r.freq*2,r.freq*5)};border:1px solid var(--bd);border-radius:var(--rr);padding:12px 14px">
-          <div style="font-size:9px;color:var(--txd);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;font-weight:600">📝 ブログ更新</div>
-          <div style="font-family:'Outfit';font-size:20px;font-weight:700;color:${bc};line-height:1">${r.bd===0?'本日':`${r.bd}日前`}</div>
-          <div style="font-size:10px;color:var(--txm);margin-top:4px">目安：${r.freq<=1?'毎日':`${r.freq}日に1回`} &nbsp;${statusLabel(r.bd,r.freq*2,r.freq*5)}</div>
-        </div>
-        <div style="flex:1;min-width:140px;background:${statusBg(r.rd,7,14)};border:1px solid var(--bd);border-radius:var(--rr);padding:12px 14px">
-          <div style="font-size:9px;color:var(--txd);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;font-weight:600">⭐ 口コミ更新</div>
-          <div style="font-family:'Outfit';font-size:20px;font-weight:700;color:${rc};line-height:1">${r.rd===0?'本日':`${r.rd}日前`}</div>
-          <div style="font-size:10px;color:var(--txm);margin-top:4px">目安：7日以内 &nbsp;${statusLabel(r.rd,7,14)}</div>
-        </div>
-        <div style="flex:1;min-width:160px;background:var(--sf2);border:1px solid var(--bd);border-radius:var(--rr);padding:12px 14px">
-          <div style="font-size:9px;color:var(--txd);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;font-weight:600">⭐ 口コミカウンター</div>
-          <div style="display:flex;align-items:baseline;gap:6px;margin-bottom:6px">
-            <span onclick="editReviewCount('${r.name}')" style="font-family:'Outfit';font-size:24px;font-weight:700;color:#F472B6;line-height:1;cursor:pointer;border-bottom:1px dashed rgba(244,114,182,.4)" title="クリックで直接入力">${r.hs.reviews||0}</span>
-            <span style="font-size:11px;color:var(--txm)">件</span>
-            ${revBadge}
-          </div>
-          <div style="font-size:10px;color:var(--txd);margin-bottom:8px"><span onclick="editRating('${r.name}')" style="cursor:pointer;border-bottom:1px dashed rgba(255,255,255,.3)" title="クリックで評価を入力">★${r.hs.rating||0}</span> &nbsp;|&nbsp; 先月末: ${r.hs.reviewsPrev!=null?r.hs.reviewsPrev:'—'}件</div>
-          <div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:6px">
-            <button onclick="adjReview('${r.name}',1)" style="background:rgba(52,211,153,.15);color:#34D399;border:1px solid rgba(52,211,153,.3);border-radius:6px;padding:4px 8px;font-size:11px;font-weight:700;cursor:pointer">＋1</button>
-            <button onclick="adjReview('${r.name}',2)" style="background:rgba(52,211,153,.15);color:#34D399;border:1px solid rgba(52,211,153,.3);border-radius:6px;padding:4px 8px;font-size:11px;font-weight:700;cursor:pointer">＋2</button>
-            <button onclick="adjReview('${r.name}',5)" style="background:rgba(52,211,153,.15);color:#34D399;border:1px solid rgba(52,211,153,.3);border-radius:6px;padding:4px 8px;font-size:11px;font-weight:700;cursor:pointer">＋5</button>
-            <button onclick="adjReview('${r.name}',-1)" style="background:rgba(251,113,133,.1);color:#FB7185;border:1px solid rgba(251,113,133,.25);border-radius:6px;padding:4px 8px;font-size:11px;font-weight:700;cursor:pointer">－1</button>
-          </div>
-          <button onclick="resetMonthlyReviews('${r.name}')" style="width:100%;background:rgba(255,255,255,.04);color:var(--txd);border:1px solid var(--bd);border-radius:6px;padding:4px;font-size:9px;cursor:pointer;letter-spacing:.5px">📅 月初リセット（現在値を先月末に保存）</button>
-        </div>
-      </div>
+  const googleRanked=[...allKuchikomi].sort((a,b)=>b.google-a.google||b.hpb-a.hpb);
+  const hpbRanked=[...allKuchikomi].sort((a,b)=>b.hpb-a.hpb||b.google-a.google);
+  const mkRankCol=(arr,key,col,label)=>arr.filter(x=>x[key]>0).map((x,i)=>{
+    const medal=i===0?'🥇':i===1?'🥈':i===2?'🥉':'';
+    return`<div class="ri" style="padding:6px 0;border-bottom:1px solid var(--bd);display:flex;align-items:center;gap:8px">
+      <span style="width:22px;text-align:center;font-size:12px;font-weight:700;color:var(--txd);flex-shrink:0">${medal||i+1}</span>
+      <span style="flex:1;min-width:0"><span style="font-size:12px;font-weight:600;color:#E6EDF3">${x.name}</span><span style="font-size:10px;color:var(--txm);margin-left:5px">${x.store.replace('院','')}</span></span>
+      <span style="font-family:'Outfit';font-size:14px;font-weight:700;color:${col}">${x[key]}件</span>
     </div>`;
-  }).join('')}
-  </div>
-  <div style="margin-top:14px;padding:12px 16px;background:var(--sf2);border-radius:var(--rr);border:1px solid var(--bd);font-size:10px;color:var(--txd);line-height:1.8">
-    ⓘ HPBのブログ・口コミページにアクセスし「UP」マークを確認 → 「✓ 確認済み」を押すと本日の日付で記録されます。<br>
-    アラート基準：ブログ＝目安頻度×3倍以上 経過 / 口コミ＝14日以上 経過
-  </div>
+  }).join('');
+  const storeCards=activeList.map(g=>{
+    const ci=stores.findIndex(s=>s.name===g.store);
+    const color=ci>=0?SC[ci%SC.length]:'#7D8CA1';
+    let rows='';
+    g.staff.forEach(name=>{
+      const d=staffProdData?.[g.store]?.[name]?.[curProdYear+'年']?.[curProdMonth]||{};
+      const gv=d.hpR!=null?d.hpR:null;
+      const hv=d.hpbR!=null?d.hpbR:null;
+      rows+=`<tr>
+        <td style="font-weight:600;color:#E6EDF3">${name}</td>
+        <td class="${gv>0?'hl':'dm'}" style="color:${gv>0?'#A3E635':'var(--txd)'}">${gv!=null?gv+'件':'-'}</td>
+        <td class="${hv>0?'hl':'dm'}" style="color:${hv>0?'#FF6B4A':'var(--txd)'}">${hv!=null?hv+'件':'-'}</td>
+      </tr>`;
+    });
+    const tG=g.staff.reduce((a,n)=>{const v=staffProdData?.[g.store]?.[n]?.[curProdYear+'年']?.[curProdMonth]?.hpR;return a+(v!=null?Number(v):0);},0);
+    const tH=g.staff.reduce((a,n)=>{const v=staffProdData?.[g.store]?.[n]?.[curProdYear+'年']?.[curProdMonth]?.hpbR;return a+(v!=null?Number(v):0);},0);
+    return`<div class="cd" style="margin-bottom:14px">
+      <div class="ct"><span class="cdot" style="background:${color}"></span>${g.store}</div>
+      <div class="csu">${curProdYear}年 ${curProdMonth}</div>
+      <div class="tw"><table>
+        <thead><tr><th>スタッフ</th><th style="color:#A3E635">🔍 Google口コミ</th><th style="color:#FF6B4A">🔥 HPB口コミ</th></tr></thead>
+        <tbody>${rows}<tr class="rws"><td>店舗合計</td><td style="color:#A3E635;font-weight:700">${tG>0?tG+'件':'-'}</td><td style="color:#FF6B4A;font-weight:700">${tH>0?tH+'件':'-'}</td></tr></tbody>
+      </table></div>
+    </div>`;
+  }).join('');
+  el.innerHTML=`<div class="fade">
+    <div class="ph">
+      <div><div class="pt"><span style="color:#F472B6">💬</span> 口コミ数値管理</div><div class="pd">${curProdYear}年 ${curProdMonth} — スタッフ別口コミ数</div></div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <div class="mp" style="margin:0">${[2025,2026].map(y=>`<button class="pl ${curProdYear===y?'on':''}" onclick="curProdYear=${y};renderMain()">${y}年</button>`).join('')}</div>
+        <div class="mp" style="margin:0">${MO.map(m=>`<button class="pl ${curProdMonth===m?'on':''}" onclick="curProdMonth='${m}';renderMain()">${m}</button>`).join('')}</div>
+        <button class="btn btn-p" onclick="fetchProdData(this)" style="font-size:10px;padding:5px 12px">${prodDataLoading?'取得中…':'↺ データ更新'}</button>
+      </div>
+    </div>
+    <div style="display:flex;gap:12px;margin-bottom:16px">
+      <div class="cd" style="flex:1;min-width:0">
+        <div class="ct"><span class="cdot" style="background:#A3E635"></span><span style="color:#A3E635">🔍</span> Google口コミ ランキング</div>
+        <div class="csu">${curProdYear}年 ${curProdMonth} — 全スタッフ</div>
+        <div class="rl">${mkRankCol(googleRanked,'google','#A3E635','Google')}</div>
+      </div>
+      <div class="cd" style="flex:1;min-width:0">
+        <div class="ct"><span class="cdot" style="background:#FF6B4A"></span><span style="color:#FF6B4A">🔥</span> HPB口コミ ランキング</div>
+        <div class="csu">${curProdYear}年 ${curProdMonth} — 全スタッフ</div>
+        <div class="rl">${mkRankCol(hpbRanked,'hpb','#FF6B4A','HPB')}</div>
+      </div>
+    </div>
+    ${storeCards}
   </div>`;
 }
 function editRating(storeName){
@@ -784,7 +770,7 @@ function toggleStaffChart(store,name){
 }
 function renderProductivity(el){
   const activeList=STAFF_LIST.filter(g=>g.staff.length>0);
-  const displayMetrics=PROD_METRICS.slice(0,2);
+  const displayMetrics=PROD_METRICS.filter(m=>['prod','members','cancel','rate'].includes(m.key));
 
   // ===== ランキング生成 =====
   const allStaff=[];
@@ -793,7 +779,7 @@ function renderProductivity(el){
     const color=ci>=0?SC[ci%SC.length]:'#7D8CA1';
     g.staff.forEach(name=>{
       const d=staffProdData?.[g.store]?.[name]?.[curProdYear+'年']?.[curProdMonth]||{};
-      allStaff.push({store:g.store,name,color,prod:d.prod||0,members:d.members||0});
+      allStaff.push({store:g.store,name,color,prod:d.prod||0,members:d.members||0,cancel:d.cancel||0,rate:d.rate||0});
     });
   });
   const mkRanking=(arr,key,fmt,color)=>{
@@ -808,6 +794,7 @@ function renderProductivity(el){
   };
   const prodRanked=[...allStaff].sort((a,b)=>b.prod-a.prod);
   const membersRanked=[...allStaff].sort((a,b)=>b.members-a.members);
+  const rateRanked=[...allStaff].sort((a,b)=>b.rate-a.rate);
   const rankingSection=`<div class="g2" style="margin-bottom:16px">
     <div class="cd">
       <div class="ct"><span class="cdot" style="background:#F0C846"></span>個人売上ランキング</div>
@@ -818,6 +805,13 @@ function renderProductivity(el){
       <div class="ct"><span class="cdot" style="background:#3ECFB4"></span>会員数ランキング</div>
       <div class="csu">${curProdYear}年 ${curProdMonth} — 全スタッフ</div>
       <div class="rl">${mkRanking(membersRanked,'members',v=>v+'名','#3ECFB4')}</div>
+    </div>
+  </div>
+  <div class="gf" style="margin-bottom:16px">
+    <div class="cd">
+      <div class="ct"><span class="cdot" style="background:#8B7CF6"></span>新規入会率ランキング</div>
+      <div class="csu">${curProdYear}年 ${curProdMonth} — 全スタッフ</div>
+      <div class="rl" style="display:grid;grid-template-columns:1fr 1fr;gap:0 16px">${mkRanking(rateRanked,'rate',v=>v+'%','#8B7CF6')}</div>
     </div>
   </div>`;
 
