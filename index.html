@@ -298,17 +298,18 @@ function renderAlerts(el){
     const color=ci>=0?SC[ci%SC.length]:'#7D8CA1';
     g.staff.forEach(name=>{
       const d=staffProdData?.[g.store]?.[name]?.[curProdYear+'年']?.[curProdMonth]||{};
-      allKuchikomi.push({store:g.store,name,color,google:d.hpR!=null?d.hpR:0,hpb:d.hpbR!=null?d.hpbR:0,hasData:d.hpR!=null||d.hpbR!=null});
+      allKuchikomi.push({store:g.store,name,color,google:d.hpR!=null?d.hpR:0,hpb:d.hpbR!=null?d.hpbR:0,rate:d.rate!=null?d.rate:0,hasData:d.hpR!=null||d.hpbR!=null||d.rate!=null});
     });
   });
   const googleRanked=[...allKuchikomi].sort((a,b)=>b.google-a.google||b.hpb-a.hpb);
   const hpbRanked=[...allKuchikomi].sort((a,b)=>b.hpb-a.hpb||b.google-a.google);
-  const mkRankCol=(arr,key,col,label)=>arr.filter(x=>x[key]>0).map((x,i)=>{
+  const rateRanked=[...allKuchikomi].sort((a,b)=>b.rate-a.rate||b.google-a.google);
+  const mkRankCol=(arr,key,col,fmt)=>arr.filter(x=>x[key]>0).map((x,i)=>{
     const medal=i===0?'🥇':i===1?'🥈':i===2?'🥉':'';
     return`<div class="ri" style="padding:6px 0;border-bottom:1px solid var(--bd);display:flex;align-items:center;gap:8px">
       <span style="width:22px;text-align:center;font-size:12px;font-weight:700;color:var(--txd);flex-shrink:0">${medal||i+1}</span>
       <span style="flex:1;min-width:0"><span style="font-size:12px;font-weight:600;color:#E6EDF3">${x.name}</span><span style="font-size:10px;color:var(--txm);margin-left:5px">${x.store.replace('院','')}</span></span>
-      <span style="font-family:'Outfit';font-size:14px;font-weight:700;color:${col}">${x[key]}件</span>
+      <span style="font-family:'Outfit';font-size:14px;font-weight:700;color:${col}">${fmt?fmt(x[key]):x[key]+'件'}</span>
     </div>`;
   }).join('');
   const storeCards=activeList.map(g=>{
@@ -319,10 +320,12 @@ function renderAlerts(el){
       const d=staffProdData?.[g.store]?.[name]?.[curProdYear+'年']?.[curProdMonth]||{};
       const gv=d.hpR!=null?d.hpR:null;
       const hv=d.hpbR!=null?d.hpbR:null;
+      const rv=d.rate!=null?d.rate:null;
       rows+=`<tr>
         <td style="font-weight:600;color:#E6EDF3">${name}</td>
         <td class="${gv>0?'hl':'dm'}" style="color:${gv>0?'#A3E635':'var(--txd)'}">${gv!=null?gv+'件':'-'}</td>
         <td class="${hv>0?'hl':'dm'}" style="color:${hv>0?'#FF6B4A':'var(--txd)'}">${hv!=null?hv+'件':'-'}</td>
+        <td class="${rv>0?'hl':'dm'}" style="color:${rv>0?'#8B7CF6':'var(--txd)'}">${rv!=null?rv+'%':'-'}</td>
       </tr>`;
     });
     const tG=g.staff.reduce((a,n)=>{const v=staffProdData?.[g.store]?.[n]?.[curProdYear+'年']?.[curProdMonth]?.hpR;return a+(v!=null?Number(v):0);},0);
@@ -331,8 +334,8 @@ function renderAlerts(el){
       <div class="ct"><span class="cdot" style="background:${color}"></span>${g.store}</div>
       <div class="csu">${curProdYear}年 ${curProdMonth}</div>
       <div class="tw"><table>
-        <thead><tr><th>スタッフ</th><th style="color:#A3E635">🔍 Google口コミ</th><th style="color:#FF6B4A">🔥 HPB口コミ</th></tr></thead>
-        <tbody>${rows}<tr class="rws"><td>店舗合計</td><td style="color:#A3E635;font-weight:700">${tG>0?tG+'件':'-'}</td><td style="color:#FF6B4A;font-weight:700">${tH>0?tH+'件':'-'}</td></tr></tbody>
+        <thead><tr><th>スタッフ</th><th style="color:#A3E635">🔍 Google口コミ</th><th style="color:#FF6B4A">🔥 HPB口コミ</th><th style="color:#8B7CF6">📈 新規入会率</th></tr></thead>
+        <tbody>${rows}<tr class="rws"><td>店舗合計</td><td style="color:#A3E635;font-weight:700">${tG>0?tG+'件':'-'}</td><td style="color:#FF6B4A;font-weight:700">${tH>0?tH+'件':'-'}</td><td>—</td></tr></tbody>
       </table></div>
     </div>`;
   }).join('');
@@ -349,12 +352,17 @@ function renderAlerts(el){
       <div class="cd" style="flex:1;min-width:0">
         <div class="ct"><span class="cdot" style="background:#A3E635"></span><span style="color:#A3E635">🔍</span> Google口コミ ランキング</div>
         <div class="csu">${curProdYear}年 ${curProdMonth} — 全スタッフ</div>
-        <div class="rl">${mkRankCol(googleRanked,'google','#A3E635','Google')}</div>
+        <div class="rl">${mkRankCol(googleRanked,'google','#A3E635')}</div>
       </div>
       <div class="cd" style="flex:1;min-width:0">
         <div class="ct"><span class="cdot" style="background:#FF6B4A"></span><span style="color:#FF6B4A">🔥</span> HPB口コミ ランキング</div>
         <div class="csu">${curProdYear}年 ${curProdMonth} — 全スタッフ</div>
-        <div class="rl">${mkRankCol(hpbRanked,'hpb','#FF6B4A','HPB')}</div>
+        <div class="rl">${mkRankCol(hpbRanked,'hpb','#FF6B4A')}</div>
+      </div>
+      <div class="cd" style="flex:1;min-width:0">
+        <div class="ct"><span class="cdot" style="background:#8B7CF6"></span><span style="color:#8B7CF6">📈</span> 新規入会率 ランキング</div>
+        <div class="csu">${curProdYear}年 ${curProdMonth} — 全スタッフ</div>
+        <div class="rl">${mkRankCol(rateRanked,'rate','#8B7CF6',v=>v+'%')}</div>
       </div>
     </div>
     ${storeCards}
