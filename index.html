@@ -780,7 +780,7 @@ function toggleStaffChart(store,name){
 }
 function renderProductivity(el){
   const activeList=STAFF_LIST.filter(g=>g.staff.length>0);
-  const displayMetrics=PROD_METRICS.filter(m=>['prod','members','cancel','rate'].includes(m.key));
+  const displayMetrics=PROD_METRICS.filter(m=>['prod','members','rate'].includes(m.key));
 
   // ===== ランキング生成 =====
   const allStaff=[];
@@ -805,24 +805,45 @@ function renderProductivity(el){
   const prodRanked=[...allStaff].sort((a,b)=>b.prod-a.prod);
   const membersRanked=[...allStaff].sort((a,b)=>b.members-a.members);
   const rateRanked=[...allStaff].sort((a,b)=>b.rate-a.rate);
-  const rankingSection=`<div class="g2" style="margin-bottom:16px">
-    <div class="cd">
-      <div class="ct"><span class="cdot" style="background:#F0C846"></span>個人売上ランキング</div>
+  const cancelRanked=[...allStaff].filter(x=>x.members>0&&x.cancel>=0).sort((a,b)=>a.cancel-b.cancel);
+  const mkRankingCol=(arr,key,fmt,col)=>arr.filter(x=>x[key]>0).map((x,i)=>{
+    const medal=i===0?'🥇':i===1?'🥈':i===2?'🥉':'';
+    return`<div class="ri" style="padding:6px 0;border-bottom:1px solid var(--bd);display:flex;align-items:center;gap:8px">
+      <span style="width:22px;text-align:center;font-size:12px;font-weight:700;color:var(--txd);flex-shrink:0">${medal||i+1}</span>
+      <span style="flex:1;min-width:0"><span style="font-size:12px;font-weight:600;color:#E6EDF3">${x.name}</span><span style="font-size:10px;color:var(--txm);margin-left:5px">${x.store.replace('院','')}</span></span>
+      <span style="font-family:'Outfit';font-size:14px;font-weight:700;color:${col}">${fmt(x[key])}</span>
+    </div>`;
+  }).join('');
+  const mkCancelRanking=arr=>arr.map((x,i)=>{
+    const medal=i===0?'🥇':i===1?'🥈':i===2?'🥉':'';
+    const col=x.cancel===0?'#A3E635':x.cancel<=3?'#3ECFB4':x.cancel<=6?'#F0C846':'#FF6B4A';
+    return`<div class="ri" style="padding:6px 0;border-bottom:1px solid var(--bd);display:flex;align-items:center;gap:8px">
+      <span style="width:22px;text-align:center;font-size:12px;font-weight:700;color:var(--txd);flex-shrink:0">${medal||i+1}</span>
+      <span style="flex:1;min-width:0"><span style="font-size:12px;font-weight:600;color:#E6EDF3">${x.name}</span><span style="font-size:10px;color:var(--txm);margin-left:5px">${x.store.replace('院','')}</span></span>
+      <span style="font-family:'Outfit';font-size:14px;font-weight:700;color:${col}">${x.cancel}名</span>
+    </div>`;
+  }).join('');
+  const rankingSection=`<div style="display:flex;gap:12px;margin-bottom:16px">
+    <div class="cd" style="flex:1;min-width:0">
+      <div class="ct"><span class="cdot" style="background:#F0C846"></span>💰 個人売上ランキング</div>
       <div class="csu">${curProdYear}年 ${curProdMonth} — 全スタッフ</div>
-      <div class="rl">${mkRanking(prodRanked,'prod',v=>'¥'+Number(v).toLocaleString(),'#F0C846')}</div>
+      <div class="rl">${mkRankingCol(prodRanked,'prod',v=>'¥'+Number(v).toLocaleString(),'#F0C846')}</div>
     </div>
-    <div class="cd">
-      <div class="ct"><span class="cdot" style="background:#3ECFB4"></span>会員数ランキング</div>
+    <div class="cd" style="flex:1;min-width:0">
+      <div class="ct"><span class="cdot" style="background:#3ECFB4"></span>👥 会員数ランキング</div>
       <div class="csu">${curProdYear}年 ${curProdMonth} — 全スタッフ</div>
-      <div class="rl">${mkRanking(membersRanked,'members',v=>v+'名','#3ECFB4')}</div>
+      <div class="rl">${mkRankingCol(membersRanked,'members',v=>v+'名','#3ECFB4')}</div>
+    </div>
+    <div class="cd" style="flex:1;min-width:0">
+      <div class="ct"><span class="cdot" style="background:#8B7CF6"></span>📈 新規入会率ランキング</div>
+      <div class="csu">${curProdYear}年 ${curProdMonth} — 全スタッフ</div>
+      <div class="rl">${mkRankingCol(rateRanked,'rate',v=>v+'%','#8B7CF6')}</div>
     </div>
   </div>
-  <div class="gf" style="margin-bottom:16px">
-    <div class="cd">
-      <div class="ct"><span class="cdot" style="background:#8B7CF6"></span>新規入会率ランキング</div>
-      <div class="csu">${curProdYear}年 ${curProdMonth} — 全スタッフ</div>
-      <div class="rl" style="display:grid;grid-template-columns:1fr 1fr;gap:0 16px">${mkRanking(rateRanked,'rate',v=>v+'%','#8B7CF6')}</div>
-    </div>
+  <div class="cd" style="margin-bottom:16px">
+    <div class="ct"><span class="cdot" style="background:#38BDF8"></span>🔻 退会数ランキング<span style="font-size:10px;color:var(--txm);font-weight:400;margin-left:8px">少ない順</span></div>
+    <div class="csu">${curProdYear}年 ${curProdMonth} — 全スタッフ</div>
+    <div class="rl" style="display:grid;grid-template-columns:1fr 1fr;gap:0 16px">${mkCancelRanking(cancelRanked)}</div>
   </div>`;
 
   const storeCards=activeList.map(g=>{
