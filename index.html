@@ -361,22 +361,23 @@ function renderAlerts(el){
     <div class="cd" style="margin-bottom:14px">
       <div class="ct"><span class="cdot" style="background:#F472B6"></span>📊 年間口コミ合計</div>
       <div class="csu">${curProdYear}年 — Google + HPB 全月合算</div>
-      <div class="tw"><table>
+      <div class="tw"><table style="table-layout:fixed"><colgroup><col style="width:100px"><col style="width:80px"><col style="width:120px"><col style="width:120px"><col style="width:80px"></colgroup>
         <thead><tr><th>店舗</th><th>スタッフ</th><th style="color:#A3E635">🔍 Google 年間</th><th style="color:#FF6B4A">🔥 HPB 年間</th><th style="color:#F472B6">合計</th></tr></thead>
         <tbody>${(()=>{
           let html='';let grandG=0,grandH=0;
           activeList.forEach(g=>{
             let storeG=0,storeH=0;
+            const ci=stores.findIndex(s=>s.name===g.store);
+            const color=ci>=0?SC[ci%SC.length]:'#7D8CA1';
+            const staffCount=g.staff.length+1;
             g.staff.forEach((name,si)=>{
               let sg=0,sh=0;
               MO.forEach(m=>{const d=staffProdData?.[g.store]?.[name]?.[curProdYear+'年']?.[m]||{};sg+=(d.hpR!=null?Number(d.hpR):0);sh+=(d.hpbR!=null?Number(d.hpbR):0);});
               storeG+=sg;storeH+=sh;
-              const ci=stores.findIndex(s=>s.name===g.store);
-              const color=ci>=0?SC[ci%SC.length]:'#7D8CA1';
-              html+='<tr'+(si===0?' style="border-top:2px solid var(--bd)"':'')+'><td'+(si===0?' style="font-weight:700"><span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:'+color+';margin-right:5px"></span>'+g.store:'')+'</td><td style="color:var(--txm)">'+name+'</td><td class="'+(sg>0?'hl':'dm')+'" style="color:'+(sg>0?'#A3E635':'var(--txd)')+'">'+sg+'件</td><td class="'+(sh>0?'hl':'dm')+'" style="color:'+(sh>0?'#FF6B4A':'var(--txd)')+'">'+sh+'件</td><td style="font-weight:600">'+(sg+sh)+'件</td></tr>';
+              html+='<tr'+(si===0?' style="border-top:2px solid var(--bd)"':'')+'>'+(si===0?'<td rowspan="'+staffCount+'" style="font-weight:700;vertical-align:middle"><span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:'+color+';margin-right:5px"></span>'+g.store+'</td>':'')+'<td style="color:var(--txm)">'+name+'</td><td class="'+(sg>0?'hl':'dm')+'" style="color:'+(sg>0?'#A3E635':'var(--txd)')+'">'+sg+'件</td><td class="'+(sh>0?'hl':'dm')+'" style="color:'+(sh>0?'#FF6B4A':'var(--txd)')+'">'+sh+'件</td><td style="font-weight:600">'+(sg+sh)+'件</td></tr>';
             });
             grandG+=storeG;grandH+=storeH;
-            html+='<tr style="background:rgba(255,255,255,.02)"><td></td><td style="font-weight:600;color:var(--txm)">店舗計</td><td style="color:#A3E635;font-weight:700">'+storeG+'件</td><td style="color:#FF6B4A;font-weight:700">'+storeH+'件</td><td style="font-weight:700;color:#F472B6">'+(storeG+storeH)+'件</td></tr>';
+            html+='<tr style="background:rgba(255,255,255,.02)"><td style="font-weight:600;color:var(--txm)">店舗計</td><td style="color:#A3E635;font-weight:700">'+storeG+'件</td><td style="color:#FF6B4A;font-weight:700">'+storeH+'件</td><td style="font-weight:700;color:#F472B6">'+(storeG+storeH)+'件</td></tr>';
           });
           html+='<tr class="rws"><td colspan="2">全店舗合計</td><td style="color:#A3E635;font-weight:700">'+grandG+'件</td><td style="color:#FF6B4A;font-weight:700">'+grandH+'件</td><td style="font-weight:700;color:#F472B6">'+(grandG+grandH)+'件</td></tr>';
           return html;
