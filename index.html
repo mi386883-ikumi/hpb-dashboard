@@ -44,6 +44,21 @@ let apiKey='AIzaSyBx1s4wOTZ0kQNEFaxU4982tiUtGVEqrPA';
 let storeData={};let liveStores=new Set();let curView='all';let curYear=2025;let curMonth='1月';let curFilterMonth=null;let charts={};let selectedCompareStores=null;
 let curHpbStore='大森院';
 let gasEndpoint='';
+let receptionFolders={
+  '大森院':    '173GDweKPxYQJn6_3_dcQH7WuMffL4twg',
+  '新馬場院':  '1Fe7r1A5GS2MiZvov1FKt9r1-2WGC8KfQ',
+  '浦添院':    '1Bzlnci1KltkK1ifrXc9sfrhvlfsITO3a',
+  '神戸住吉院':'1wABVP10W9tiqHTdC1IpImxtzHA2IHMCK',
+  '京都花園院':'1j6BfrNC68lcEu9CN2phOpQIlsPU_oIEw',
+  '人形町院':  '1jgZR3qwVhAw55o2ZwZW39FY6xMYqGD76',
+  '札幌丸山院':'15NCcl21PJPk5eVDt7Y6wKM9z2jw3ev_C',
+  '大里院':    '1lAhOSOybFMMuKCDmLcEV5T-egJ6QMp98',
+  'コザ院':    '1TY6wE9Qttwpy4o01QICRDaESe6ctXeYM',
+  '中野院':    '1FRK9ZuuxmIpMfy3P1p-YLT6zpVddPZai',
+  '日暮里院':  '1bbU090TUZLRIKEPvjcDnyc3vPCmQ2c07'
+};
+let folderFileLists={};
+let receptionCache={};let receptionLoading=false;
 let hpbStatsByStore={
   '大森院':{reviews:150,reviewsPrev:145,rating:4.75,blogs:598,ranking:9,rankingKeyword:'大森 整体',rankingUrl:'https://beauty.hotpepper.jp/genre/kgkw011/stc0290015/',salonUrl:'https://beauty.hotpepper.jp/kr/slnH000551938/',lastUpdated:'2026-03-28',lastBlogDate:'2026-03-29',lastReviewDate:'2026-03-29',blogFreqDays:2},
   '京都花園院':{reviews:119,reviewsPrev:119,rating:4.94,blogs:466,ranking:1,rankingKeyword:'京都花園 整体',rankingUrl:'https://beauty.hotpepper.jp/genre/kgkw011/stc2206645/',salonUrl:'https://beauty.hotpepper.jp/kr/slnH000655277/',lastUpdated:'2026-03-29',lastBlogDate:'2026-03-29',lastReviewDate:'2026-03-29',blogFreqDays:2},
@@ -60,7 +75,7 @@ let hpbStatsByStore={
 // ===== 個人生産性 スタッフリスト =====
 const STAFF_LIST=[
   {store:'大森院',   staff:['宮崎','亀井','植松']},
-  {store:'新馬場院', staff:['加々美','宮崎']},
+  {store:'新馬場院', staff:['加々美','宮崎','宮﨑']},
   {store:'日暮里院', staff:['宇田川','古谷','須永']},
   {store:'浦添院',   staff:['阿嘉']},
   {store:'人形町院', staff:['小林','大澤']},
@@ -799,32 +814,43 @@ function toggleStaffChart(store,name){
 }
 function renderProductivity(el){
   const activeList=STAFF_LIST.filter(g=>g.staff.length>0);
-  const displayMetrics=PROD_METRICS.filter(m=>['prod','members','rate'].includes(m.key));
-
-  // ===== ランキング生成 =====
+  // 受付履歴データを非同期でバックグラウンド取得
+  Object.keys(receptionFolders).forEach(storeName=>{
+    const cacheKey=`${storeName}|${curProdYear}|${curProdMonth}`;
+    if(!receptionCache[cacheKey]){
+      (async()=>{
+        const folderId=receptionFolders[storeName];
+        const mm=String(MO.indexOf(curProdMonth)+1).padStart(2,'0');
+        const yyyymm=`${curProdYear}${mm}`;
+        const sheetId=await getFolderFileId(folderId,yyyymm);
+        if(!sheetId)return;
+        try{
+          const url=`https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/A3:U1000?key=${apiKey}`;
+          const res=await fetch(url);
+          const data=await res.json();
+          if(data.values&&data.values.length>0){receptionCache[cacheKey]=data.values;renderMain();}
+        }catch(e){}
+      })();
+    }
+  });
+  // allStaff: 受付データから生産性、staffProdDataから成約率等
   const allStaff=[];
   activeList.forEach(g=>{
     const ci=stores.findIndex(s=>s.name===g.store);
     const color=ci>=0?SC[ci%SC.length]:'#7D8CA1';
+    const cacheKey=`${g.store}|${curProdYear}|${curProdMonth}`;
+    const recParsed=receptionCache[cacheKey]?parseReceptionRows(receptionCache[cacheKey]):[];
+    const recLookup={};recParsed.forEach(d=>recLookup[d.name]=d);
     g.staff.forEach(name=>{
       const d=staffProdData?.[g.store]?.[name]?.[curProdYear+'年']?.[curProdMonth]||{};
-      allStaff.push({store:g.store,name,color,prod:d.prod||0,members:d.members||0,cancel:d.cancel||0,rate:d.rate||0});
+      const rec=recLookup[name];
+      allStaff.push({store:g.store,name,color,prod:rec?.total||0,cont:rec?.contSales||0,newSales:rec?.newSales||0,count:rec?.count||0,members:d.members||0,cancel:d.cancel||0,rate:d.rate||0});
     });
   });
-  const mkRanking=(arr,key,fmt,color)=>{
-    return arr.filter(x=>x[key]>0).map((x,i)=>{
-      const medal=i===0?'🥇':i===1?'🥈':i===2?'🥉':'';
-      return`<div class="ri" style="padding:5px 0;border-bottom:1px solid var(--bd)">
-        <span class="rp" style="width:22px;font-size:11px;font-weight:700;color:var(--txd)">${medal||i+1}</span>
-        <span style="flex:1;font-size:12px;font-weight:600;color:#E6EDF3">${x.name}<span style="font-size:10px;color:var(--txm);margin-left:6px">${x.store.replace('院','')}</span></span>
-        <span style="font-family:'Outfit';font-size:13px;font-weight:700;color:${color}">${fmt(x[key])}</span>
-      </div>`;
-    }).join('');
-  };
   const prodRanked=[...allStaff].sort((a,b)=>b.prod-a.prod);
-  const membersRanked=[...allStaff].sort((a,b)=>b.members-a.members);
   const rateRanked=[...allStaff].sort((a,b)=>b.rate-a.rate);
   const cancelRanked=[...allStaff].filter(x=>x.members>0&&x.cancel>=0).sort((a,b)=>a.cancel-b.cancel);
+  const membersRanked=[...allStaff].sort((a,b)=>b.members-a.members);
   const mkRankingCol=(arr,key,fmt,col)=>arr.filter(x=>x[key]>0).map((x,i)=>{
     const medal=i===0?'🥇':i===1?'🥈':i===2?'🥉':'';
     return`<div class="ri" style="padding:6px 0;border-bottom:1px solid var(--bd);display:flex;align-items:center;gap:8px">
@@ -864,44 +890,52 @@ function renderProductivity(el){
       <div class="rl">${mkRankingCol(membersRanked,'members',v=>v+'名','#3ECFB4')}</div>
     </div>
   </div>`;
-
   const storeCards=activeList.map(g=>{
     const ci=stores.findIndex(s=>s.name===g.store);
     const color=ci>=0?SC[ci%SC.length]:'#7D8CA1';
+    const cacheKey=`${g.store}|${curProdYear}|${curProdMonth}`;
+    const hasRec=!!receptionCache[cacheKey];
+    const recParsed=hasRec?parseReceptionRows(receptionCache[cacheKey]):[];
+    const recLookup={};recParsed.forEach(d=>recLookup[d.name]=d);
+    const fmtM=v=>v>0?'¥'+Number(v).toLocaleString():'-';
+    const fmtC=v=>v>0?v+'件':'-';
+    const fmtR=v=>v!=null&&v>0?v+'%':'-';
     let rows='';
     g.staff.forEach(name=>{
       const d=staffProdData?.[g.store]?.[name]?.[curProdYear+'年']?.[curProdMonth]||{};
-      const cells=displayMetrics.map(m=>{
-        const v=d[m.key];const hasVal=v!=null&&v!=='';
-        return`<td class="${hasVal?'hl':'dm'}">${hasVal?m.fmt(v):'-'}</td>`;
-      }).join('');
+      const rec=recLookup[name];
       const key=g.store+'|'+name;
       const isExp=!!expandedStaff[key];
       const cid='sc-'+sanitizeId(g.store)+'-'+sanitizeId(name);
       const esc=s=>s.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
       rows+=`<tr class="staff-row${isExp?' expanded':''}" onclick="toggleStaffChart('${esc(g.store)}','${esc(name)}')">
-        <td style="font-weight:600;color:#E6EDF3"><span style="display:inline-block;width:14px;font-size:9px;color:var(--txd);transition:transform .2s;transform:rotate(${isExp?90:0}deg)">▶</span> ${name}</td>${cells}
+        <td style="font-weight:600;color:#E6EDF3"><span style="display:inline-block;width:14px;font-size:9px;color:var(--txd);transition:transform .2s;transform:rotate(${isExp?90:0}deg)">▶</span> ${name}</td>
+        <td class="${rec?.total>0?'hl':'dm'}">${fmtM(rec?.total||0)}</td>
+        <td style="color:#3ECFB4;font-weight:${rec?.contSales>0?'600':'400'}">${fmtM(rec?.contSales||0)}</td>
+        <td style="color:#F472B6;font-weight:${rec?.newSales>0?'600':'400'}">${fmtM(rec?.newSales||0)}</td>
+        <td style="color:#60A5FA;font-weight:${rec?.count>0?'600':'400'}">${fmtC(rec?.count||0)}</td>
+        <td style="color:#8B7CF6;font-weight:600">${fmtR(d.rate)}</td>
       </tr>`;
-      if(isExp){rows+=`<tr class="staff-chart-row"><td colspan="${displayMetrics.length+1}"><div class="staff-chart-wrap"><canvas id="${cid}"></canvas></div></td></tr>`;}
+      if(isExp){rows+=`<tr class="staff-chart-row"><td colspan="6"><div class="staff-chart-wrap"><canvas id="${cid}"></canvas></div></td></tr>`;}
     });
-    const totRow=displayMetrics.map(m=>{
-      const sum=g.staff.reduce((a,n)=>{const v=staffProdData?.[g.store]?.[n]?.[curProdYear+'年']?.[curProdMonth]?.[m.key];return a+(v!=null?Number(v):0);},0);
-      return`<td style="font-weight:700;color:${color}">${sum>0?m.fmt(sum):'-'}</td>`;
-    }).join('');
+    const tP=recParsed.reduce((a,b)=>a+b.total,0);
+    const tC=recParsed.reduce((a,b)=>a+b.contSales,0);
+    const tN=recParsed.reduce((a,b)=>a+b.newSales,0);
+    const tK=recParsed.reduce((a,b)=>a+b.count,0);
     return`<div class="cd" style="margin-bottom:16px">
-      <div class="ct"><span class="cdot" style="background:${color}"></span>${g.store}</div>
+      <div class="ct"><span class="cdot" style="background:${color}"></span>${g.store}${!hasRec&&receptionFolders[g.store]?'<span style="font-size:10px;color:var(--txd);margin-left:6px">読込中…</span>':''}</div>
       <div class="csu">${curProdYear}年 ${curProdMonth} — ${g.staff.length}名 ／ 行をタップでグラフ展開</div>
       <div class="tw"><table>
-        <thead><tr><th>スタッフ</th>${displayMetrics.map(m=>`<th>${m.label}</th>`).join('')}</tr></thead>
-        <tbody>${rows}<tr class="rws"><td>店舗合計</td>${totRow}</tr></tbody>
+        <thead><tr><th>スタッフ</th><th>生産性（個人売上）</th><th>継続売上</th><th>新規売上</th><th>会員数</th><th>成約率</th></tr></thead>
+        <tbody>${rows}${tP>0?`<tr class="rws"><td>店舗合計</td><td>¥${tP.toLocaleString()}</td><td>¥${tC.toLocaleString()}</td><td>¥${tN.toLocaleString()}</td><td>${tK}件</td><td>-</td></tr>`:''}</tbody>
       </table></div>
     </div>`;
   }).join('');
-  if(!prodDataLoaded&&!prodDataLoading) fetchProdData(null);
+  if(!prodDataLoaded&&!prodDataLoading)fetchProdData(null);
   el.innerHTML=`<div class="fade">
     <div class="ph">
       <div><div class="pt"><span style="color:#A78BFA">📊</span> 個人生産性管理</div><div class="pd">${curProdYear}年 ${curProdMonth} — TAKEDAGROUPスタッフ別データ</div></div>
-      <div style="display:flex;gap:8px;align-items:center"><div class="mp" style="margin:0">${[2025,2026].map(y=>`<button class="pl ${curProdYear===y?'on':''}" onclick="curProdYear=${y};renderMain()">${y}年</button>`).join('')}</div><div class="mp" style="margin:0">${MO.map(m=>`<button class="pl ${curProdMonth===m?'on':''}" onclick="curProdMonth='${m}';renderMain()">${m}</button>`).join('')}</div><button class="btn btn-p" onclick="fetchProdData(this)" style="font-size:10px;padding:5px 12px">${prodDataLoading?'取得中…':'↺ データ更新'}</button></div>
+      <div style="display:flex;gap:8px;align-items:center"><div class="mp" style="margin:0">${[2025,2026].map(y=>`<button class="pl ${curProdYear===y?'on':''}" onclick="curProdYear=${y};renderMain()">${y}年</button>`).join('')}</div><div class="mp" style="margin:0">${MO.map(m=>`<button class="pl ${curProdMonth===m?'on':''}" onclick="curProdMonth='${m}';renderMain()">${m}</button>`).join('')}</div><button class="btn btn-p" onclick="receptionCache={};folderFileLists={};renderMain()" style="font-size:10px;padding:5px 12px">↺ 受付データ更新</button></div>
     </div>
     ${prodDataLoading?'<div class="stb"><span class="sd lv"></span>スプレッドシートからデータを取得しています…</div>':''}
     ${rankingSection}
@@ -927,6 +961,43 @@ function initProductivityCharts(){
   });
 }
 
+// ===== 受付履歴 フォルダ→ファイルID解決 =====
+async function getFolderFileId(folderId,yyyymm){
+  if(!folderFileLists[folderId]){
+    try{
+      const url=`https://www.googleapis.com/drive/v3/files?q='${folderId}'+in+parents&key=${apiKey}&fields=files(id,name)&pageSize=200`;
+      const res=await fetch(url);
+      const data=await res.json();
+      const map={};(data.files||[]).forEach(f=>map[f.name]=f.id);
+      folderFileLists[folderId]=map;
+    }catch(e){return null;}
+  }
+  return folderFileLists[folderId]?.[yyyymm]||null;
+}
+// ===== 受付履歴 データパーサー =====
+function parseReceptionRows(rows){
+  const staffMap={};
+  rows.forEach(row=>{
+    const staff=(row[7]||'').trim();
+    if(!staff)return;
+    const salesStr=(row[14]||'').replace(/[,¥￥\s]/g,'');
+    const sales=parseInt(salesStr)||0;
+    if(sales<=0)return;
+    const isNew=(row[20]||'').trim()==='新患';
+    const lCol=(row[11]||'').trim();
+    const countMember=lCol!==''&&lCol!=='楽トレ';
+    if(!staffMap[staff])staffMap[staff]={total:0,newSales:0,count:0,newCount:0};
+    staffMap[staff].total+=sales;
+    if(countMember)staffMap[staff].count++;
+    if(isNew){staffMap[staff].newSales+=sales;staffMap[staff].newCount++;}
+  });
+  return Object.entries(staffMap).map(([name,d])=>({
+    name,total:d.total,newSales:d.newSales,contSales:d.total-d.newSales,
+    count:d.count,newCount:d.newCount,
+    rate:d.count>0?Math.round(d.newCount/d.count*1000)/10:0
+  })).sort((a,b)=>b.total-a.total);
+}
+// ===== ここまで =====
 function openSettings(){document.getElementById('settingsModal').classList.add('show');document.getElementById('mApiKey').value=apiKey;document.getElementById('mGasEndpoint').value=gasEndpoint;renderStoreEdit();}
 function closeSettings(){document.getElementById('settingsModal').classList.remove('show');}
 function renderStoreEdit(){const el=document.getElementById('storeListEdit');el.innerHTML=stores.map((s,i)=>`<div class="se-row"><input class="fi se-nm" value="${s.name}" data-idx="${i}" placeholder="店舗名" /><input class="fi" value="${s.id}" data-idx="${i}" placeholder="スプレッドシートID" /><button class="del-b" onclick="delStore(${i})">削除</button></div>`).join('');}
