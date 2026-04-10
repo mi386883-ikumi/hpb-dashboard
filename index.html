@@ -148,7 +148,28 @@ function fetchProdData(btnEl){
       if(c.gasEndpoint)gasEndpoint=c.gasEndpoint;
     }
   }catch(e){}
-
+  // ── 受付履歴キャッシュ復元 ──
+  try{
+    const sf=localStorage.getItem('hpb_folder_lists');
+    if(sf)folderFileLists=JSON.parse(sf);
+  }catch(e){}
+  try{
+    const sr=localStorage.getItem('hpb_reception_cache');
+    if(sr){
+      const parsed=JSON.parse(sr);
+      const now=Date.now();
+      const curYM=new Date().getFullYear()*100+(new Date().getMonth()+1);
+      Object.keys(parsed).forEach(key=>{
+        const entry=parsed[key];
+        const parts=key.split('|');
+        const entryYM=parseInt(parts[1])*100+(MO.indexOf(parts[2])+1);
+        // 過去月は永続、当月は2時間TTL
+        if(entryYM<curYM||(now-(entry.ts||0))<7200000){
+          receptionCache[key]=entry.data;
+        }
+      });
+    }
+  }catch(e){}
   // ── 自動月次スナップショット ──
   // 新しい月を検知したら reviewsPrev を自動更新し来月のベースラインにする
   try{
@@ -828,7 +849,15 @@ function renderProductivity(el){
           const url=`https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/A3:U1000?key=${apiKey}`;
           const res=await fetch(url);
           const data=await res.json();
-          if(data.values&&data.values.length>0){receptionCache[cacheKey]=data.values;renderMain();}
+          if(data.values&&data.values.length>0){
+            receptionCache[cacheKey]=parseReceptionRows(data.values);
+            try{
+              const existing=JSON.parse(localStorage.getItem('hpb_reception_cache')||'{}');
+              existing[cacheKey]={data:receptionCache[cacheKey],ts:Date.now()};
+              localStorage.setItem('hpb_reception_cache',JSON.stringify(existing));
+            }catch(e){}
+            renderMain();
+          }
         }catch(e){}
       })();
     }
@@ -839,7 +868,7 @@ function renderProductivity(el){
     const ci=stores.findIndex(s=>s.name===g.store);
     const color=ci>=0?SC[ci%SC.length]:'#7D8CA1';
     const cacheKey=`${g.store}|${curProdYear}|${curProdMonth}`;
-    const recParsed=receptionCache[cacheKey]?parseReceptionRows(receptionCache[cacheKey]):[];
+    const recParsed=receptionCache[cacheKey]||[];
     const recLookup={};recParsed.forEach(d=>recLookup[d.name]=d);
     g.staff.forEach(name=>{
       const d=staffProdData?.[g.store]?.[name]?.[curProdYear+'年']?.[curProdMonth]||{};
@@ -895,7 +924,7 @@ function renderProductivity(el){
     const color=ci>=0?SC[ci%SC.length]:'#7D8CA1';
     const cacheKey=`${g.store}|${curProdYear}|${curProdMonth}`;
     const hasRec=!!receptionCache[cacheKey];
-    const recParsed=hasRec?parseReceptionRows(receptionCache[cacheKey]):[];
+    const recParsed=hasRec?receptionCache[cacheKey]:[];
     const recLookup={};recParsed.forEach(d=>recLookup[d.name]=d);
     const fmtM=v=>v>0?'¥'+Number(v).toLocaleString():'-';
     const fmtC=v=>v>0?v+'件':'-';
@@ -970,6 +999,7 @@ async function getFolderFileId(folderId,yyyymm){
       const data=await res.json();
       const map={};(data.files||[]).forEach(f=>map[f.name]=f.id);
       folderFileLists[folderId]=map;
+      try{localStorage.setItem('hpb_folder_lists',JSON.stringify(folderFileLists));}catch(e){}
     }catch(e){return null;}
   }
   return folderFileLists[folderId]?.[yyyymm]||null;
