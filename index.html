@@ -461,24 +461,7 @@ function renderInsight(el){
     return{store,top,bot,ratio,color:ci>=0?SC[ci%SC.length]:'#7D8CA1'};
   }).filter(d=>d&&d.ratio>1.5).sort((a,b)=>b.ratio-a.ratio);
 
-  // 5. HP・HPB新規数が伸びた店舗
-  const growthData=[];
-  stores.forEach((s,i)=>{
-    const d=storeData[i]?.[curY];
-    if(!d)return;
-    const cur=d.monthly.find(m=>m.month===curM);
-    const prevD=storeData[i]?.[prevY];
-    const prev=prevD?.monthly.find(m=>m.month===prevM);
-    if(!cur)return;
-    const hpbC=cur.HPB??0,hpbP=prev?.HPB??0;
-    const hpC=cur.HP??0,hpP=prev?.HP??0;
-    const hpbUp=hpbC>hpbP,hpUp=hpC>hpP;
-    if(!hpbUp&&!hpUp)return;
-    growthData.push({store:s.name,hpbC,hpbP,hpbUp,hpbDiff:hpbC-hpbP,hpC,hpP,hpUp,hpDiff:hpC-hpP,color:SC[i%SC.length]});
-  });
-  growthData.sort((a,b)=>(b.hpbDiff+b.hpDiff)-(a.hpbDiff+a.hpDiff));
-
-  const urgentCount=lowReview.length+highCancel.length;
+const urgentCount=lowReview.length+highCancel.length;
   const warnCount=trendDown.length+gapData.length;
 
   const mkRow=(icon,title,detail,action,sev)=>{
@@ -521,16 +504,7 @@ function renderInsight(el){
       return mkRow('📉',`${d.name}（${d.store.replace('院','')}）— 売上 ${d.change}%低下`,`${prevM} ${pf} → ${curM} ${cf}`,'売上回復のため個別面談・目標設定を行ってください','warn');
     }).join('');
 
-  const growthHtml=growthData.length===0
-    ?mkRow('—','前月比で増加した店舗なし',`${prevM}→${curM} HP・HPBともに前月比増加の店舗はありません`,'','ok')
-    :growthData.map(d=>{
-      const parts=[];
-      if(d.hpbUp)parts.push(`HPB: ${d.hpbP}→<strong style="color:#FF6B4A">${d.hpbC}名</strong>（+${d.hpbDiff}）`);
-      if(d.hpUp)parts.push(`HP: ${d.hpP}→<strong style="color:#3ECFB4">${d.hpC}名</strong>（+${d.hpDiff}）`);
-      return mkRow('🌱',d.store,parts.join(' ／ '),'','ok');
-    }).join('');
-
-  const gapHtml=gapData.length===0
+const gapHtml=gapData.length===0
     ?mkRow('✅','スタッフ間成績差 — 問題なし','各店舗内の売上格差は許容範囲（1.5倍以内）に収まっています','','ok')
     :gapData.map(d=>{
       const tf='¥'+Number(d.top.cur.prod).toLocaleString();
@@ -572,11 +546,7 @@ function renderInsight(el){
         <div class="csu">${curY}年${curM} — 店舗内最高/最低比 1.5倍以上を検知</div>
         <div>${gapHtml}</div>
       </div>
-      <div class="cd" style="grid-column:1/-1">
-        <div class="ct"><span class="cdot" style="background:#A3E635"></span>🌱 新規数が伸びた店舗（HP・HPB）</div>
-        <div class="csu">${prevM} → ${curM} 前月比で新規数が増加した店舗</div>
-        <div>${growthHtml}</div>
-      </div>
+
     </div>
   </div>`;
 }
