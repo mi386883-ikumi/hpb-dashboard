@@ -169,7 +169,7 @@ function sanitizeId(s){return s.replace(/[^a-zA-Z0-9]/g,'_');}
 // ===== 個人生産性 データ取得 =====
 const PROD_SHEET_ID='1dWIU9QF8y62HgBM0yaOdt3DwjCt1T8MLzK1fHjIwnJ4';
 const PROD_SHEET_GID='1705325539';
-const STORE_MAP={'大森':'大森院','新馬場':'新馬場院','日暮里':'日暮里院','浦添':'浦添院','人形町':'人形町院','京都花園':'京都花園院','神戸住吉':'神戸住吉院','沖縄大里':'大里院','札幌':'札幌丸山院','コザ':'コザ院','沖縄コザ':'コザ院'};
+const STORE_MAP={'大森':'大森院','新馬場':'新馬場院','日暮里':'日暮里院','浦添':'浦添院','人形町':'人形町院','京都花園':'京都花園院','神戸住吉':'神戸住吉院','沖縄大里':'大里院','札幌':'札幌丸山院','コザ':'コザ院','沖縄コザ':'コザ院','中野':'中野院'};
 function matchStaff(fullName,staffList){if(!fullName)return null;const clean=fullName.trim(),noSpace=clean.replace(/\s+/g,''),first=clean.split(/\s+/)[0];return staffList.find(s=>first===s||noSpace.startsWith(s))||null;}
 function fetchProdData(btnEl){
   if(prodDataLoading)return;
@@ -337,7 +337,7 @@ function getStoreYear(idx,year){return storeData[idx]?.[year]||null;}
 function aggAll(){const map={};stores.forEach((_,i)=>{const d=getStoreYear(i,curYear);if(!d)return;const months=curFilterMonth?d.monthly.filter(m=>m.month===curFilterMonth):d.monthly;months.forEach(m=>{if(!map[m.month]){map[m.month]={month:m.month,total:0};CH.forEach(k=>map[m.month][k]=0);}CH.forEach(k=>map[m.month][k]+=(m[k]||0));map[m.month].total+=m.total;});});return MO.filter(m=>map[m]).map(m=>map[m]);}
 function getMonths(){const s=new Set();stores.forEach((_,i)=>{const d=getStoreYear(i,curYear);if(d)d.monthly.forEach(m=>s.add(m.month));});return MO.filter(m=>s.has(m));}
 
-function renderSidebar(){let h=`<div class="sb-sec">総合</div><div class="ni sp ${curView==='all'?'on':''}" onclick="nav('all')"><span class="nd"></span>全店舗 合計</div><div class="ni cp ${curView==='compare'?'on':''}" onclick="nav('compare')"><span class="nd"></span>店舗比較</div><div class="ni ${curView==='sales'?'on':''}" onclick="nav('sales')" style="color:#F0C846"><span class="nd" style="background:#F0C846"></span>売上管理</div><div class="ni ${curView==='hpb'?'on':''}" onclick="nav('hpb')" style="color:#FF6B4A"><span class="nd" style="background:#FF6B4A"></span>ホットペッパーマーケティング</div><div class="ni ${curView==='hp'?'on':''}" onclick="nav('hp')" style="color:#3ECFB4"><span class="nd" style="background:#3ECFB4"></span>HPマーケティング</div><div class="ni ${curView==='alerts'?'on':''}" onclick="nav('alerts')" style="color:#F472B6"><span class="nd" style="background:#F472B6"></span>💬 口コミ数値管理</div><div class="ni ${curView==='productivity'?'on':''}" onclick="nav('productivity')" style="color:#A78BFA"><span class="nd" style="background:#A78BFA"></span>📊 個人生産性管理</div><div class="sb-sec">店舗別</div>`;stores.forEach((s,i)=>{const lv=liveStores.has(i);h+=`<div class="ni ${curView===i?'on':''}" onclick="nav(${i})"><span class="nd" style="background:${SC[i%SC.length]}"></span>${s.name}${lv?'<span class="live-dot">●</span>':''}</div>`;});document.getElementById('sbNav').innerHTML=h;}
+function renderSidebar(){let h=`<div class="sb-sec">総合</div><div class="ni sp ${curView==='all'?'on':''}" onclick="nav('all')"><span class="nd"></span>全店舗 合計</div><div class="ni cp ${curView==='compare'?'on':''}" onclick="nav('compare')"><span class="nd"></span>店舗比較</div><div class="ni ${curView==='sales'?'on':''}" onclick="nav('sales')" style="color:#F0C846"><span class="nd" style="background:#F0C846"></span>売上管理</div><div class="ni ${curView==='hpb'?'on':''}" onclick="nav('hpb')" style="color:#FF6B4A"><span class="nd" style="background:#FF6B4A"></span>ホットペッパーマーケティング</div><div class="ni ${curView==='hp'?'on':''}" onclick="nav('hp')" style="color:#3ECFB4"><span class="nd" style="background:#3ECFB4"></span>HPマーケティング</div><div class="ni ${curView==='insight'?'on':''}" onclick="nav('insight')" style="color:#34D399"><span class="nd" style="background:#34D399"></span>🤖 AIインサイト</div><div class="ni ${curView==='alerts'?'on':''}" onclick="nav('alerts')" style="color:#F472B6"><span class="nd" style="background:#F472B6"></span>💬 口コミ数値管理</div><div class="ni ${curView==='productivity'?'on':''}" onclick="nav('productivity')" style="color:#A78BFA"><span class="nd" style="background:#A78BFA"></span>📊 個人生産性管理</div><div class="sb-sec">店舗別</div>`;stores.forEach((s,i)=>{const lv=liveStores.has(i);h+=`<div class="ni ${curView===i?'on':''}" onclick="nav(${i})"><span class="nd" style="background:${SC[i%SC.length]}"></span>${s.name}${lv?'<span class="live-dot">●</span>':''}</div>`;});document.getElementById('sbNav').innerHTML=h;}
 function nav(v){curView=v;renderSidebar();renderMain();document.querySelector('.sb').classList.remove('open');}
 function setYear(y){curYear=y;curFilterMonth=null;renderMain();}
 function setFilterMonth(m){curFilterMonth=m;renderMain();}
@@ -350,7 +350,7 @@ function mkBar(id,labels,ds){const c=document.getElementById(id);if(!c)return;ch
 function mkLine(id,labels,ds){const c=document.getElementById(id);if(!c)return;charts[id]=new Chart(c,{type:'line',data:{labels,datasets:ds},options:CO});}
 function mkDoughnut(id,labels,data,colors){const c=document.getElementById(id);if(!c)return;const total=data.reduce((a,b)=>a+b,0);charts[id]=new Chart(c,{type:'doughnut',data:{labels,datasets:[{data,backgroundColor:colors,borderColor:'#0D1117',borderWidth:3}]},options:{responsive:true,maintainAspectRatio:false,cutout:'58%',plugins:{legend:{position:'right',labels:{color:'#7D8CA1',font:{family:'Noto Sans JP',size:10},padding:10,boxWidth:10}},tooltip:CO.plugins.tooltip,datalabels:{display:true,color:'#fff',font:{weight:'bold',size:11,family:'Noto Sans JP'},formatter:(v)=>{if(!total||v===0)return '';const p=(v/total*100).toFixed(1);return parseFloat(p)<5?'':p+'%';},textShadowColor:'rgba(0,0,0,0.7)',textShadowBlur:4}}}});}
 
-function renderMain(){destroyCharts();const el=document.getElementById('mainC');if(curView==='all')renderAll(el);else if(curView==='compare')renderCompare(el);else if(curView==='sales')renderSales(el);else if(curView==='hpb')renderHPB(el);else if(curView==='hp')renderHPPage(el);else if(curView==='alerts')renderAlerts(el);else if(curView==='productivity')renderProductivity(el);else renderStore(el,curView);requestAnimationFrame(()=>initCharts());}
+function renderMain(){destroyCharts();const el=document.getElementById('mainC');if(curView==='all')renderAll(el);else if(curView==='compare')renderCompare(el);else if(curView==='sales')renderSales(el);else if(curView==='hpb')renderHPB(el);else if(curView==='hp')renderHPPage(el);else if(curView==='alerts')renderAlerts(el);else if(curView==='productivity')renderProductivity(el);else if(curView==='insight')renderInsight(el);else renderStore(el,curView);requestAnimationFrame(()=>initCharts());}
 function showMonthEndBanner(){
   // 月末（25日以降）に登録フォームバナーを表示
   const day=new Date().getDate();
@@ -400,6 +400,162 @@ function showToast(msg,color){
   document.body.appendChild(t);
   setTimeout(()=>t.remove(),4000);
 }
+function renderInsight(el){
+  const curY=curProdYear,curM=curProdMonth;
+  const midx=MO.indexOf(curM);
+  const prevM=midx>0?MO[midx-1]:'12月';
+  const prevY=midx>0?curY:curY-1;
+
+  // スタッフデータ収集
+  const allStaff=[];
+  const byStore={};
+  STAFF_LIST.forEach(g=>{
+    if(!g.staff.length)return;
+    g.staff.forEach(name=>{
+      const cur=staffProdData?.[g.store]?.[name]?.[curY+'年']?.[curM]||{};
+      const prev=staffProdData?.[g.store]?.[name]?.[prevY+'年']?.[prevM]||{};
+      const ci=stores.findIndex(s=>s.name===g.store);
+      const color=ci>=0?SC[ci%SC.length]:'#7D8CA1';
+      const d={store:g.store,name,color,cur,prev};
+      allStaff.push(d);
+      if(!byStore[g.store])byStore[g.store]=[];
+      byStore[g.store].push(d);
+    });
+  });
+
+  // 1. 口コミ0件スタッフ
+  const lowReview=allStaff.filter(s=>{
+    if(!Object.keys(s.cur).length)return false;
+    const hs=hpbStatsByStore[s.store];
+    return(s.cur.hpR??0)===0||((!hs?.noHpb)&&(s.cur.hpbR??0)===0);
+  });
+
+  // 2. 退会数が多い店舗
+  const storeCancels=Object.entries(byStore).map(([store,list])=>{
+    const cur=list.reduce((a,s)=>a+(s.cur.cancel??0),0);
+    const prev=list.reduce((a,s)=>a+(s.prev.cancel??0),0);
+    const hasData=list.some(s=>s.cur.cancel!=null);
+    const ci=stores.findIndex(s=>s.name===store);
+    return{store,cur,prev,hasData,color:ci>=0?SC[ci%SC.length]:'#7D8CA1'};
+  }).filter(d=>d.hasData);
+  const cancelVals=storeCancels.map(d=>d.cur).filter(v=>v>0);
+  const avgCancel=cancelVals.length?cancelVals.reduce((a,b)=>a+b,0)/cancelVals.length:0;
+  const highCancel=storeCancels.filter(d=>d.cur>avgCancel*1.3||(d.prev>0&&d.cur>d.prev*1.3)).sort((a,b)=>b.cur-a.cur);
+
+  // 3. 売上・入会率の低下トレンド
+  const trendDown=[];
+  allStaff.forEach(s=>{
+    const cp=s.cur.prod,pp=s.prev.prod,cr=s.cur.rate,pr=s.prev.rate;
+    if(cp!=null&&pp!=null&&pp>0&&(cp-pp)/pp<-0.15)
+      trendDown.push({...s,kind:'prod',change:((cp-pp)/pp*100).toFixed(0),curVal:cp,prevVal:pp});
+    if(cr!=null&&pr!=null&&pr>0&&(cr-pr)/pr<-0.20)
+      trendDown.push({...s,kind:'rate',change:((cr-pr)/pr*100).toFixed(0),curVal:cr,prevVal:pr});
+  });
+  trendDown.sort((a,b)=>a.change-b.change);
+
+  // 4. スタッフ間成績差
+  const gapData=Object.entries(byStore).map(([store,list])=>{
+    const wp=list.filter(s=>s.cur.prod!=null&&s.cur.prod>0);
+    if(wp.length<2)return null;
+    wp.sort((a,b)=>b.cur.prod-a.cur.prod);
+    const top=wp[0],bot=wp[wp.length-1];
+    const ratio=top.cur.prod/bot.cur.prod;
+    const ci=stores.findIndex(s=>s.name===store);
+    return{store,top,bot,ratio,color:ci>=0?SC[ci%SC.length]:'#7D8CA1'};
+  }).filter(d=>d&&d.ratio>1.5).sort((a,b)=>b.ratio-a.ratio);
+
+  const urgentCount=lowReview.length+highCancel.length;
+  const warnCount=trendDown.length+gapData.length;
+
+  const mkRow=(icon,title,detail,action,sev)=>{
+    const sc=sev==='urgent'?'#FF6B4A':sev==='warn'?'#F0C846':'#34D399';
+    const sb=sev==='urgent'?'rgba(255,107,74,0.12)':sev==='warn'?'rgba(240,200,70,0.12)':'rgba(52,211,153,0.12)';
+    const sl=sev==='urgent'?'要対応':sev==='warn'?'注意':'良好';
+    return`<div style="display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:1px solid var(--bd)">
+      <span style="font-size:15px;flex-shrink:0;margin-top:2px">${icon}</span>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:12px;font-weight:600;color:#E6EDF3;margin-bottom:2px">${title}</div>
+        <div style="font-size:11px;color:var(--txm)">${detail}</div>
+        ${action?`<div style="font-size:10px;color:${sc};margin-top:4px;font-weight:600">→ ${action}</div>`:''}
+      </div>
+      <span style="background:${sb};color:${sc};font-size:9px;font-weight:700;padding:2px 8px;border-radius:4px;flex-shrink:0;white-space:nowrap">${sl}</span>
+    </div>`;
+  };
+
+  const reviewHtml=lowReview.length===0
+    ?mkRow('✅','口コミ獲得 — 全スタッフ問題なし',`${curY}年${curM}は全スタッフがGoogle・HPB口コミを獲得しています`,'','ok')
+    :lowReview.map(s=>{
+      const gv=s.cur.hpR??0,hv=s.cur.hpbR??0;
+      const hs=hpbStatsByStore[s.store];
+      const issues=[];
+      if(gv===0)issues.push('Google口コミ 0件');
+      if(!hs?.noHpb&&hv===0)issues.push('HPB口コミ 0件');
+      return mkRow('💬',`${s.name}（${s.store.replace('院','')}）— ${issues.join(' / ')}`,`${curY}年${curM} 口コミ獲得数がゼロです`,'施術後のレビュー依頼を徹底してください','urgent');
+    }).join('');
+
+  const cancelHtml=highCancel.length===0
+    ?mkRow('✅','退会数 — 全店舗平均以内',`全店舗の退会数は平均 ${avgCancel.toFixed(1)}名 以内に収まっています`,'','ok')
+    :highCancel.map(d=>{
+      const vsAvg=avgCancel>0?`（平均比 +${((d.cur/avgCancel-1)*100).toFixed(0)}%）`:'';
+      const vsLast=d.prev>0?`前月 ${d.prev}名 → 今月 ${d.cur}名`:`今月 ${d.cur}名`;
+      return mkRow('🚨',`${d.store} — 退会数 ${d.cur}名 ${vsAvg}`,vsLast,'退会理由のヒアリングとフォロー面談を実施してください','urgent');
+    }).join('');
+
+  const trendHtml=trendDown.length===0
+    ?mkRow('✅','売上・入会率 — 大きな低下なし','前月比で15%以上の低下は検知されていません','','ok')
+    :trendDown.map(d=>{
+      const kl=d.kind==='prod'?'売上':'新規入会率';
+      const cf=d.kind==='prod'?'¥'+Number(d.curVal).toLocaleString():d.curVal+'%';
+      const pf=d.kind==='prod'?'¥'+Number(d.prevVal).toLocaleString():d.prevVal+'%';
+      return mkRow('📉',`${d.name}（${d.store.replace('院','')}）— ${kl} ${d.change}%低下`,`${prevM} ${pf} → ${curM} ${cf}`,`${kl}回復のため個別面談・目標設定を行ってください`,'warn');
+    }).join('');
+
+  const gapHtml=gapData.length===0
+    ?mkRow('✅','スタッフ間成績差 — 問題なし','各店舗内の売上格差は許容範囲（1.5倍以内）に収まっています','','ok')
+    :gapData.map(d=>{
+      const tf='¥'+Number(d.top.cur.prod).toLocaleString();
+      const bf='¥'+Number(d.bot.cur.prod).toLocaleString();
+      return mkRow('⚖️',`${d.store} — スタッフ間売上差 ${d.ratio.toFixed(1)}倍`,`最高: ${d.top.name} ${tf} ／ 最低: ${d.bot.name} ${bf}`,'低パフォーマンスのスタッフへの技術・接客指導を検討してください','warn');
+    }).join('');
+
+  el.innerHTML=`<div class="fade">
+    <div class="ph">
+      <div><div class="pt"><span style="color:#34D399">🤖</span> AIインサイト</div><div class="pd">ルールベース自動分析 — ${curY}年 ${curM}</div></div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <div class="mp" style="margin:0">${[2025,2026].map(y=>`<button class="pl ${curProdYear===y?'on':''}" onclick="curProdYear=${y};renderMain()">${y}年</button>`).join('')}</div>
+        <div class="mp" style="margin:0">${MO.map(m=>`<button class="pl ${curProdMonth===m?'on':''}" onclick="curProdMonth='${m}';renderMain()">${m}</button>`).join('')}</div>
+      </div>
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px">
+      ${urgentCount>0?`<span style="background:rgba(255,107,74,0.15);color:#FF6B4A;font-size:11px;font-weight:700;padding:5px 14px;border-radius:20px">🔴 要対応 ${urgentCount}件</span>`:''}
+      ${warnCount>0?`<span style="background:rgba(240,200,70,0.15);color:#F0C846;font-size:11px;font-weight:700;padding:5px 14px;border-radius:20px">🟡 注意 ${warnCount}件</span>`:''}
+      <span style="background:rgba(52,211,153,0.15);color:#34D399;font-size:11px;font-weight:700;padding:5px 14px;border-radius:20px">🟢 ${urgentCount===0&&warnCount===0?'全項目 良好':'その他 良好'}</span>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div class="cd">
+        <div class="ct"><span class="cdot" style="background:#F472B6"></span>💬 口コミ獲得状況</div>
+        <div class="csu">${curY}年${curM} — 0件スタッフを検知</div>
+        <div>${reviewHtml}</div>
+      </div>
+      <div class="cd">
+        <div class="ct"><span class="cdot" style="background:#FF6B4A"></span>🚨 退会数アラート</div>
+        <div class="csu">${curY}年${curM} — 全店舗平均: ${avgCancel.toFixed(1)}名</div>
+        <div>${cancelHtml}</div>
+      </div>
+      <div class="cd">
+        <div class="ct"><span class="cdot" style="background:#38BDF8"></span>📉 売上・入会率トレンド</div>
+        <div class="csu">前月比 -15%以上（売上）/ -20%以上（入会率）を検知</div>
+        <div>${trendHtml}</div>
+      </div>
+      <div class="cd">
+        <div class="ct"><span class="cdot" style="background:#F0C846"></span>⚖️ スタッフ間成績差</div>
+        <div class="csu">${curY}年${curM} — 店舗内最高/最低比 1.5倍以上を検知</div>
+        <div>${gapHtml}</div>
+      </div>
+    </div>
+  </div>`;
+}
+
 function renderAlerts(el){
   const activeList=STAFF_LIST.filter(g=>g.staff.length>0);
   // 全スタッフの口コミデータを収集
