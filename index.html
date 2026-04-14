@@ -1103,9 +1103,21 @@ function renderProductivity(el){
     });
   });
   const prodRanked=[...allStaff].sort((a,b)=>b.prod-a.prod);
-  const rateRanked=[...allStaff].sort((a,b)=>b.rate-a.rate);
   const cancelRanked=[...allStaff].filter(x=>x.members>0&&x.cancel>=0).sort((a,b)=>a.cancel-b.cancel);
   const membersRanked=[...allStaff].sort((a,b)=>b.members-a.members);
+  // 年間売上：staffProdDataから当年全月合計
+  const annualRanked=[];
+  STAFF_LIST.forEach(g=>{
+    if(!g.staff.length)return;
+    g.staff.forEach(name=>{
+      const months=staffProdData?.[g.store]?.[name]?.[curProdYear+'年']||{};
+      const total=Object.values(months).reduce((a,m)=>a+(m.prod||0),0);
+      const ci=stores.findIndex(s=>s.name===g.store);
+      const color=ci>=0?SC[ci%SC.length]:'#7D8CA1';
+      if(total>0)annualRanked.push({store:g.store,name,color,annual:total});
+    });
+  });
+  annualRanked.sort((a,b)=>b.annual-a.annual);
   const mkRankingCol=(arr,key,fmt,col)=>arr.filter(x=>x[key]>0).map((x,i)=>{
     const medal=i===0?'🥇':i===1?'🥈':i===2?'🥉':'';
     return`<div class="ri" style="padding:6px 0;border-bottom:1px solid var(--bd);display:flex;align-items:center;gap:8px">
@@ -1130,9 +1142,9 @@ function renderProductivity(el){
       <div class="rl">${mkRankingCol(prodRanked,'prod',v=>'¥'+Number(v).toLocaleString(),'#F0C846')}</div>
     </div>
     <div class="cd" style="flex:1;min-width:0">
-      <div class="ct"><span class="cdot" style="background:#8B7CF6"></span>📈 新規入会率ランキング</div>
-      <div class="csu">${curProdYear}年 ${curProdMonth} — 全スタッフ</div>
-      <div class="rl">${mkRankingCol(rateRanked,'rate',v=>v+'%','#8B7CF6')}</div>
+      <div class="ct"><span class="cdot" style="background:#8B7CF6"></span>🏆 年間売上ランキング</div>
+      <div class="csu">${curProdYear}年 累計 — 全スタッフ</div>
+      <div class="rl">${annualRanked.map((x,i)=>{const medal=i===0?'🥇':i===1?'🥈':i===2?'🥉':'';return`<div class="ri" style="padding:6px 0;border-bottom:1px solid var(--bd);display:flex;align-items:center;gap:8px"><span style="width:22px;text-align:center;font-size:12px;font-weight:700;color:var(--txd);flex-shrink:0">${medal||i+1}</span><span style="flex:1;min-width:0"><span style="font-size:12px;font-weight:600;color:#E6EDF3">${x.name}</span><span style="font-size:10px;color:var(--txm);margin-left:5px">${x.store.replace('院','')}</span></span><span style="font-family:'Outfit';font-size:14px;font-weight:700;color:#8B7CF6">¥${Number(x.annual).toLocaleString()}</span></div>`;}).join('')}</div>
     </div>
     <div class="cd" style="flex:1;min-width:0">
       <div class="ct"><span class="cdot" style="background:#38BDF8"></span>🔻 退会数ランキング<span style="font-size:10px;color:var(--txm);font-weight:400;margin-left:6px">少ない順</span></div>
