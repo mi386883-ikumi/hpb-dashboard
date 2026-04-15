@@ -439,10 +439,11 @@ async function fetchAdData(btn){
       let cnt=0,feeRow=null,cpaRow=null;
       for(let i=start;i<start+45&&i<rows.length;i++){
         const r=rows[i];
-        if(r[1]===''&&r[2]==='合計'){
-          cnt++;
-          if(cnt===2)feeRow=r;
-          if(cnt===3){cpaRow=r;break;}
+        const c2=(r[2]||'').trim();
+        const c1=(r[1]||'').trim();
+        if(c2==='合計'){
+          if(c1==='費用')feeRow=r;
+          if(c1==='費用対効果'){cpaRow=r;break;}
         }
       }
       if(feeRow){
