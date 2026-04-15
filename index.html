@@ -337,7 +337,7 @@ function getStoreYear(idx,year){return storeData[idx]?.[year]||null;}
 function aggAll(){const map={};stores.forEach((_,i)=>{const d=getStoreYear(i,curYear);if(!d)return;const months=curFilterMonth?d.monthly.filter(m=>m.month===curFilterMonth):d.monthly;months.forEach(m=>{if(!map[m.month]){map[m.month]={month:m.month,total:0};CH.forEach(k=>map[m.month][k]=0);}CH.forEach(k=>map[m.month][k]+=(m[k]||0));map[m.month].total+=m.total;});});return MO.filter(m=>map[m]).map(m=>map[m]);}
 function getMonths(){const s=new Set();stores.forEach((_,i)=>{const d=getStoreYear(i,curYear);if(d)d.monthly.forEach(m=>s.add(m.month));});return MO.filter(m=>s.has(m));}
 
-function renderSidebar(){let h=`<div class="sb-sec">総合</div><div class="ni sp ${curView==='all'?'on':''}" onclick="nav('all')"><span class="nd"></span>全店舗 合計</div><div class="ni cp ${curView==='compare'?'on':''}" onclick="nav('compare')"><span class="nd"></span>店舗比較</div><div class="ni ${curView==='sales'?'on':''}" onclick="nav('sales')" style="color:#F0C846"><span class="nd" style="background:#F0C846"></span>売上管理</div><div class="ni ${curView==='hpb'?'on':''}" onclick="nav('hpb')" style="color:#FF6B4A"><span class="nd" style="background:#FF6B4A"></span>ホットペッパーマーケティング</div><div class="ni ${curView==='hp'?'on':''}" onclick="nav('hp')" style="color:#3ECFB4"><span class="nd" style="background:#3ECFB4"></span>HPマーケティング</div><div class="ni ${curView==='insight'?'on':''}" onclick="nav('insight')" style="color:#34D399"><span class="nd" style="background:#34D399"></span>🤖 AIインサイト</div><div class="ni ${curView==='alerts'?'on':''}" onclick="nav('alerts')" style="color:#F472B6"><span class="nd" style="background:#F472B6"></span>💬 口コミ数値管理</div><div class="ni ${curView==='productivity'?'on':''}" onclick="nav('productivity')" style="color:#A78BFA"><span class="nd" style="background:#A78BFA"></span>📊 個人生産性管理</div><div class="sb-sec">店舗別</div>`;stores.forEach((s,i)=>{const lv=liveStores.has(i);h+=`<div class="ni ${curView===i?'on':''}" onclick="nav(${i})"><span class="nd" style="background:${SC[i%SC.length]}"></span>${s.name}${lv?'<span class="live-dot">●</span>':''}</div>`;});document.getElementById('sbNav').innerHTML=h;}
+function renderSidebar(){let h=`<div class="sb-sec">総合</div><div class="ni sp ${curView==='all'?'on':''}" onclick="nav('all')"><span class="nd"></span>全店舗 合計</div><div class="ni cp ${curView==='compare'?'on':''}" onclick="nav('compare')"><span class="nd"></span>店舗比較</div><div class="ni ${curView==='sales'?'on':''}" onclick="nav('sales')" style="color:#F0C846"><span class="nd" style="background:#F0C846"></span>売上管理</div><div class="ni ${curView==='hpb'?'on':''}" onclick="nav('hpb')" style="color:#FF6B4A"><span class="nd" style="background:#FF6B4A"></span>ホットペッパーマーケティング</div><div class="ni ${curView==='hp'?'on':''}" onclick="nav('hp')" style="color:#3ECFB4"><span class="nd" style="background:#3ECFB4"></span>HPマーケティング</div><div class="ni ${curView==='adcost'?'on':''}" onclick="nav('adcost')" style="color:#FBBF24"><span class="nd" style="background:#FBBF24"></span>💴 広告費管理</div><div class="ni ${curView==='insight'?'on':''}" onclick="nav('insight')" style="color:#34D399"><span class="nd" style="background:#34D399"></span>🤖 AIインサイト</div><div class="ni ${curView==='alerts'?'on':''}" onclick="nav('alerts')" style="color:#F472B6"><span class="nd" style="background:#F472B6"></span>💬 口コミ数値管理</div><div class="ni ${curView==='productivity'?'on':''}" onclick="nav('productivity')" style="color:#A78BFA"><span class="nd" style="background:#A78BFA"></span>📊 個人生産性管理</div><div class="sb-sec">店舗別</div>`;stores.forEach((s,i)=>{const lv=liveStores.has(i);h+=`<div class="ni ${curView===i?'on':''}" onclick="nav(${i})"><span class="nd" style="background:${SC[i%SC.length]}"></span>${s.name}${lv?'<span class="live-dot">●</span>':''}</div>`;});document.getElementById('sbNav').innerHTML=h;}
 function nav(v){curView=v;renderSidebar();renderMain();document.querySelector('.sb').classList.remove('open');}
 function setYear(y){curYear=y;curFilterMonth=null;renderMain();}
 function setFilterMonth(m){curFilterMonth=m;renderMain();}
@@ -350,7 +350,7 @@ function mkBar(id,labels,ds){const c=document.getElementById(id);if(!c)return;ch
 function mkLine(id,labels,ds){const c=document.getElementById(id);if(!c)return;charts[id]=new Chart(c,{type:'line',data:{labels,datasets:ds},options:CO});}
 function mkDoughnut(id,labels,data,colors){const c=document.getElementById(id);if(!c)return;const total=data.reduce((a,b)=>a+b,0);charts[id]=new Chart(c,{type:'doughnut',data:{labels,datasets:[{data,backgroundColor:colors,borderColor:'#0D1117',borderWidth:3}]},options:{responsive:true,maintainAspectRatio:false,cutout:'58%',plugins:{legend:{position:'right',labels:{color:'#7D8CA1',font:{family:'Noto Sans JP',size:10},padding:10,boxWidth:10}},tooltip:CO.plugins.tooltip,datalabels:{display:true,color:'#fff',font:{weight:'bold',size:11,family:'Noto Sans JP'},formatter:(v)=>{if(!total||v===0)return '';const p=(v/total*100).toFixed(1);return parseFloat(p)<5?'':p+'%';},textShadowColor:'rgba(0,0,0,0.7)',textShadowBlur:4}}}});}
 
-function renderMain(){destroyCharts();const el=document.getElementById('mainC');if(curView==='all')renderAll(el);else if(curView==='compare')renderCompare(el);else if(curView==='sales')renderSales(el);else if(curView==='hpb')renderHPB(el);else if(curView==='hp')renderHPPage(el);else if(curView==='alerts')renderAlerts(el);else if(curView==='productivity')renderProductivity(el);else if(curView==='insight')renderInsight(el);else renderStore(el,curView);requestAnimationFrame(()=>initCharts());}
+function renderMain(){destroyCharts();const el=document.getElementById('mainC');if(curView==='all')renderAll(el);else if(curView==='compare')renderCompare(el);else if(curView==='sales')renderSales(el);else if(curView==='hpb')renderHPB(el);else if(curView==='hp')renderHPPage(el);else if(curView==='alerts')renderAlerts(el);else if(curView==='productivity')renderProductivity(el);else if(curView==='insight')renderInsight(el);else if(curView==='adcost')renderAdCost(el);else renderStore(el,curView);requestAnimationFrame(()=>initCharts());}
 function showMonthEndBanner(){
   // 月末（25日以降）に登録フォームバナーを表示
   const day=new Date().getDate();
@@ -400,6 +400,108 @@ function showToast(msg,color){
   document.body.appendChild(t);
   setTimeout(()=>t.remove(),4000);
 }
+// ===== 広告費データ（費用対効果シートより） =====
+const AD_COST_DATA={
+  '大森':{'2025':{1:82390,2:115007,3:114499,4:95746,5:182668,6:173285,7:179943,8:168904,9:132211,10:165625,11:117882,12:124506,total:1652666},'2026':{1:124469,2:145772,3:180649,4:55000,5:55000,6:55000,7:55000,8:55000,9:55000,10:55000,11:55000,12:55000,total:0}},
+  '千葉駅':{'2025':{1:460109,2:299430,3:175382,4:146300,5:240749,6:161898,7:208606,8:202596,9:167176,10:260943,11:300170,12:311315,total:2934674},'2026':{1:224109,2:213682,3:240924,4:66000,5:66000,6:66000,7:66000,8:66000,9:66000,10:66000,11:66000,12:66000,total:0}},
+  '飯田橋':{'2025':{1:148183,2:186599,3:167046,4:134960,5:120000,6:80586,7:93961,8:72594,9:55000,10:98510,11:33532,12:44941,total:1235912},'2026':{1:44942,2:65504,3:46493,4:16500,5:16500,6:16500,7:16500,8:16500,9:16500,10:16500,11:16500,12:16500,total:0}},
+  '関内':{'2025':{1:58812,2:59943,3:60409,4:59267,5:61500,6:82046,7:60463,8:59200,9:60600,10:60940,11:59983,12:57627,total:740790},'2026':{1:55803,2:56550,3:56320,4:0,5:0,6:0,7:0,8:0,9:0,10:0,11:0,12:0,total:0}},
+  '新宿':{'2025':{1:93995,2:66000,3:66000,4:55000,5:115500,6:199435,7:167448,8:105310,9:78958,10:55000,11:55000,12:108550,total:1166196},'2026':{1:55000,2:190791,3:244822,4:0,5:0,6:0,7:0,8:0,9:0,10:0,11:0,12:0,total:0}},
+  '銀座':{'2025':{1:316242,2:281609,3:281386,4:280962,5:330266,6:282814,7:281184,8:281362,9:180619,10:231097,11:180366,12:192555,total:3120462},'2026':{1:180848,2:180756,3:70136,4:0,5:0,6:0,7:0,8:0,9:0,10:0,11:0,12:0,total:0}},
+  '西川口':{'2025':{1:126219,2:90472,3:101962,4:155850,5:149410,6:83809,7:86515,8:143172,9:93178,10:158151,11:103335,12:115289,total:1407362},'2026':{1:162543,2:92560,3:98939,4:0,5:0,6:0,7:0,8:0,9:0,10:0,11:0,12:0,total:354042}},
+  '仙台':{'2025':{1:221438,2:249719,3:251976,4:322988,5:231698,6:287675,7:240179,8:278409,9:247597,10:265672,11:267504,12:304745,total:3169600},'2026':{1:285661,2:369269,3:315569,4:0,5:0,6:0,7:0,8:0,9:0,10:0,11:0,12:0,total:0}},
+  '新馬場':{'2025':{1:81852,2:55000,3:111257,4:55000,5:77429,6:55000,7:115134,8:103513,9:104938,10:55000,11:55000,12:104952,total:974075},'2026':{1:55000,2:237601,3:55000,4:0,5:0,6:0,7:0,8:0,9:0,10:0,11:0,12:0,total:0}},
+  '四条烏丸':{'2025':{1:119174,2:112028,3:174571,4:111384,5:150457,6:106786,7:189602,8:138405,9:196969,10:149853,11:233110,12:232066,total:1914405},'2026':{1:118181,2:138769,3:181516,4:55000,5:55000,6:55000,7:55000,8:55000,9:55000,10:55000,11:55000,12:55000,total:0}},
+  '板宿':{'2025':{1:126000,2:126000,3:126000,4:126000,5:66000,6:0,7:0,8:0,9:0,10:0,11:0,12:0,total:570000},'2026':{1:0,2:0,3:0,4:0,5:0,6:0,7:0,8:0,9:0,10:0,11:0,12:0,total:0}}
+};
+let curAdYear=2026;
+const AD_STORES=Object.keys(AD_COST_DATA);
+const AD_COLORS=['#FF6B4A','#F0C846','#3ECFB4','#8B7CF6','#F472B6','#38BDF8','#A3E635','#FB7185','#FBBF24','#34D399','#60A5FA'];
+
+function renderAdCost(el){
+  const yr=curAdYear.toString();
+  const today=new Date();
+  const curMNum=today.getFullYear()===curAdYear?today.getMonth()+1:0;
+
+  // 月別合計（全店舗）
+  const monthTotals=Array.from({length:12},(_,i)=>AD_STORES.reduce((s,n)=>s+(AD_COST_DATA[n][yr]?.[i+1]||0),0));
+  const yearTotals=AD_STORES.map(n=>AD_STORES.indexOf(n)>=0?Object.entries(AD_COST_DATA[n][yr]||{}).filter(([k])=>k!=='total').reduce((s,[,v])=>s+v,0):0);
+  const grandTotal=yearTotals.reduce((a,b)=>a+b,0);
+  const maxMonth=Math.max(...monthTotals.filter(v=>v>0));
+  const maxStore=Math.max(...yearTotals);
+
+  // ヒートマップ色
+  const heatColor=(v,max)=>{
+    if(!v||!max)return'rgba(255,255,255,0.03)';
+    const r=v/max;
+    if(r<0.3)return'rgba(62,207,180,0.15)';
+    if(r<0.6)return'rgba(240,200,70,0.2)';
+    return'rgba(255,107,74,0.25)';
+  };
+
+  // サマリーカード
+  const topStores=[...AD_STORES].sort((a,b)=>(yearTotals[AD_STORES.indexOf(b)])-(yearTotals[AD_STORES.indexOf(a)])).slice(0,3);
+  const summaryCards=topStores.map((n,i)=>{
+    const v=yearTotals[AD_STORES.indexOf(n)];
+    const col=AD_COLORS[AD_STORES.indexOf(n)%AD_COLORS.length];
+    const medal=i===0?'🥇':i===1?'🥈':'🥉';
+    return`<div class="cd" style="flex:1;min-width:0">
+      <div style="font-size:10px;color:var(--txm);margin-bottom:4px">${medal} 広告費 ${yr}年</div>
+      <div style="font-size:13px;font-weight:700;color:${col};margin-bottom:2px">${n}</div>
+      <div style="font-family:'Outfit';font-size:18px;font-weight:700;color:#E6EDF3">¥${Number(v).toLocaleString()}</div>
+    </div>`;
+  }).join('');
+
+  // メインテーブル
+  const thead=`<tr style="font-size:10px;color:var(--txm)"><th style="text-align:left;padding:6px 10px;white-space:nowrap">店舗</th>${Array.from({length:12},(_,i)=>`<th style="padding:6px 4px;text-align:right;white-space:nowrap;${i+1===curMNum?'color:#F0C846':''}">${i+1}月</th>`).join('')}<th style="padding:6px 8px;text-align:right;white-space:nowrap;color:var(--txm)">年計</th></tr>`;
+
+  const tbody=AD_STORES.map((n,si)=>{
+    const col=AD_COLORS[si%AD_COLORS.length];
+    const storeYearTotal=yearTotals[si];
+    const barW=maxStore>0?(storeYearTotal/maxStore*100).toFixed(0):0;
+    const cells=Array.from({length:12},(_,i)=>{
+      const v=AD_COST_DATA[n][yr]?.[i+1]||0;
+      const bg=heatColor(v,maxMonth);
+      const isCur=i+1===curMNum;
+      const isFuture=curMNum>0&&i+1>curMNum;
+      return`<td style="padding:5px 4px;text-align:right;font-family:'Outfit';font-size:11px;font-weight:600;background:${bg};border-radius:3px;${isCur?'outline:1px solid #F0C846;':''}${isFuture?'color:var(--txd);':'color:#E6EDF3;'}">${v>0?'¥'+Number(v).toLocaleString():'-'}</td>`;
+    }).join('');
+    return`<tr style="border-bottom:1px solid var(--bd)">
+      <td style="padding:7px 10px;white-space:nowrap">
+        <span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${col};margin-right:6px;flex-shrink:0"></span>
+        <span style="font-size:12px;font-weight:600;color:#E6EDF3">${n}</span>
+      </td>${cells}
+      <td style="padding:5px 8px;text-align:right">
+        <span style="font-family:'Outfit';font-size:12px;font-weight:700;color:${col}">¥${Number(storeYearTotal).toLocaleString()}</span>
+        <div style="margin-top:2px;height:3px;background:var(--sf3);border-radius:2px;width:60px;margin-left:auto"><div style="height:3px;background:${col};border-radius:2px;width:${barW}%"></div></div>
+      </td>
+    </tr>`;
+  }).join('');
+
+  // 合計行
+  const totalRow=`<tr style="background:var(--sf2)"><td style="padding:7px 10px;font-size:11px;font-weight:700;color:var(--txm)">月計</td>${monthTotals.map((v,i)=>`<td style="padding:5px 4px;text-align:right;font-family:'Outfit';font-size:11px;font-weight:700;color:var(--txm);${i+1===curMNum?'color:#F0C846;':''}">${v>0?'¥'+Number(v).toLocaleString():'-'}</td>`).join('')}<td style="padding:5px 8px;text-align:right;font-family:'Outfit';font-size:12px;font-weight:700;color:#E6EDF3">¥${Number(grandTotal).toLocaleString()}</td></tr>`;
+
+  el.innerHTML=`<div class="fade">
+    <div class="ph">
+      <div><div class="pt"><span style="color:#FBBF24">💴</span> 広告費管理</div><div class="pd">費用対効果シート — 店舗別月次広告費</div></div>
+      <div class="mp" style="margin:0">${[2025,2026].map(y=>`<button class="pl ${curAdYear===y?'on':''}" onclick="curAdYear=${y};renderMain()">${y}年</button>`).join('')}</div>
+    </div>
+    <div style="display:flex;gap:12px;margin-bottom:16px">${summaryCards}<div class="cd" style="flex:1;min-width:0">
+      <div style="font-size:10px;color:var(--txm);margin-bottom:4px">📊 ${yr}年 全店舗合計</div>
+      <div style="font-family:'Outfit';font-size:20px;font-weight:700;color:#FBBF24">¥${Number(grandTotal).toLocaleString()}</div>
+      <div style="font-size:10px;color:var(--txm);margin-top:4px">月平均 ¥${Number(Math.round(grandTotal/monthTotals.filter(v=>v>0).length||1)).toLocaleString()}</div>
+    </div></div>
+    <div class="cd">
+      <div class="ct"><span class="cdot" style="background:#FBBF24"></span>店舗別月次広告費 — ${yr}年</div>
+      <div class="csu">${curMNum>0?`${curMNum}月が現在月（黄枠）、それ以降は契約済みHPB費用など`:'全月確定値'}</div>
+      <div style="overflow-x:auto"><table style="width:100%;border-collapse:separate;border-spacing:2px">
+        <thead>${thead}</thead>
+        <tbody>${tbody}${totalRow}</tbody>
+      </table></div>
+    </div>
+  </div>`;
+}
+
 function renderInsight(el){
   const curY=curProdYear,curM=curProdMonth;
   const midx=MO.indexOf(curM);
