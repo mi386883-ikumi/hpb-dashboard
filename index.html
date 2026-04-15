@@ -437,7 +437,7 @@ async function fetchAdData(btn){
     const pn=s=>{try{return parseInt(s.replace(/,/g,'').replace(/\s/g,''))||0;}catch{return 0;}};
     Object.entries(AD_STORE_ROWS).forEach(([name,start])=>{
       let cnt=0,feeRow=null,cpaRow=null;
-      for(let i=start;i<start+36&&i<rows.length;i++){
+      for(let i=start;i<start+45&&i<rows.length;i++){
         const r=rows[i];
         if(r[1]===''&&r[2]==='合計'){
           cnt++;
