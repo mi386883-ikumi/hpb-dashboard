@@ -406,9 +406,23 @@ let AD_CPA_DATA={};
 let curAdYear=2026;
 let adDataLoaded=false;
 let adDataLoading=false;
-const AD_STORE_ROWS={'大森':36,'新馬場':307,'日暮里':637,'住吉':934,'京都花園':1363,'人形町':1231,'札幌円山':1429,'浦添':472,'沖縄コザ':1462,'大里':1825,'中野店':1858};
-const AD_STORES=Object.keys(AD_STORE_ROWS);
+// CSV上のcol0名 → 表示名マッピング
+const AD_NAME_MAP={'大森':'大森','新馬場':'新馬場','日暮里':'日暮里','住吉':'住吉','京都花園':'京都花園','人形町':'人形町','札幌':'札幌円山','沖縄浦添':'浦添','沖縄市コザ':'沖縄コザ','大里':'大里','中野':'中野店'};
+const AD_STORES=['大森','新馬場','日暮里','住吉','京都花園','人形町','札幌円山','浦添','沖縄コザ','大里','中野店'];
 const AD_COLORS=['#FF6B4A','#F0C846','#3ECFB4','#8B7CF6','#F472B6','#38BDF8','#A3E635','#FB7185','#FBBF24','#34D399','#60A5FA'];
+const AD_CACHE_KEY='ad_data_cache';
+const AD_CACHE_TTL=60*60*1000; // 1時間
+
+function loadAdCache(){
+  try{
+    const c=JSON.parse(localStorage.getItem(AD_CACHE_KEY)||'null');
+    if(c&&Date.now()-c.ts<AD_CACHE_TTL){AD_COST_DATA=c.cost;AD_CPA_DATA=c.cpa;return true;}
+  }catch(e){}
+  return false;
+}
+function saveAdCache(){
+  try{localStorage.setItem(AD_CACHE_KEY,JSON.stringify({ts:Date.now(),cost:AD_COST_DATA,cpa:AD_CPA_DATA}));}catch(e){}
+}
 
 function parseAdCSV(text){
   const rows=[];
@@ -428,6 +442,8 @@ function parseAdCSV(text){
 
 async function fetchAdData(btn){
   if(adDataLoading)return;
+  // 手動更新でなければキャッシュ確認
+  if(!btn&&loadAdCache()){adDataLoaded=true;renderMain();return;}
   adDataLoading=true;
   if(btn){btn.disabled=true;btn.textContent='取得中…';}
   try{
@@ -435,27 +451,32 @@ async function fetchAdData(btn){
     const text=await res.text();
     const rows=parseAdCSV(text);
     const pn=s=>{try{return parseInt(s.replace(/,/g,'').replace(/\s/g,''))||0;}catch{return 0;}};
-    Object.entries(AD_STORE_ROWS).forEach(([name,start])=>{
-      let cnt=0,feeRow=null,cpaRow=null;
-      for(let i=start;i<start+45&&i<rows.length;i++){
-        const r=rows[i];
-        const c2=(r[2]||'').trim();
+    // col0の店舗名で動的にスキャン（行番号に依存しない）
+    for(let i=0;i<rows.length;i++){
+      const csvName=(rows[i][0]||'').trim();
+      if(!AD_NAME_MAP[csvName])continue;
+      const displayName=AD_NAME_MAP[csvName];
+      let feeRow=null,cpaRow=null;
+      for(let j=i;j<i+45&&j<rows.length;j++){
+        const r=rows[j];
         const c1=(r[1]||'').trim();
+        const c2=(r[2]||'').trim();
         if(c2==='合計'){
           if(c1==='費用')feeRow=r;
           if(c1==='費用対効果'){cpaRow=r;break;}
         }
       }
       if(feeRow){
-        AD_COST_DATA[name]={'2025':{},'2026':{}};
-        for(let j=0;j<12;j++){AD_COST_DATA[name]['2025'][j+1]=pn(feeRow[50+j]);AD_COST_DATA[name]['2026'][j+1]=pn(feeRow[63+j]);}
-        AD_COST_DATA[name]['2025'].total=pn(feeRow[62]);AD_COST_DATA[name]['2026'].total=pn(feeRow[75]);
+        AD_COST_DATA[displayName]={'2025':{},'2026':{}};
+        for(let j=0;j<12;j++){AD_COST_DATA[displayName]['2025'][j+1]=pn(feeRow[50+j]);AD_COST_DATA[displayName]['2026'][j+1]=pn(feeRow[63+j]);}
+        AD_COST_DATA[displayName]['2025'].total=pn(feeRow[62]);AD_COST_DATA[displayName]['2026'].total=pn(feeRow[75]);
       }
       if(cpaRow){
-        AD_CPA_DATA[name]={'2025':{},'2026':{}};
-        for(let j=0;j<12;j++){AD_CPA_DATA[name]['2025'][j+1]=pn(cpaRow[50+j]);AD_CPA_DATA[name]['2026'][j+1]=pn(cpaRow[63+j]);}
+        AD_CPA_DATA[displayName]={'2025':{},'2026':{}};
+        for(let j=0;j<12;j++){AD_CPA_DATA[displayName]['2025'][j+1]=pn(cpaRow[50+j]);AD_CPA_DATA[displayName]['2026'][j+1]=pn(cpaRow[63+j]);}
       }
-    });
+    }
+    saveAdCache();
     adDataLoaded=true;renderMain();
   }catch(e){console.error('fetchAdData error:',e);}
   finally{adDataLoading=false;if(btn){btn.disabled=false;btn.textContent='↺ データ更新';}}
