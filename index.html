@@ -407,10 +407,10 @@ let curAdYear=2026;
 let adDataLoaded=false;
 let adDataLoading=false;
 // CSV上のcol0名 → 表示名マッピング
-const AD_NAME_MAP={'大森':'大森','新馬場':'新馬場','日暮里':'日暮里','住吉':'住吉','京都花園':'京都花園','人形町':'人形町','札幌':'札幌円山','沖縄浦添':'浦添','沖縄市コザ':'沖縄コザ','大里':'大里','中野':'中野院'};
+const AD_NAME_MAP={'大森':'大森','新馬場':'新馬場','日暮里':'日暮里','住吉':'住吉','京都花園':'京都花園','人形町':'人形町','札幌':'札幌円山','浦添':'浦添','沖縄浦添':'浦添','沖縄市コザ':'沖縄コザ','コザ':'沖縄コザ','大里':'大里','中野':'中野院','中野院':'中野院'};
 const AD_STORES=['大森','新馬場','日暮里','住吉','京都花園','人形町','札幌円山','浦添','沖縄コザ','大里','中野院'];
 const AD_COLORS=['#FF6B4A','#F0C846','#3ECFB4','#8B7CF6','#F472B6','#38BDF8','#A3E635','#FB7185','#FBBF24','#34D399','#60A5FA'];
-const AD_CACHE_KEY='ad_data_cache_v2';
+const AD_CACHE_KEY='ad_data_cache_v3';
 const AD_CACHE_TTL=60*60*1000; // 1時間
 
 function loadAdCache(){
@@ -543,8 +543,7 @@ function renderAdCost(el){
       return`<td style="padding:5px 4px;text-align:right;font-family:'Outfit';font-size:11px;font-weight:600;background:${bg};border-radius:3px;${isCur?'outline:1px solid #F0C846;':''}${isFuture?'color:var(--txd);':'color:#E6EDF3;'}">${v>0?'¥'+Number(v).toLocaleString():'-'}</td>`;
     }).join('');
     const cpaCells=Array.from({length:12},(_,i)=>{
-      const fee=AD_COST_DATA[n]?.[yr]?.[i+1]||0;
-      const v=fee>0?(AD_CPA_DATA[n]?.[yr]?.[i+1]||0):0; // 費用0の月はCPAも0
+      const v=AD_CPA_DATA[n]?.[yr]?.[i+1]||0;
       const isCur=i+1===curMNum;
       const isFuture=curMNum>0&&i+1>curMNum;
       return`<td style="padding:4px 4px;text-align:right;font-family:'Outfit';font-size:11px;font-weight:700;${isCur?'outline:1px solid rgba(240,200,70,0.4);border-radius:2px;':''}${isFuture||!v?'color:var(--txd);':'color:'+cpaColor(v)+';'}">${v>0?'¥'+Number(v).toLocaleString():'-'}</td>`;
