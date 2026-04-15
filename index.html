@@ -508,18 +508,6 @@ function renderAdCost(el){
     return'rgba(255,107,74,0.25)';
   };
 
-  // サマリーカード
-  const topStores=[...AD_STORES].sort((a,b)=>(yearTotals[AD_STORES.indexOf(b)])-(yearTotals[AD_STORES.indexOf(a)])).slice(0,3);
-  const summaryCards=topStores.map((n,i)=>{
-    const v=yearTotals[AD_STORES.indexOf(n)];
-    const col=AD_COLORS[AD_STORES.indexOf(n)%AD_COLORS.length];
-    const medal=i===0?'🥇':i===1?'🥈':'🥉';
-    return`<div class="cd" style="flex:1;min-width:0">
-      <div style="font-size:10px;color:var(--txm);margin-bottom:4px">${medal} 広告費 ${yr}年</div>
-      <div style="font-size:13px;font-weight:700;color:${col};margin-bottom:2px">${n}</div>
-      <div style="font-family:'Outfit';font-size:18px;font-weight:700;color:#E6EDF3">¥${Number(v).toLocaleString()}</div>
-    </div>`;
-  }).join('');
 
   // メインテーブル
   const thead=`<tr style="font-size:10px;color:var(--txm)"><th style="text-align:left;padding:6px 10px;white-space:nowrap">店舗</th>${Array.from({length:12},(_,i)=>`<th style="padding:6px 4px;text-align:right;white-space:nowrap;${i+1===curMNum?'color:#F0C846':''}">${i+1}月</th>`).join('')}<th style="padding:6px 8px;text-align:right;white-space:nowrap;color:var(--txm)">年計</th></tr>`;
@@ -575,11 +563,17 @@ function renderAdCost(el){
       </div>
     </div>
     ${adDataLoading?'<div class="stb"><span class="sd lv"></span>スプレッドシートからデータを取得しています…</div>':''}
-    <div style="display:flex;gap:12px;margin-bottom:16px">${summaryCards}<div class="cd" style="flex:1;min-width:0">
-      <div style="font-size:10px;color:var(--txm);margin-bottom:4px">📊 ${yr}年 全店舗合計</div>
-      <div style="font-family:'Outfit';font-size:20px;font-weight:700;color:#FBBF24">¥${Number(grandTotal).toLocaleString()}</div>
-      <div style="font-size:10px;color:var(--txm);margin-top:4px">月平均 ¥${Number(Math.round(grandTotal/monthTotals.filter(v=>v>0).length||1)).toLocaleString()}</div>
-    </div></div>
+    <div class="cd" style="display:inline-flex;gap:24px;align-items:center;margin-bottom:16px;padding:14px 24px">
+      <div>
+        <div style="font-size:10px;color:var(--txm);margin-bottom:2px">📊 ${yr}年 全店舗合計</div>
+        <div style="font-family:'Outfit';font-size:22px;font-weight:700;color:#FBBF24">¥${Number(grandTotal).toLocaleString()}</div>
+      </div>
+      <div style="width:1px;height:32px;background:var(--bd)"></div>
+      <div>
+        <div style="font-size:10px;color:var(--txm);margin-bottom:2px">月平均</div>
+        <div style="font-family:'Outfit';font-size:16px;font-weight:700;color:#E6EDF3">¥${Number(Math.round(grandTotal/(monthTotals.filter(v=>v>0).length||1))).toLocaleString()}</div>
+      </div>
+    </div>
     <div class="cd">
       <div class="ct"><span class="cdot" style="background:#FBBF24"></span>店舗別月次広告費 — ${yr}年</div>
       <div class="csu">${curMNum>0?`${curMNum}月が現在月（黄枠）、それ以降は契約済みHPB費用など`:'全月確定値'}</div>
