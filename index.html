@@ -463,13 +463,17 @@ async function fetchAdData(btn){
 
 function renderAdCost(el){
   if(!adDataLoaded&&!adDataLoading)fetchAdData(null);
+  if(!adDataLoaded){
+    el.innerHTML=`<div class="fade"><div class="ph"><div><div class="pt"><span style="color:#FBBF24">💴</span> 広告費管理</div><div class="pd">費用対効果シート — 店舗別月次広告費</div></div></div><div class="stb"><span class="sd lv"></span>スプレッドシートからデータを取得しています…</div></div>`;
+    return;
+  }
   const yr=curAdYear.toString();
   const today=new Date();
   const curMNum=today.getFullYear()===curAdYear?today.getMonth()+1:0;
 
   // 月別合計（全店舗）
-  const monthTotals=Array.from({length:12},(_,i)=>AD_STORES.reduce((s,n)=>s+(AD_COST_DATA[n][yr]?.[i+1]||0),0));
-  const yearTotals=AD_STORES.map(n=>AD_STORES.indexOf(n)>=0?Object.entries(AD_COST_DATA[n][yr]||{}).filter(([k])=>k!=='total').reduce((s,[,v])=>s+v,0):0);
+  const monthTotals=Array.from({length:12},(_,i)=>AD_STORES.reduce((s,n)=>s+((AD_COST_DATA[n]?.[yr])?.[i+1]||0),0));
+  const yearTotals=AD_STORES.map(n=>Object.entries(AD_COST_DATA[n]?.[yr]||{}).filter(([k])=>k!=='total').reduce((s,[,v])=>s+v,0));
   const grandTotal=yearTotals.reduce((a,b)=>a+b,0);
   const maxMonth=Math.max(...monthTotals.filter(v=>v>0));
   const maxStore=Math.max(...yearTotals);
@@ -511,7 +515,7 @@ function renderAdCost(el){
     const storeYearTotal=yearTotals[si];
     const barW=maxStore>0?(storeYearTotal/maxStore*100).toFixed(0):0;
     const cells=Array.from({length:12},(_,i)=>{
-      const v=AD_COST_DATA[n][yr]?.[i+1]||0;
+      const v=AD_COST_DATA[n]?.[yr]?.[i+1]||0;
       const bg=heatColor(v,maxMonth);
       const isCur=i+1===curMNum;
       const isFuture=curMNum>0&&i+1>curMNum;
