@@ -482,6 +482,12 @@ async function fetchAdData(btn){
   finally{adDataLoading=false;if(btn){btn.disabled=false;btn.textContent='↺ データ更新';}}
 }
 
+// 広告費管理用：表示名 → stores配列のstore.nameマッピング
+const AD_TO_STORE={'大森':'大森院','新馬場':'新馬場院','日暮里':'日暮里院','住吉':'神戸住吉院',
+  '京都花園':'京都花園院','人形町':'人形町院','札幌円山':'札幌丸山院','浦添':'浦添院',
+  '沖縄コザ':'コザ院','大里':'大里院','中野院':'中野院'};
+let curAdMonth=null; // null=全月合計
+
 function renderAdCost(el){
   if(!adDataLoaded&&!adDataLoading)fetchAdData(null);
   if(!adDataLoaded){
@@ -491,6 +497,8 @@ function renderAdCost(el){
   const yr=curAdYear.toString();
   const today=new Date();
   const curMNum=today.getFullYear()===curAdYear?today.getMonth()+1:0;
+  // 選択月（数値）
+  const selM=curAdMonth; // null or 1-12
 
   // 月別合計（全店舗）
   const monthTotals=Array.from({length:12},(_,i)=>AD_STORES.reduce((s,n)=>s+((AD_COST_DATA[n]?.[yr])?.[i+1]||0),0));
@@ -498,6 +506,70 @@ function renderAdCost(el){
   const grandTotal=yearTotals.reduce((a,b)=>a+b,0);
   const maxMonth=Math.max(...monthTotals.filter(v=>v>0));
   const maxStore=Math.max(...yearTotals);
+
+  // 売上データ取得（storeDataから）
+  const getSales=(adName,mNum)=>{
+    const sName=AD_TO_STORE[adName];
+    const si=stores.findIndex(s=>s.name===sName);
+    if(si<0)return 0;
+    const d=storeData[si]?.[curAdYear];
+    if(!d)return 0;
+    if(mNum){
+      const mo=MO[mNum-1];
+      return d.monthly.find(m=>m.month===mo)?.sales||0;
+    }else{
+      return d.monthly.reduce((a,m)=>a+(m.sales||0),0);
+    }
+  };
+
+  // 広告比率カード（月別）
+  const ratioRows=AD_STORES.map((n,si)=>{
+    const col=AD_COLORS[si%AD_COLORS.length];
+    const adCost=selM?(AD_COST_DATA[n]?.[yr]?.[selM]||0):yearTotals[si];
+    const sales=getSales(n,selM);
+    const ratio=sales>0?(adCost/sales*100):null;
+    const ratioStr=ratio!=null?ratio.toFixed(1)+'%':'-';
+    const ratioCol=ratio==null?'var(--txd)':ratio<=5?'#A3E635':ratio<=10?'#3ECFB4':ratio<=15?'#F0C846':'#FF6B4A';
+    return`<tr style="border-bottom:1px solid var(--bd)">
+      <td style="padding:8px 12px;white-space:nowrap">
+        <span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${col};margin-right:6px"></span>
+        <span style="font-size:12px;font-weight:600;color:#E6EDF3">${n}</span>
+      </td>
+      <td style="padding:8px 6px;text-align:right;font-family:'Outfit';font-size:12px;color:#E6EDF3">${sales>0?'¥'+Number(sales).toLocaleString():'-'}</td>
+      <td style="padding:8px 6px;text-align:right;font-family:'Outfit';font-size:12px;color:#FBBF24">${adCost>0?'¥'+Number(adCost).toLocaleString():'-'}</td>
+      <td style="padding:8px 12px;text-align:right">
+        <span style="font-family:'Outfit';font-size:14px;font-weight:700;color:${ratioCol}">${ratioStr}</span>
+        ${ratio!=null?`<div style="margin-top:3px;height:3px;background:var(--sf3);border-radius:2px"><div style="height:3px;background:${ratioCol};border-radius:2px;width:${Math.min(ratio*4,100).toFixed(0)}%"></div></div>`:''}
+      </td>
+    </tr>`;
+  }).join('');
+
+  // 合計行
+  const totalAdCost=selM?monthTotals[selM-1]:grandTotal;
+  const totalSales=AD_STORES.reduce((a,n)=>a+getSales(n,selM),0);
+  const totalRatio=totalSales>0?(totalAdCost/totalSales*100):null;
+  const totalRatioCol=totalRatio==null?'var(--txd)':totalRatio<=5?'#A3E635':totalRatio<=10?'#3ECFB4':totalRatio<=15?'#F0C846':'#FF6B4A';
+
+  const ratioTable=`<div class="cd" style="margin-bottom:16px">
+    <div class="ct"><span class="cdot" style="background:#34D399"></span>📊 売上対広告費比率 — ${yr}年 ${selM?selM+'月':'全月合計'}</div>
+    <div class="csu">広告費 ÷ 売上 × 100（目安：5%以下🟢 10%以下🔵 15%以下🟡 超過🔴）</div>
+    <div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse">
+      <thead><tr style="font-size:10px;color:var(--txm);border-bottom:1px solid var(--bd)">
+        <th style="padding:6px 12px;text-align:left">店舗</th>
+        <th style="padding:6px 6px;text-align:right">売上</th>
+        <th style="padding:6px 6px;text-align:right">広告費</th>
+        <th style="padding:6px 12px;text-align:right">広告比率</th>
+      </tr></thead>
+      <tbody>${ratioRows}
+        <tr style="background:var(--sf2)">
+          <td style="padding:8px 12px;font-size:11px;font-weight:700;color:var(--txm)">合計</td>
+          <td style="padding:8px 6px;text-align:right;font-family:'Outfit';font-size:12px;font-weight:700;color:#E6EDF3">${totalSales>0?'¥'+Number(totalSales).toLocaleString():'-'}</td>
+          <td style="padding:8px 6px;text-align:right;font-family:'Outfit';font-size:12px;font-weight:700;color:#FBBF24">${totalAdCost>0?'¥'+Number(totalAdCost).toLocaleString():'-'}</td>
+          <td style="padding:8px 12px;text-align:right;font-family:'Outfit';font-size:14px;font-weight:700;color:${totalRatioCol}">${totalRatio!=null?totalRatio.toFixed(1)+'%':'-'}</td>
+        </tr>
+      </tbody>
+    </table></div>
+  </div>`;
 
   // ヒートマップ色
   const heatColor=(v,max)=>{
@@ -554,6 +626,12 @@ function renderAdCost(el){
   // 合計行
   const totalRow=`<tr style="background:var(--sf2)"><td style="padding:7px 10px;font-size:11px;font-weight:700;color:var(--txm)">月計</td>${monthTotals.map((v,i)=>`<td style="padding:5px 4px;text-align:right;font-family:'Outfit';font-size:11px;font-weight:700;color:var(--txm);${i+1===curMNum?'color:#F0C846;':''}">${v>0?'¥'+Number(v).toLocaleString():'-'}</td>`).join('')}<td style="padding:5px 8px;text-align:right;font-family:'Outfit';font-size:12px;font-weight:700;color:#E6EDF3">¥${Number(grandTotal).toLocaleString()}</td></tr>`;
 
+  // 月セレクターボタン
+  const monthBtns=`<div class="mp" style="margin-bottom:14px">
+    <button class="pl ${selM===null?'on':''}" onclick="curAdMonth=null;renderMain()">全月</button>
+    ${MO.map((m,i)=>`<button class="pl ${selM===i+1?'on':''}" onclick="curAdMonth=${i+1};renderMain()">${m}</button>`).join('')}
+  </div>`;
+
   el.innerHTML=`<div class="fade">
     <div class="ph">
       <div><div class="pt"><span style="color:#FBBF24">💴</span> 広告費管理</div><div class="pd">費用対効果シート — 店舗別月次広告費</div></div>
@@ -574,6 +652,8 @@ function renderAdCost(el){
         <div style="font-family:'Outfit';font-size:16px;font-weight:700;color:#E6EDF3">¥${Number(Math.round(grandTotal/(monthTotals.filter(v=>v>0).length||1))).toLocaleString()}</div>
       </div>
     </div>
+    ${monthBtns}
+    ${ratioTable}
     <div class="cd">
       <div class="ct"><span class="cdot" style="background:#FBBF24"></span>店舗別月次広告費 — ${yr}年</div>
       <div class="csu">${curMNum>0?`${curMNum}月が現在月（黄枠）、それ以降は契約済みHPB費用など`:'全月確定値'}</div>
