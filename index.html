@@ -651,6 +651,11 @@ function renderAdCost(el){
         <div style="font-size:10px;color:var(--txm);margin-bottom:2px">月平均</div>
         <div style="font-family:'Outfit';font-size:16px;font-weight:700;color:#E6EDF3">¥${Number(Math.round(grandTotal/(monthTotals.filter(v=>v>0).length||1))).toLocaleString()}</div>
       </div>
+      <div style="width:1px;height:32px;background:var(--bd)"></div>
+      <div>
+        <div style="font-size:10px;color:var(--txm);margin-bottom:2px">広告比率${selM?'（'+selM+'月）':'（全月）'}</div>
+        <div style="font-family:'Outfit';font-size:22px;font-weight:700;color:${totalRatioCol}">${totalRatio!=null?totalRatio.toFixed(1)+'%':'-'}</div>
+      </div>
     </div>
     ${monthBtns}
     ${ratioTable}
