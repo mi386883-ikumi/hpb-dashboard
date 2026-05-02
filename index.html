@@ -183,8 +183,14 @@ function fetchProdData(btnEl){
     try{
       const nd={};
       (data.table?.rows||[]).forEach(r=>{
-        const ds=r.c[0]?.v||'';const dm=ds.match(/Date\((\d+),(\d+),/);if(!dm)return;
-        const year=parseInt(dm[1]),mon=parseInt(dm[2])+1,ms=mon+'月';
+        const ds=r.c[0]?.v||'';
+        let year,mon;
+        const dm=ds.match(/Date\((\d+),(\d+),/);
+        const dm2=ds.match(/(\d{4})年(\d+)月/);
+        if(dm){year=parseInt(dm[1]);mon=parseInt(dm[2])+1;}
+        else if(dm2){year=parseInt(dm2[1]);mon=parseInt(dm2[2]);}
+        else return;
+        const ms=mon+'月';
         if(year<2025||year>2026)return;
         const fn=(r.c[1]?.v||'').trim(),sn=(r.c[2]?.v||'').trim();
         if(!fn||fn==='ヘルプ'||!sn)return;
