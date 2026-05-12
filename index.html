@@ -86,7 +86,7 @@ const STAFF_LIST=[
   {store:'中野院',   staff:['高山','林']},
   {store:'コザ院',   staff:['大嶺']}
 ];
-// ===== 受付履歴 静的データ（〜2026年3月確定分） =====
+// ===== 受付履歴 静的データ（〜2026年4月確定分） =====
 const STATIC_RECEPTION={
   "大森院|2025|3月":[{"name":"宮崎","total":1488510,"newSales":131100,"contSales":1357410,"count":107,"newCount":8,"rate":7.5},{"name":"亀井","total":1356520,"newSales":114350,"contSales":1242170,"count":99,"newCount":7,"rate":7.1}],
   "大森院|2025|4月":[{"name":"宮崎","total":1509910,"newSales":165250,"contSales":1344660,"count":111,"newCount":8,"rate":7.2},{"name":"亀井","total":1349770,"newSales":91700,"contSales":1258070,"count":97,"newCount":7,"rate":7.2},{"name":"植松","total":4000,"newSales":4000,"contSales":0,"count":0,"newCount":1,"rate":0}],
@@ -101,6 +101,7 @@ const STATIC_RECEPTION={
   "大森院|2026|1月":[{"name":"宮崎","total":1334280,"newSales":62350,"contSales":1271930,"count":105,"newCount":9,"rate":8.6},{"name":"亀井","total":1189650,"newSales":83850,"contSales":1105800,"count":89,"newCount":6,"rate":6.7},{"name":"植松","total":1057980,"newSales":214780,"contSales":843200,"count":56,"newCount":16,"rate":28.6}],
   "大森院|2026|2月":[{"name":"宮崎","total":1269210,"newSales":143080,"contSales":1126130,"count":100,"newCount":7,"rate":7.0},{"name":"亀井","total":1196900,"newSales":119150,"contSales":1077750,"count":89,"newCount":6,"rate":6.7},{"name":"植松","total":970800,"newSales":141450,"contSales":829350,"count":53,"newCount":16,"rate":30.2}],
   "大森院|2026|3月":[{"name":"宮崎","total":1357860,"newSales":109430,"contSales":1248430,"count":105,"newCount":8,"rate":7.6},{"name":"亀井","total":1284600,"newSales":103380,"contSales":1181220,"count":92,"newCount":8,"rate":8.7},{"name":"植松","total":1124380,"newSales":223880,"contSales":900500,"count":61,"newCount":25,"rate":41.0}],
+  "大森院|2026|4月":[{"name":"宮崎","total":1386960,"newSales":133230,"contSales":1253730,"count":106,"newCount":9,"rate":8.5},{"name":"亀井","total":1364920,"newSales":179150,"contSales":1185770,"count":91,"newCount":11,"rate":12.1},{"name":"植松","total":1011750,"newSales":149200,"contSales":862550,"count":60,"newCount":14,"rate":23.3}],
   "新馬場院|2025|1月":[{"name":"宮崎","total":1240400,"newSales":225450,"contSales":1014950,"count":58,"newCount":16,"rate":27.6},{"name":"加々美","total":1177400,"newSales":107350,"contSales":1070050,"count":64,"newCount":11,"rate":17.2}],
   "新馬場院|2025|2月":[{"name":"宮崎","total":1247750,"newSales":128600,"contSales":1119150,"count":61,"newCount":8,"rate":13.1},{"name":"加々美","total":1181700,"newSales":123000,"contSales":1058700,"count":62,"newCount":8,"rate":12.9}],
   "新馬場院|2025|3月":[{"name":"加々美","total":1143800,"newSales":99250,"contSales":1044550,"count":63,"newCount":7,"rate":11.1},{"name":"宮崎","total":1067900,"newSales":122000,"contSales":945900,"count":50,"newCount":8,"rate":16.0}],
@@ -115,6 +116,8 @@ const STATIC_RECEPTION={
   "新馬場院|2025|12月":[{"name":"加々美","total":1092300,"newSales":131450,"contSales":960850,"count":58,"newCount":16,"rate":27.6},{"name":"宮崎","total":1049700,"newSales":76500,"contSales":973200,"count":56,"newCount":10,"rate":17.9}],
   "新馬場院|2026|1月":[{"name":"宮崎","total":1148700,"newSales":153850,"contSales":994850,"count":62,"newCount":9,"rate":14.5},{"name":"加々美","total":1058150,"newSales":57450,"contSales":1000700,"count":60,"newCount":5,"rate":8.3}],
   "新馬場院|2026|2月":[{"name":"宮崎","total":1469550,"newSales":443150,"contSales":1026400,"count":71,"newCount":35,"rate":49.3},{"name":"加々美","total":1116850,"newSales":209750,"contSales":907100,"count":58,"newCount":32,"rate":55.2}],
+  "新馬場院|2026|3月":[{"name":"宮崎","total":1257150,"newSales":30700,"contSales":1226450,"count":67,"newCount":5,"rate":7.5},{"name":"加々美","total":1245900,"newSales":144750,"contSales":1101150,"count":64,"newCount":12,"rate":18.8}],
+  "新馬場院|2026|4月":[{"name":"加々美","total":1321200,"newSales":191000,"contSales":1130200,"count":69,"newCount":13,"rate":18.8},{"name":"宮崎","total":1265400,"newSales":36750,"contSales":1228650,"count":67,"newCount":4,"rate":6.0}],
   "浦添院|2025|2月":[{"name":"阿嘉","total":1263470,"newSales":237910,"contSales":1025560,"count":34,"newCount":16,"rate":47.1},{"name":"花城","total":628250,"newSales":167450,"contSales":460800,"count":25,"newCount":19,"rate":76.0}],
   "浦添院|2025|4月":[{"name":"阿嘉","total":1151430,"newSales":162830,"contSales":988600,"count":39,"newCount":14,"rate":35.9},{"name":"花城","total":580720,"newSales":80410,"contSales":500310,"count":20,"newCount":18,"rate":90.0}],
   "浦添院|2025|5月":[{"name":"阿嘉","total":1352820,"newSales":270300,"contSales":1082520,"count":43,"newCount":17,"rate":39.5},{"name":"花城","total":693230,"newSales":207300,"contSales":485930,"count":24,"newCount":18,"rate":75.0}],
@@ -1553,7 +1556,7 @@ async function getFolderFileId(folderId,yyyymm){
 function parseReceptionRows(rows){
   const staffMap={};
   rows.forEach(row=>{
-    const staff=(row[7]||'').trim();
+    const staff=(row[7]||'').trim().replace(/﨑/g,'崎');
     if(!staff)return;
     const salesStr=(row[14]||'').replace(/[,¥￥\s]/g,'');
     const sales=parseInt(salesStr)||0;
