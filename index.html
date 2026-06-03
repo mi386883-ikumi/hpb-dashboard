@@ -86,7 +86,7 @@ const STAFF_LIST=[
   {store:'中野院',   staff:['高山','林']},
   {store:'コザ院',   staff:['大嶺','比嘉']}
 ];
-// ===== 受付履歴 静的データ（〜2026年4月確定分） =====
+// ===== 受付履歴 静的データ（〜2026年5月確定分） =====
 const STATIC_RECEPTION={
   "大森院|2025|3月":[{"name":"宮崎","total":1488510,"newSales":131100,"contSales":1357410,"count":107,"newCount":8,"rate":7.5},{"name":"亀井","total":1356520,"newSales":114350,"contSales":1242170,"count":99,"newCount":7,"rate":7.1}],
   "大森院|2025|4月":[{"name":"宮崎","total":1509910,"newSales":165250,"contSales":1344660,"count":111,"newCount":8,"rate":7.2},{"name":"亀井","total":1349770,"newSales":91700,"contSales":1258070,"count":97,"newCount":7,"rate":7.2},{"name":"植松","total":4000,"newSales":4000,"contSales":0,"count":0,"newCount":1,"rate":0}],
@@ -181,7 +181,7 @@ function fetchProdData(btnEl){
   prodDataLoading=true;
   if(btnEl){btnEl.disabled=true;btnEl.textContent='取得中…';}
   const done=(ok)=>{prodDataLoading=false;if(btnEl){btnEl.disabled=false;btnEl.textContent='↺ データ更新';}if(ok){prodDataLoaded=true;renderMain();}};
-  const tq=encodeURIComponent("SELECT * WHERE A >= date '2025-01-01' ORDER BY A");
+  const tq=encodeURIComponent("SELECT * WHERE A >= date '2026-05-01' ORDER BY A");
   const url=`https://docs.google.com/spreadsheets/d/${PROD_SHEET_ID}/gviz/tq?tqx=out:json&gid=${PROD_SHEET_GID}&tq=${tq}`;
   fetch(url)
     .then(r=>r.text())
@@ -189,7 +189,6 @@ function fetchProdData(btnEl){
       const json=txt.replace(/^\/\*[^*]*\*\/\s*[\w.]+\s*\(/, '').replace(/\);\s*$/, '');
       const data=JSON.parse(json);
       try{
-        const nd={};
         (data.table?.rows||[]).forEach(r=>{
           const ds=r.c[0]?.v||'';
           let year,mon;
@@ -198,22 +197,24 @@ function fetchProdData(btnEl){
           if(dm){year=parseInt(dm[1]);mon=parseInt(dm[2])+1;}
           else if(dm2){year=parseInt(dm2[1]);mon=parseInt(dm2[2]);}
           else return;
+          if(year<2026||(year===2026&&mon<5)||year>2027)return;
           const ms=mon+'月';
-          if(year<2025||year>2027)return;
           const fn=(r.c[1]?.v||'').trim(),sn=(r.c[2]?.v||'').trim();
           if(!fn||fn==='ヘルプ'||!sn)return;
           const store=STORE_MAP[sn];if(!store)return;
           const sl=STAFF_LIST.find(g=>g.store===store)?.staff||[];
           const staff=matchStaff(fn,sl);if(!staff)return;
-          if(!nd[store])nd[store]={};if(!nd[store][staff])nd[store][staff]={};const yk=year+'年';if(!nd[store][staff][yk])nd[store][staff][yk]={};
+          if(!staffProdData[store])staffProdData[store]={};
+          if(!staffProdData[store][staff])staffProdData[store][staff]={};
+          const yk=year+'年';
+          if(!staffProdData[store][staff][yk])staffProdData[store][staff][yk]={};
           const rate=(r.c[45]?.v!=null?r.c[45].v:r.c[5]?.v);
-          nd[store][staff][yk][ms]={
+          staffProdData[store][staff][yk][ms]={
             prod:r.c[14]?.v??null,members:r.c[8]?.v??null,cancel:r.c[9]?.v??null,newM:r.c[4]?.v??null,
             rate:rate!=null?Math.round(rate*100):null,
             hpbR:(r.c[13]?.v??r.c[43]?.v)??null,hpR:(r.c[12]?.v??r.c[42]?.v)??null
           };
         });
-        staffProdData=nd;
       }catch(e){console.error('parseProd:',e);}
       done(true);
     })
