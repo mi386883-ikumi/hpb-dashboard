@@ -742,8 +742,40 @@ function renderInsight(el){
     return{store,top,bot,ratio,color:ci>=0?SC[ci%SC.length]:'#7D8CA1'};
   }).filter(d=>d&&d.ratio>1.5).sort((a,b)=>b.ratio-a.ratio);
 
-const urgentCount=lowReview.length+highCancel.length;
-  const warnCount=trendDown.length+gapData.length;
+  // ===== 追加インサイト（前月比較・閾値判定）=====
+  const fmtY=v=>'¥'+Number(v).toLocaleString();
+
+  // A. 店舗売上が前月比10万円以上低下（全スタッフのprod合計＝退職者含む）
+  const storeSalesDrop=Object.keys(staffProdData).map(store=>{
+    const sm=staffProdData[store];let cur=0,prev=0,hc=false,hp=false;
+    Object.values(sm).forEach(yrs=>{
+      const c=yrs?.[curY+'年']?.[curM],p=yrs?.[prevY+'年']?.[prevM];
+      if(c&&c.prod!=null){cur+=c.prod;hc=true;}
+      if(p&&p.prod!=null){prev+=p.prod;hp=true;}
+    });
+    const ci=stores.findIndex(s=>s.name===store);
+    return{store,cur,prev,drop:prev-cur,hc,hp,color:ci>=0?SC[ci%SC.length]:'#7D8CA1'};
+  }).filter(d=>d.hc&&d.hp&&d.drop>=100000).sort((a,b)=>b.drop-a.drop);
+
+  // B-a. リピート率（成約率）30%以下
+  const lowRepeat=allStaff.filter(s=>s.cur.rate!=null&&s.cur.rate<=30).sort((a,b)=>a.cur.rate-b.cur.rate);
+  // B-b. 個人生産性100万円以下
+  const lowProd=allStaff.filter(s=>s.cur.prod!=null&&s.cur.prod<=1000000).sort((a,b)=>a.cur.prod-b.cur.prod);
+  // B-c. 退会率10%以上（個人：退会数÷会員数×100）
+  const indCancel=allStaff.filter(s=>s.cur.members>0&&s.cur.cancel!=null&&(s.cur.cancel/s.cur.members*100)>=10)
+    .map(s=>({...s,crate:s.cur.cancel/s.cur.members*100})).sort((a,b)=>b.crate-a.crate);
+  // B-d. 新規人数に対して口コミ数が50%以下
+  const lowReviewRatio=allStaff.filter(s=>{
+    if(!(s.cur.newM>0))return false;
+    const rv=(s.cur.hpbR??0)+(s.cur.hpR??0);
+    return(rv/s.cur.newM*100)<=50;
+  }).map(s=>{const rv=(s.cur.hpbR??0)+(s.cur.hpR??0);return{...s,rv,ratio:rv/s.cur.newM*100};}).sort((a,b)=>a.ratio-b.ratio);
+  // B-e. 個人生産性が前月比10万円以上低下
+  const prodDrop=allStaff.filter(s=>s.cur.prod!=null&&s.prev.prod!=null&&(s.prev.prod-s.cur.prod)>=100000)
+    .map(s=>({...s,drop:s.prev.prod-s.cur.prod})).sort((a,b)=>b.drop-a.drop);
+
+  const urgentCount=lowReview.length+highCancel.length+indCancel.length;
+  const warnCount=trendDown.length+gapData.length+storeSalesDrop.length+lowRepeat.length+lowProd.length+lowReviewRatio.length+prodDrop.length;
 
   const mkRow=(icon,title,detail,action,sev)=>{
     const sc=sev==='urgent'?'#FF6B4A':sev==='warn'?'#F0C846':'#34D399';
@@ -793,6 +825,31 @@ const gapHtml=gapData.length===0
       return mkRow('⚖️',`${d.store} — スタッフ間売上差 ${d.ratio.toFixed(1)}倍`,`最高: ${d.top.name} ${tf} ／ 最低: ${d.bot.name} ${bf}`,'低パフォーマンスのスタッフへの技術・接客指導を検討してください','warn');
     }).join('');
 
+  // ── 追加カードのHTML ──
+  const storeSalesDropHtml=storeSalesDrop.length===0
+    ?mkRow('✅','店舗売上 — 前月比10万円以上の低下なし',`${prevM}→${curM} で売上が10万円以上落ちた店舗はありません`,'','ok')
+    :storeSalesDrop.map(d=>mkRow('🏬',`${d.store} — 売上 ${fmtY(d.drop)} 低下`,`${prevM} ${fmtY(d.prev)} → ${curM} ${fmtY(d.cur)}`,'店舗全体の集客・稼働状況を確認してください','warn')).join('');
+
+  const lowRepeatHtml=lowRepeat.length===0
+    ?mkRow('✅','リピート率 — 全スタッフ30%超','リピート率（成約率）30%以下のスタッフはいません','','ok')
+    :lowRepeat.map(s=>mkRow('🔁',`${s.name}（${s.store.replace('院','')}）— リピート率 ${s.cur.rate}%`,`${curY}年${curM}`,'次回予約・リピート促進策を強化してください','warn')).join('');
+
+  const lowProdHtml=lowProd.length===0
+    ?mkRow('✅','個人生産性 — 全スタッフ100万円超','個人生産性が100万円以下のスタッフはいません','','ok')
+    :lowProd.map(s=>mkRow('💰',`${s.name}（${s.store.replace('院','')}）— 生産性 ${fmtY(s.cur.prod)}`,`${curY}年${curM}`,'稼働率・客単価・リピートの改善を検討してください','warn')).join('');
+
+  const indCancelHtml=indCancel.length===0
+    ?mkRow('✅','個人退会率 — 全スタッフ10%未満','退会率（退会数÷会員数）10%以上のスタッフはいません','','ok')
+    :indCancel.map(s=>mkRow('🚪',`${s.name}（${s.store.replace('院','')}）— 退会率 ${s.crate.toFixed(1)}%`,`退会 ${s.cur.cancel}名 ／ 会員 ${s.cur.members}名`,'退会フォローと顧客満足度の向上を図ってください','urgent')).join('');
+
+  const lowReviewRatioHtml=lowReviewRatio.length===0
+    ?mkRow('✅','口コミ獲得率 — 全スタッフ良好','新規人数に対し口コミ数が50%を下回るスタッフはいません','','ok')
+    :lowReviewRatio.map(s=>mkRow('⭐',`${s.name}（${s.store.replace('院','')}）— 口コミ率 ${s.ratio.toFixed(0)}%`,`口コミ ${s.rv}件 ／ 新規 ${s.cur.newM}名`,'施術後の口コミ依頼を徹底してください','warn')).join('');
+
+  const prodDropHtml=prodDrop.length===0
+    ?mkRow('✅','個人生産性 — 前月比10万円以上の低下なし',`${prevM}→${curM} で生産性が10万円以上落ちたスタッフはいません`,'','ok')
+    :prodDrop.map(s=>mkRow('📉',`${s.name}（${s.store.replace('院','')}）— 生産性 ${fmtY(s.drop)} 低下`,`${prevM} ${fmtY(s.prev.prod)} → ${curM} ${fmtY(s.cur.prod)}`,'前月からの低下要因を確認してください','warn')).join('');
+
   el.innerHTML=`<div class="fade">
     <div class="ph">
       <div><div class="pt"><span style="color:#34D399">🤖</span> AIインサイト</div><div class="pd">ルールベース自動分析 — ${curY}年 ${curM}</div></div>
@@ -827,7 +884,41 @@ const gapHtml=gapData.length===0
         <div class="csu">${curY}年${curM} — 店舗内最高/最低比 1.5倍以上を検知</div>
         <div>${gapHtml}</div>
       </div>
+    </div>
 
+    <div class="ct" style="margin:24px 0 4px"><span class="cdot" style="background:#34D399"></span>📊 追加インサイト（前月比較・閾値判定）</div>
+    <div class="csu" style="margin-bottom:12px">${prevY}年${prevM} を基準に ${curY}年${curM} を分析</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div class="cd">
+        <div class="ct"><span class="cdot" style="background:#FB7185"></span>🏬 店舗売上 前月比低下</div>
+        <div class="csu">${prevM}→${curM} で売上が10万円以上低下した店舗を検知</div>
+        <div>${storeSalesDropHtml}</div>
+      </div>
+      <div class="cd">
+        <div class="ct"><span class="cdot" style="background:#A78BFA"></span>🔁 リピート率 30%以下</div>
+        <div class="csu">${curY}年${curM} — リピート率（成約率）30%以下のスタッフを検知</div>
+        <div>${lowRepeatHtml}</div>
+      </div>
+      <div class="cd">
+        <div class="ct"><span class="cdot" style="background:#34D399"></span>💰 個人生産性 100万円以下</div>
+        <div class="csu">${curY}年${curM} — 生産性100万円以下のスタッフを検知</div>
+        <div>${lowProdHtml}</div>
+      </div>
+      <div class="cd">
+        <div class="ct"><span class="cdot" style="background:#FF6B4A"></span>🚪 個人退会率 10%以上</div>
+        <div class="csu">${curY}年${curM} — 退会率（退会数÷会員数）10%以上のスタッフを検知</div>
+        <div>${indCancelHtml}</div>
+      </div>
+      <div class="cd">
+        <div class="ct"><span class="cdot" style="background:#FBBF24"></span>⭐ 口コミ率 新規比50%以下</div>
+        <div class="csu">${curY}年${curM} — 新規人数に対し口コミ数が50%以下のスタッフを検知</div>
+        <div>${lowReviewRatioHtml}</div>
+      </div>
+      <div class="cd">
+        <div class="ct"><span class="cdot" style="background:#38BDF8"></span>📉 個人生産性 前月比低下</div>
+        <div class="csu">${prevM}→${curM} で生産性が10万円以上低下したスタッフを検知</div>
+        <div>${prodDropHtml}</div>
+      </div>
     </div>
   </div>`;
 }
