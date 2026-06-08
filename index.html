@@ -32,7 +32,7 @@
 <nav class="sb" id="sidebar"><div class="sb-hd"><div class="sb-brand">武田グループ</div><div class="sb-sub">管理画面</div></div><div class="sb-nav" id="sbNav"></div><div class="sb-ft"><button class="sb-btn" onclick="openSettings()">⚙ 店舗管理・API設定</button></div></nav>
 <div class="mn" id="mainC"></div>
 </div>
-<div class="mo" id="settingsModal"><div class="ml"><h2>店舗管理・API設定</h2><div class="ml-sub">APIキーは全店舗共通。各店舗のスプレッドシートIDを入力してください。<br>スプレッドシートは「リンクを知っている全員が閲覧可」にしてください。</div><div class="fg"><label class="fl">Google Sheets APIキー</label><input class="fi" id="mApiKey" placeholder="AIza..." /></div><div class="fg"><label class="fl">HPB自動取得 GASエンドポイントURL（任意）</label><input class="fi" id="mGasEndpoint" placeholder="https://script.google.com/macros/s/.../exec" /><div style="font-size:10px;color:var(--txd);margin-top:4px">Google Apps ScriptをWebアプリとして公開したURLを入力すると、HPBの口コミ数・評価・ブログ数を自動取得できます。</div></div><div class="fg"><label class="fl">店舗一覧</label><div class="sl-edit" id="storeListEdit"></div><button class="btn" onclick="addStoreRow()" style="margin-top:5px">＋ 店舗を追加</button></div><div class="ma"><button class="btn" onclick="closeSettings()">キャンセル</button><button class="btn btn-p" onclick="saveSettings()">保存してデータ取得</button></div><div id="sStatus" style="margin-top:10px;font-size:11px;display:none"></div></div></div>
+<div class="mo" id="settingsModal"><div class="ml"><h2>店舗管理・API設定</h2><div class="ml-sub">APIキーは全店舗共通。各店舗のスプレッドシートIDを入力してください。<br>スプレッドシートは「リンクを知っている全員が閲覧可」にしてください。</div><div class="fg"><label class="fl">Google Sheets APIキー</label><input class="fi" id="mApiKey" placeholder="AIza..." /></div><div class="fg"><label class="fl">HPB自動取得 GASエンドポイントURL（任意）</label><input class="fi" id="mGasEndpoint" placeholder="https://script.google.com/macros/s/.../exec" /><div style="font-size:10px;color:var(--txd);margin-top:4px">Google Apps ScriptをWebアプリとして公開したURLを入力すると、HPBの口コミ数・評価・ブログ数を自動取得できます。</div></div><div class="fg"><label class="fl">店舗一覧</label><div class="sl-edit" id="storeListEdit"></div><button class="btn" onclick="addStoreRow()" style="margin-top:5px">＋ 店舗を追加</button></div><div class="fg" style="border-top:1px solid var(--bd);padding-top:12px"><label class="fl">埋め込み用データの書き出し</label><div style="font-size:10px;color:var(--txd);margin-bottom:6px">データ取得済みのこのブラウザで押すと、集客・口コミ・受付データを埋め込み用 .js として保存します。出力ファイルを開発者に渡すと、サイトに焼き込めます。</div><button class="btn" onclick="exportEmbedData()">⬇ データを書き出す（.js）</button></div><div class="ma"><button class="btn" onclick="closeSettings()">キャンセル</button><button class="btn btn-p" onclick="saveSettings()">保存してデータ取得</button></div><div id="sStatus" style="margin-top:10px;font-size:11px;display:none"></div></div></div>
 <script>
 const MO=['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'];
 const CH=['HPB','HP','チラシ','メタ広告','minimo','紹介','骨Fix','その他'];
@@ -220,8 +220,18 @@ function fetchProdData(btnEl){
     })
     .catch(e=>{console.error('fetchProd:',e);done(false);});
 }
+// ===== 埋め込みデータ（「データ書き出し」ボタンで生成 → ここに貼り付け）=====
+// EMBEDDED_STORE_DATA : 集客（来店経路）データ  店舗名 → {年:{monthly,daily}}
+// EMBEDDED_HPB_STATS  : 口コミ・評価          店舗名 → stats
+// EMBEDDED_RECEPTION  : 受付/売上             '店舗院|年|月' → [...]
+let EMBEDDED_STORE_DATA={};
+let EMBEDDED_HPB_STATS={};
+let EMBEDDED_RECEPTION={};
+
 // ブラウザに保存された設定を読み込む
 (function(){
+  // 埋め込み口コミ・評価をベース適用（defaults < embedded < localStorage）
+  try{Object.keys(EMBEDDED_HPB_STATS).forEach(k=>{hpbStatsByStore[k]=Object.assign({},hpbStatsByStore[k]||{},EMBEDDED_HPB_STATS[k]);});}catch(e){}
   try{
     const saved=localStorage.getItem('hpb_dashboard_config');
     if(saved){
@@ -234,6 +244,8 @@ function fetchProdData(btnEl){
   }catch(e){}
   // ── 受付履歴 静的データをベースロード ──
   Object.assign(receptionCache, STATIC_RECEPTION);
+  // ── 埋め込み受付/売上データを上書き適用（STATICより新しい確定値）──
+  try{Object.assign(receptionCache, EMBEDDED_RECEPTION);}catch(e){}
   // ── 受付履歴キャッシュ復元 ──
   try{
     const sf=localStorage.getItem('hpb_folder_lists');
@@ -276,6 +288,13 @@ function fetchProdData(btnEl){
     } else if(!lastSnap){
       localStorage.setItem('hpb_snapshot_month',ym);
     }
+  }catch(e){}
+  // ── 埋め込み集客（来店経路）データを storeData に復元（店舗名→index）──
+  try{
+    Object.keys(EMBEDDED_STORE_DATA).forEach(name=>{
+      const idx=stores.findIndex(s=>s.name===name);
+      if(idx>=0){storeData[idx]=Object.assign(storeData[idx]||{},EMBEDDED_STORE_DATA[name]);liveStores.add(idx);}
+    });
   }catch(e){}
 })();
 
@@ -344,6 +363,28 @@ async function fetchStore(idx){
 }
 async function fetchAllStores(){const st=document.getElementById('sStatus');if(st){st.style.display='block';st.style.color='var(--gd)';st.textContent='データ取得中…（2025年＋2026年）';}let ok=0;for(let i=0;i<stores.length;i++){if(!stores[i].id)continue;if(st)st.textContent=`${stores[i].name} を取得中… (${i+1}/${stores.length})`;const d=await fetchStore(i);if(d){if(!storeData[i])storeData[i]={};Object.assign(storeData[i],d);liveStores.add(i);ok++;}}if(st){if(ok>0){st.style.color='var(--em)';st.textContent=`✓ ${ok}店舗のデータを取得しました（2025年＋2026年）`;}else{st.style.color='var(--rs)';st.textContent='⚠ 取得できませんでした。設定を確認してください。';}}renderSidebar();renderMain();}
 
+// ===== 埋め込み用データの書き出し =====
+// 集客データ等が読み込まれたブラウザでこれを実行すると、埋め込み用JSが .js として保存される。
+// 出力された .js をチャットに貼り付ければ、開発側で index.html に焼き込み（静的化）できる。
+function exportEmbedData(){
+  const sd={};
+  stores.forEach((s,i)=>{if(storeData[i]&&Object.keys(storeData[i]).length)sd[s.name]=storeData[i];});
+  const hs={};Object.keys(hpbStatsByStore).forEach(k=>{hs[k]=hpbStatsByStore[k];});
+  const rc={};Object.keys(receptionCache).forEach(k=>{if(receptionCache[k]&&receptionCache[k].length)rc[k]=receptionCache[k];});
+  if(Object.keys(sd).length===0&&!confirm('集客データがまだ読み込まれていません。\n（⚙設定でAPIキーを入れて取得済みのブラウザで実行してください）\n\nこのまま口コミ・受付データだけ書き出しますか？'))return;
+  const date=new Date().toISOString().slice(0,10);
+  const js=`/* HPB 埋め込みデータ 書き出し ${date} */\n`+
+    `EMBEDDED_STORE_DATA=${JSON.stringify(sd)};\n`+
+    `EMBEDDED_HPB_STATS=${JSON.stringify(hs)};\n`+
+    `EMBEDDED_RECEPTION=${JSON.stringify(rc)};\n`;
+  try{
+    const blob=new Blob([js],{type:'text/javascript'});
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a');a.href=url;a.download=`hpb-embed-data-${date}.js`;
+    document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(url);
+  }catch(e){console.error(e);}
+  alert(`✅ 書き出し完了（hpb-embed-data-${date}.js）\n\n集客データ: ${Object.keys(sd).length}店舗\n口コミ・評価: ${Object.keys(hs).length}店舗\n受付/売上: ${Object.keys(rc).length}キー\n\nダウンロードされた .js ファイルをチャットに貼り付け（または共有）してください。`);
+}
 function getStoreYear(idx,year){return storeData[idx]?.[year]||null;}
 function aggAll(){const map={};stores.forEach((_,i)=>{const d=getStoreYear(i,curYear);if(!d)return;const months=curFilterMonth?d.monthly.filter(m=>m.month===curFilterMonth):d.monthly;months.forEach(m=>{if(!map[m.month]){map[m.month]={month:m.month,total:0};CH.forEach(k=>map[m.month][k]=0);}CH.forEach(k=>map[m.month][k]+=(m[k]||0));map[m.month].total+=m.total;});});return MO.filter(m=>map[m]).map(m=>map[m]);}
 function getMonths(){const s=new Set();stores.forEach((_,i)=>{const d=getStoreYear(i,curYear);if(d)d.monthly.forEach(m=>s.add(m.month));});return MO.filter(m=>s.has(m));}
