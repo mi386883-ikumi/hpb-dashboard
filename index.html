@@ -32,7 +32,7 @@
 <nav class="sb" id="sidebar"><div class="sb-hd"><div class="sb-brand">武田グループ</div><div class="sb-sub">管理画面</div></div><div class="sb-nav" id="sbNav"></div><div class="sb-ft"><button class="sb-btn" onclick="openSettings()">⚙ 店舗管理・API設定</button></div></nav>
 <div class="mn" id="mainC"></div>
 </div>
-<div class="mo" id="settingsModal"><div class="ml"><h2>店舗管理・API設定</h2><div class="ml-sub">APIキーは全店舗共通。各店舗のスプレッドシートIDを入力してください。<br>スプレッドシートは「リンクを知っている全員が閲覧可」にしてください。</div><div class="fg"><label class="fl">Google Sheets APIキー</label><input class="fi" id="mApiKey" placeholder="AIza..." /></div><div class="fg"><label class="fl">HPB自動取得 GASエンドポイントURL（任意）</label><input class="fi" id="mGasEndpoint" placeholder="https://script.google.com/macros/s/.../exec" /><div style="font-size:10px;color:var(--txd);margin-top:4px">Google Apps ScriptをWebアプリとして公開したURLを入力すると、HPBの口コミ数・評価・ブログ数を自動取得できます。</div></div><div class="fg"><label class="fl">店舗一覧</label><div class="sl-edit" id="storeListEdit"></div><button class="btn" onclick="addStoreRow()" style="margin-top:5px">＋ 店舗を追加</button></div><div class="fg" style="border-top:1px solid var(--bd);padding-top:12px"><label class="fl">埋め込み用データの書き出し</label><div style="font-size:10px;color:var(--txd);margin-bottom:6px">データ取得済みのこのブラウザで押すと、集客・口コミ・受付データを埋め込み用 .js として保存します。出力ファイルを開発者に渡すと、サイトに焼き込めます。</div><button class="btn" onclick="exportEmbedData()">⬇ データを書き出す（.js）</button></div><div class="ma"><button class="btn" onclick="closeSettings()">キャンセル</button><button class="btn btn-p" onclick="saveSettings()">保存してデータ取得</button></div><div id="sStatus" style="margin-top:10px;font-size:11px;display:none"></div></div></div>
+<div class="mo" id="settingsModal"><div class="ml"><h2>店舗管理・API設定</h2><div class="ml-sub">APIキーは全店舗共通。各店舗のスプレッドシートIDを入力してください。<br>スプレッドシートは「リンクを知っている全員が閲覧可」にしてください。</div><div class="fg"><label class="fl">Google Sheets APIキー</label><div style="display:flex;gap:6px;align-items:center"><input class="fi" id="mApiKey" type="password" placeholder="AIza..." style="flex:1;min-width:0" /><button type="button" class="btn" id="revealKeyBtn" onclick="toggleApiKeyReveal()" style="white-space:nowrap">🔒 表示</button></div><div style="font-size:10px;color:var(--txd);margin-top:4px">APIキーは伏せ字で表示されます。「表示」を押してパスワード（初期：0000）を入力すると確認・編集できます。<a href="#" onclick="changeViewPassword();return false;" style="color:var(--tl);text-decoration:none">パスワードを変更</a></div></div><div class="fg"><label class="fl">HPB自動取得 GASエンドポイントURL（任意）</label><input class="fi" id="mGasEndpoint" placeholder="https://script.google.com/macros/s/.../exec" /><div style="font-size:10px;color:var(--txd);margin-top:4px">Google Apps ScriptをWebアプリとして公開したURLを入力すると、HPBの口コミ数・評価・ブログ数を自動取得できます。</div></div><div class="fg"><label class="fl">店舗一覧</label><div class="sl-edit" id="storeListEdit"></div><button class="btn" onclick="addStoreRow()" style="margin-top:5px">＋ 店舗を追加</button></div><div class="fg" style="border-top:1px solid var(--bd);padding-top:12px"><label class="fl">埋め込み用データの書き出し</label><div style="font-size:10px;color:var(--txd);margin-bottom:6px">データ取得済みのこのブラウザで押すと、集客・口コミ・受付データを埋め込み用 .js として保存します。出力ファイルを開発者に渡すと、サイトに焼き込めます。</div><button class="btn" onclick="exportEmbedData()">⬇ データを書き出す（.js）</button></div><div class="ma"><button class="btn" onclick="closeSettings()">キャンセル</button><button class="btn btn-p" onclick="saveSettings()">保存してデータ取得</button></div><div id="sStatus" style="margin-top:10px;font-size:11px;display:none"></div></div></div>
 <script>
 const MO=['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'];
 const CH=['HPB','HP','チラシ','メタ広告','minimo','紹介','骨Fix','その他'];
@@ -1228,8 +1228,9 @@ function renderSales(el){
       const c=SC[i%SC.length];
       if(!storeMonthly[i])return`<div class="kp" style="--kc:${c}"><div class="kl">${s.name}</div><div class="kv" style="color:var(--txd);font-size:14px">取得中…</div><div class="kn" style="color:var(--txd)">データ読み込み中</div></div>`;
       const v=curFilterMonth?(storeMonthly[i]?.[curFilterMonth]||0):(ms.reduce((a,m)=>a+(storeMonthly[i]?.[m]||0),0));
-      const prevM=ms.length>=2?ms[ms.length-2]:'';
-      const prev=prevM&&!curFilterMonth?0:(curFilterMonth&&prevM?(storeMonthly[i]?.[prevM]||0):0);
+      // 月フィルタ選択時のみ「選択月の直前の月」と比較（年間合計表示時は前月比なし）
+      let prev=0;
+      if(curFilterMonth){const ci=ms.indexOf(curFilterMonth);const pm=ci>0?ms[ci-1]:'';prev=pm?(storeMonthly[i]?.[pm]||0):0;}
       const d2=prev>0?((v-prev)/prev*100).toFixed(1):null;
       return`<div class="kp" style="--kc:${c}"><div class="kl">${s.name}</div><div class="kv" style="color:${c};font-size:16px">¥${v.toLocaleString()}</div><div class="kn">${curFilterMonth?curFilterMonth:'年間合計'}${d2!==null?'　'+(d2>=0?'▲+'+d2:'▼'+d2)+'%':''}</div></div>`;
     }).join('')}
@@ -1711,7 +1712,28 @@ function parseReceptionRows(rows){
   })).sort((a,b)=>b.total-a.total);
 }
 // ===== ここまで =====
-function openSettings(){document.getElementById('settingsModal').classList.add('show');document.getElementById('mApiKey').value=apiKey;document.getElementById('mGasEndpoint').value=gasEndpoint;renderStoreEdit();}
+// ===== APIキー表示パスワード保護 =====
+let apiKeyRevealed=false;
+function getViewPassword(){try{return localStorage.getItem('hpb_view_pw')||'0000';}catch(e){return '0000';}}
+function toggleApiKeyReveal(){
+  const inp=document.getElementById('mApiKey');const btn=document.getElementById('revealKeyBtn');
+  if(!inp)return;
+  if(apiKeyRevealed){inp.type='password';apiKeyRevealed=false;if(btn)btn.textContent='🔒 表示';return;}
+  const pw=prompt('APIキーを表示するにはパスワードを入力してください：');
+  if(pw===null)return;
+  if(pw!==getViewPassword()){alert('パスワードが違います。');return;}
+  inp.type='text';apiKeyRevealed=true;if(btn)btn.textContent='🙈 隠す';
+}
+function changeViewPassword(){
+  const cur=prompt('現在のパスワードを入力してください：');
+  if(cur===null)return;
+  if(cur!==getViewPassword()){alert('現在のパスワードが違います。');return;}
+  const nw=prompt('新しいパスワードを入力してください：');
+  if(nw===null||nw.trim()===''){if(nw!==null)alert('パスワードが空です。変更しませんでした。');return;}
+  try{localStorage.setItem('hpb_view_pw',nw.trim());}catch(e){}
+  alert('パスワードを変更しました。');
+}
+function openSettings(){document.getElementById('settingsModal').classList.add('show');const k=document.getElementById('mApiKey');k.value=apiKey;k.type='password';apiKeyRevealed=false;const rb=document.getElementById('revealKeyBtn');if(rb)rb.textContent='🔒 表示';document.getElementById('mGasEndpoint').value=gasEndpoint;renderStoreEdit();}
 function closeSettings(){document.getElementById('settingsModal').classList.remove('show');}
 function renderStoreEdit(){const el=document.getElementById('storeListEdit');el.innerHTML=stores.map((s,i)=>`<div class="se-row"><input class="fi se-nm" value="${s.name}" data-idx="${i}" placeholder="店舗名" /><input class="fi" value="${s.id}" data-idx="${i}" placeholder="スプレッドシートID" /><button class="del-b" onclick="delStore(${i})">削除</button></div>`).join('');}
 function addStoreRow(){stores.push({name:'',id:''});renderStoreEdit();}
