@@ -23,6 +23,7 @@
 .mp{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:12px;}.pl{padding:4px 11px;border-radius:5px;font-size:10px;font-weight:500;border:1px solid var(--bd);background:transparent;color:var(--txm);cursor:pointer;font-family:inherit;transition:all .2s;}.pl.on{background:var(--ac);color:#fff;border-color:var(--ac);}.pl:hover:not(.on){border-color:var(--bdh);color:var(--tx);}
 .mo{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:1000;display:none;align-items:center;justify-content:center;backdrop-filter:blur(4px);}.mo.show{display:flex;}.ml{background:var(--sf);border:1px solid var(--bd);border-radius:var(--r);padding:26px;width:600px;max-width:94vw;max-height:85vh;overflow-y:auto;}.ml h2{font-family:'Outfit';font-size:17px;font-weight:700;margin-bottom:4px;}.ml-sub{font-size:11px;color:var(--txm);margin-bottom:18px;}.fg{margin-bottom:12px;}.fl{font-size:9px;color:var(--txm);font-weight:600;text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px;display:block;}.fi{width:100%;padding:8px 11px;background:var(--bg);border:1px solid var(--bd);border-radius:var(--rr);color:var(--tx);font-size:12px;font-family:'Outfit',monospace;outline:none;transition:border-color .2s;}.fi:focus{border-color:var(--ac);}.sl-edit{margin-bottom:14px;max-height:300px;overflow-y:auto;}.se-row{display:flex;gap:5px;align-items:center;padding:6px 0;border-bottom:1px solid var(--bd);font-size:11px;}.se-row input{flex:1;min-width:0;}.se-nm{width:90px;flex-shrink:0;}.del-b{background:transparent;border:1px solid rgba(251,113,133,.3);color:var(--rs);border-radius:4px;padding:4px 8px;cursor:pointer;font-size:9px;font-family:inherit;}.del-b:hover{background:rgba(251,113,133,.1);}.ma{display:flex;gap:6px;justify-content:flex-end;margin-top:18px;}.btn{padding:7px 14px;border-radius:var(--rr);font-size:11px;font-weight:600;border:1px solid var(--bd);background:var(--sf2);color:var(--txm);cursor:pointer;font-family:inherit;transition:all .2s;}.btn:hover{background:var(--sf3);color:var(--tx);}.btn-p{background:var(--ac);color:#fff;border-color:var(--ac);}.btn-p:hover{box-shadow:0 4px 16px var(--acs);opacity:.9;}
 @media(max-width:900px){.sb{transform:translateX(-100%);}.sb.open{transform:translateX(0);}.mn{margin-left:0;padding:16px 12px 36px;}.g2{grid-template-columns:1fr;}.mt{display:flex!important;}}.mt{display:none;position:fixed;top:8px;left:8px;z-index:200;background:var(--sf2);border-radius:var(--rr);padding:6px 10px;cursor:pointer;color:var(--tx);font-size:15px;border:none;}.sbtg{position:fixed;top:12px;left:250px;z-index:150;background:var(--sf2);border:1px solid var(--bd);border-left:none;border-radius:0 8px 8px 0;padding:10px 5px;cursor:pointer;color:var(--txm);font-size:11px;transition:left .3s;}body.sbHid .sb{transform:translateX(-100%);}body.sbHid .mn{margin-left:0;}body.sbHid .sbtg{left:0;}body.sbHid .sb.open{transform:translateX(0);}@media(max-width:900px){.sbtg{display:none;}}@keyframes fadeIn{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}.fade{animation:fadeIn .3s ease forwards;}
+.act{border-left:3px solid var(--bd);padding:7px 0 7px 12px;margin-bottom:9px;}.act .adg{font-size:12px;color:#E6EDF3;font-weight:600;line-height:1.4;}.act .kdi{font-size:11.5px;color:var(--txm);margin-top:4px;line-height:1.45;}.act .kdi b{color:var(--sk);font-weight:700;}.act .tgt{font-size:11px;color:var(--em);margin-top:3px;font-weight:600;}.kchip{display:inline-flex;flex-direction:column;background:var(--sf2);border:1px solid var(--bd);border-radius:var(--rr);padding:6px 10px;min-width:64px;}.kchip .kcl{font-size:9px;color:var(--txd);margin-bottom:2px;}.kchip .kcv{font-family:'Outfit';font-size:15px;font-weight:700;line-height:1;}.phb{font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;}
 .staff-row{cursor:pointer;user-select:none;}.staff-row:hover td{background:rgba(167,139,250,.05)!important;}.staff-row.expanded td{background:rgba(167,139,250,.04);}.staff-chart-row td{padding:0!important;border-bottom:1px solid var(--bd);}.staff-chart-wrap{height:240px;padding:12px 12px 10px;background:rgba(167,139,250,.04);animation:fadeIn .25s ease forwards;}
 </style>
 </head>
@@ -411,7 +412,7 @@ function getStoreYear(idx,year){return storeData[idx]?.[year]||null;}
 function aggAll(){const map={};stores.forEach((_,i)=>{const d=getStoreYear(i,curYear);if(!d)return;const months=curFilterMonth?d.monthly.filter(m=>m.month===curFilterMonth):d.monthly;months.forEach(m=>{if(!map[m.month]){map[m.month]={month:m.month,total:0};CH.forEach(k=>map[m.month][k]=0);}CH.forEach(k=>map[m.month][k]+=(m[k]||0));map[m.month].total+=m.total;});});return MO.filter(m=>map[m]).map(m=>map[m]);}
 function getMonths(){const s=new Set();stores.forEach((_,i)=>{const d=getStoreYear(i,curYear);if(d)d.monthly.forEach(m=>s.add(m.month));});return MO.filter(m=>s.has(m));}
 
-function renderSidebar(){let h=`<div class="sb-sec">総合</div><div class="ni sp ${curView==='all'?'on':''}" onclick="nav('all')"><span class="nd"></span>全店舗 合計</div><div class="ni cp ${curView==='compare'?'on':''}" onclick="nav('compare')"><span class="nd"></span>店舗比較</div><div class="ni ${curView==='sales'?'on':''}" onclick="nav('sales')" style="color:#F0C846"><span class="nd" style="background:#F0C846"></span>売上管理</div><div class="ni ${curView==='hpb'?'on':''}" onclick="nav('hpb')" style="color:#FF6B4A"><span class="nd" style="background:#FF6B4A"></span>ホットペッパーマーケティング</div><div class="ni ${curView==='hp'?'on':''}" onclick="nav('hp')" style="color:#3ECFB4"><span class="nd" style="background:#3ECFB4"></span>HPマーケティング</div><div class="ni ${curView==='adcost'?'on':''}" onclick="nav('adcost')" style="color:#FBBF24"><span class="nd" style="background:#FBBF24"></span>💴 広告費管理</div><div class="ni ${curView==='insight'?'on':''}" onclick="nav('insight')" style="color:#34D399"><span class="nd" style="background:#34D399"></span>🤖 AIインサイト</div><div class="ni ${curView==='alerts'?'on':''}" onclick="nav('alerts')" style="color:#F472B6"><span class="nd" style="background:#F472B6"></span>💬 口コミ数値管理</div><div class="ni ${curView==='productivity'?'on':''}" onclick="nav('productivity')" style="color:#A78BFA"><span class="nd" style="background:#A78BFA"></span>📊 個人生産性管理</div><div class="ni ${curView==='keiei'?'on':''}" onclick="nav('keiei')" style="color:#34D399"><span class="nd" style="background:#34D399"></span>📈 経営分析</div><div class="sb-sec">店舗別</div>`;stores.forEach((s,i)=>{const lv=liveStores.has(i);h+=`<div class="ni ${curView===i?'on':''}" onclick="nav(${i})"><span class="nd" style="background:${SC[i%SC.length]}"></span>${s.name}${lv?'<span class="live-dot">●</span>':''}</div>`;});document.getElementById('sbNav').innerHTML=h;}
+function renderSidebar(){let h=`<div class="sb-sec">総合</div><div class="ni sp ${curView==='all'?'on':''}" onclick="nav('all')"><span class="nd"></span>全店舗 合計</div><div class="ni cp ${curView==='compare'?'on':''}" onclick="nav('compare')"><span class="nd"></span>店舗比較</div><div class="ni ${curView==='sales'?'on':''}" onclick="nav('sales')" style="color:#F0C846"><span class="nd" style="background:#F0C846"></span>売上管理</div><div class="ni ${curView==='hpb'?'on':''}" onclick="nav('hpb')" style="color:#FF6B4A"><span class="nd" style="background:#FF6B4A"></span>ホットペッパーマーケティング</div><div class="ni ${curView==='hp'?'on':''}" onclick="nav('hp')" style="color:#3ECFB4"><span class="nd" style="background:#3ECFB4"></span>HPマーケティング</div><div class="ni ${curView==='adcost'?'on':''}" onclick="nav('adcost')" style="color:#FBBF24"><span class="nd" style="background:#FBBF24"></span>💴 広告費管理</div><div class="ni ${curView==='insight'?'on':''}" onclick="nav('insight')" style="color:#34D399"><span class="nd" style="background:#34D399"></span>🤖 AIインサイト</div><div class="ni ${curView==='alerts'?'on':''}" onclick="nav('alerts')" style="color:#F472B6"><span class="nd" style="background:#F472B6"></span>💬 口コミ数値管理</div><div class="ni ${curView==='productivity'?'on':''}" onclick="nav('productivity')" style="color:#A78BFA"><span class="nd" style="background:#A78BFA"></span>📊 個人生産性管理</div><div class="ni ${curView==='keiei'?'on':''}" onclick="nav('keiei')" style="color:#34D399"><span class="nd" style="background:#34D399"></span>📈 経営分析</div><div class="ni ${curView==='action'?'on':''}" onclick="nav('action')" style="color:#FBBF24"><span class="nd" style="background:#FBBF24"></span>🎯 改善アクション＆KDI</div><div class="sb-sec">店舗別</div>`;stores.forEach((s,i)=>{const lv=liveStores.has(i);h+=`<div class="ni ${curView===i?'on':''}" onclick="nav(${i})"><span class="nd" style="background:${SC[i%SC.length]}"></span>${s.name}${lv?'<span class="live-dot">●</span>':''}</div>`;});document.getElementById('sbNav').innerHTML=h;}
 function nav(v){curView=v;renderSidebar();renderMain();document.querySelector('.sb').classList.remove('open');}
 function setYear(y){curYear=y;curFilterMonth=null;renderMain();}
 function setFilterMonth(m){curFilterMonth=m;renderMain();}
@@ -424,7 +425,7 @@ function mkBar(id,labels,ds){const c=document.getElementById(id);if(!c)return;ch
 function mkLine(id,labels,ds){const c=document.getElementById(id);if(!c)return;charts[id]=new Chart(c,{type:'line',data:{labels,datasets:ds},options:CO});}
 function mkDoughnut(id,labels,data,colors){const c=document.getElementById(id);if(!c)return;const total=data.reduce((a,b)=>a+b,0);charts[id]=new Chart(c,{type:'doughnut',data:{labels,datasets:[{data,backgroundColor:colors,borderColor:'#0D1117',borderWidth:3}]},options:{responsive:true,maintainAspectRatio:false,cutout:'58%',plugins:{legend:{position:'right',labels:{color:'#7D8CA1',font:{family:'Noto Sans JP',size:10},padding:10,boxWidth:10}},tooltip:CO.plugins.tooltip,datalabels:{display:true,color:'#fff',font:{weight:'bold',size:11,family:'Noto Sans JP'},formatter:(v)=>{if(!total||v===0)return '';const p=(v/total*100).toFixed(1);return parseFloat(p)<5?'':p+'%';},textShadowColor:'rgba(0,0,0,0.7)',textShadowBlur:4}}}});}
 
-function renderMain(){destroyCharts();const el=document.getElementById('mainC');if(curView==='all')renderAll(el);else if(curView==='compare')renderCompare(el);else if(curView==='sales')renderSales(el);else if(curView==='hpb')renderHPB(el);else if(curView==='hp')renderHPPage(el);else if(curView==='alerts')renderAlerts(el);else if(curView==='productivity')renderProductivity(el);else if(curView==='insight')renderInsight(el);else if(curView==='keiei')renderKeiei(el);else if(curView==='adcost')renderAdCost(el);else renderStore(el,curView);requestAnimationFrame(()=>initCharts());}
+function renderMain(){destroyCharts();const el=document.getElementById('mainC');if(curView==='all')renderAll(el);else if(curView==='compare')renderCompare(el);else if(curView==='sales')renderSales(el);else if(curView==='hpb')renderHPB(el);else if(curView==='hp')renderHPPage(el);else if(curView==='alerts')renderAlerts(el);else if(curView==='productivity')renderProductivity(el);else if(curView==='insight')renderInsight(el);else if(curView==='keiei')renderKeiei(el);else if(curView==='action')renderAction(el);else if(curView==='adcost')renderAdCost(el);else renderStore(el,curView);requestAnimationFrame(()=>initCharts());}
 function showMonthEndBanner(){
   // 月末（25日以降）に登録フォームバナーを表示
   const day=new Date().getDate();
@@ -1816,6 +1817,118 @@ function renderKeiei(el){
       <div class="cd"><div class="ct"><span class="cdot" style="background:var(--pk)"></span>💬 口コミ獲得効率ランキング</div><div class="csu">${Y}年 累計（〜${M}）｜(G＋HPB口コミ)÷新患数｜緑≥1.0 黄0.5-1.0 赤&lt;0.5</div><div class="rl">${effRows||'<div style="color:var(--txd);font-size:12px">データ取得中…</div>'}</div></div>
       ${matrix}
     </div>
+  </div>`;
+}
+// ===== 改善アクション＆KDI ページ =====
+function renderAction(el){
+  const Y=curProdYear,M=curProdMonth,midx=MO.indexOf(M);
+  const pM=midx>0?MO[midx-1]:'12月',pY=midx>0?Y:Y-1;
+  const yen=v=>'¥'+Math.round(v).toLocaleString();
+  const storeColor=name=>{const ci=stores.findIndex(s=>s.name===name);return ci>=0?SC[ci%SC.length]:'#7D8CA1';};
+  // 目標算出（現実的ストレッチ）
+  const tChurn=c=>c==null?null:c>10?10:c>5?Math.max(5,+(c-2).toFixed(1)):5;
+  const tRate=r=>r==null?null:r<20?r+10:r<40?r+5:Math.max(r,40);
+  const tEff=e=>e==null?0.5:e<0.5?0.5:e<1?+(e+0.2).toFixed(1):1.0;
+  const tProd=p=>p<1000000?1000000:p<1300000?1300000:p;
+  // 個人の累計口コミ効率（当年1月〜選択月）
+  const effOf=(st,nm)=>{let rev=0,np=0;for(let i=0;i<=midx;i++){const m=MO[i];const d=staffProdData?.[st]?.[nm]?.[Y+'年']?.[m];if(d)rev+=(Number(d.hpbR)||0)+(Number(d.hpR)||0);const rr=receptionCache[`${st}|${Y}|${m}`]?.find(x=>x.name===nm);if(rr)np+=rr.newCount||0;}return np>=5?{eff:rev/np,rev,np}:{eff:null,rev,np};};
+  const kpiOf=(st,nm,yy,mm)=>{const d=staffProdData?.[st]?.[nm]?.[yy+'年']?.[mm];if(!d)return null;const mem=Number(d.members)||0,can=d.cancel!=null?Number(d.cancel):null;const rr=receptionCache[`${st}|${yy}|${mm}`]?.find(x=>x.name===nm);return{mem,can,newM:Number(d.newM)||0,rate:d.rate!=null?Number(d.rate):null,prod:Number(d.prod)||0,np:rr?rr.newCount:null,chr:mem>0&&can!=null?can/mem*100:null};};
+  // 個人診断 → 見直し/KDI/目標
+  const diagStaff=(k)=>{
+    const phase=k.mem<30?'new':'mid';const iss=[];
+    if(k.chr!=null&&k.chr<=50){
+      if(k.chr>10)iss.push({sev:3,c:'var(--rs)',ic:'🔻',t:`退会率 ${k.chr.toFixed(1)}%（危険）— 担当会員の離脱が多い`,kdi:`施術後に<b>次回予約をその場で確保100%</b>＋離脱しそうな会員へ<b>月4件</b>フォロー連絡`,tg:`退会率 ${tChurn(k.chr)}%以下`});
+      else if(k.chr>5)iss.push({sev:2,c:'var(--am)',ic:'🔻',t:`退会率 ${k.chr.toFixed(1)}%（注意）— あと一歩で優良水準`,kdi:`来店が空きそうな会員へ<b>事前フォロー連絡 週2件</b>`,tg:`退会率 ${tChurn(k.chr)}%以下`});
+    }
+    if(k.rate!=null&&k.np!=null&&k.np>=3){
+      if(k.rate<20)iss.push({sev:3,c:'var(--rs)',ic:'🎯',t:`成約率 ${k.rate}%（低）— 新患の入会提案が弱い`,kdi:`全新患に初回カウンセリングで<b>NCM提案＋回数券提示を実施率100%</b>`,tg:`成約率 ${tRate(k.rate)}%`});
+      else if(k.rate<40)iss.push({sev:1,c:'var(--vt)',ic:'🎯',t:`成約率 ${k.rate}%（標準）— 提案の質で伸びる余地`,kdi:`入会に至らなかった新患の<b>理由を毎回記録し週次で振り返り</b>`,tg:`成約率 ${tRate(k.rate)}%`});
+    }
+    const e=effOf(k.st,k.nm);
+    if(e.eff!=null){
+      if(e.eff<0.5)iss.push({sev:2,c:'var(--rs)',ic:'💬',t:`口コミ効率 ${e.eff.toFixed(2)}（低）— 依頼が習慣化していない`,kdi:`施術後の<b>口コミ依頼を毎回</b>（新患数×1件＝週目安の依頼数を確保）`,tg:`口コミ効率 ${tEff(e.eff)}以上`});
+      else if(e.eff<1.0)iss.push({sev:1,c:'var(--am)',ic:'💬',t:`口コミ効率 ${e.eff.toFixed(2)}（標準）`,kdi:`満足度の高い会員へ<b>名指しで口コミ依頼 週2件</b>`,tg:`口コミ効率 ${tEff(e.eff)}以上`});
+    }
+    if(phase==='mid'&&k.prod>0&&k.prod<1000000)iss.push({sev:2,c:'var(--gd)',ic:'💰',t:`個人売上 ${yen(k.prod)}（一人前ライン130万円未満）`,kdi:`<b>1日の施術枠の稼働</b>を確認＋<b>継続提案を全会員に</b>`,tg:`月商 ${yen(tProd(k.prod))}`});
+    iss.sort((a,b)=>b.sev-a.sev);
+    let top=iss.slice(0,3);
+    if(phase==='new')top=[{sev:4,c:'var(--tl)',ic:'🌱',t:`立ち上げ期 — まず担当会員の定着を最優先`,kdi:`担当新規の<b>2回目来院率</b>を上げる＝初回で<b>次回予約100%確保＋3日以内フォロー連絡</b>`,tg:`会員 純増（退会<新規）／退会率を店舗平均以下`}].concat(iss.slice(0,2));
+    if(!top.length)top=[{sev:0,c:'var(--em)',ic:'✅',t:`全KPI良好 — 現状維持＋後輩育成へ`,kdi:`自分の<b>継続・口コミ獲得のやり方を店舗で共有 月1回</b>`,tg:`現水準を維持`}];
+    return{phase,top};
+  };
+  // 店舗集計
+  const agg=(yy,mm)=>{const o={};STAFF_LIST.forEach(g=>{if(!g.staff.length)return;let mem=0,can=0,newM=0,rev=0,prod=0,hasCan=false,rn=0,rd=0,np=0,prods=[];g.staff.forEach(nm=>{const d=staffProdData?.[g.store]?.[nm]?.[yy+'年']?.[mm];if(!d)return;mem+=Number(d.members)||0;if(d.cancel!=null){can+=Number(d.cancel)||0;hasCan=true;}newM+=Number(d.newM)||0;rev+=(Number(d.hpbR)||0)+(Number(d.hpR)||0);const p=Number(d.prod)||0;prod+=p;if(p>0)prods.push(p);const rr=receptionCache[`${g.store}|${yy}|${mm}`]?.find(x=>x.name===nm);if(d.rate!=null&&rr&&rr.newCount>0){rn+=d.rate*rr.newCount;rd+=rr.newCount;}if(rr)np+=rr.newCount||0;});
+    // 受付データ最新月の依存度
+    let dep=null;for(const[y2,m2] of [[yy,mm]].concat([2026,2025].flatMap(y=>MO.slice().reverse().map(m=>[y,m])))){const arr=receptionCache[`${g.store}|${y2}|${m2}`];if(arr&&arr.length){const tot=arr.reduce((a,x)=>a+x.total,0),ns=arr.reduce((a,x)=>a+x.newSales,0);if(tot>0){dep=ns/tot*100;break;}}}
+    o[g.store]={mem,can,newM,rev,prod,hasCan,chr:hasCan&&mem>0?can/mem*100:null,rate:rd>0?rn/rd:null,np,dep,gap:prods.length>=2?Math.max(...prods)/Math.min(...prods):null,revEff:np>0?rev/np:null};});return o;};
+  const cur=agg(Y,M);
+  // 店舗診断
+  const diagStore=(a)=>{const iss=[];
+    if(a.chr!=null&&a.chr<=50){if(a.chr>10)iss.push({sev:3,c:'var(--rs)',ic:'🔻',t:`店舗退会率 ${a.chr.toFixed(1)}%（危険）— 会員維持が最重要課題`,kdi:`朝礼で<b>継続フォロー対象を共有</b>、<b>次回予約その場確保</b>を全スタッフ徹底`,tg:`退会率 10%以下`});else if(a.chr>5)iss.push({sev:1,c:'var(--am)',ic:'🔻',t:`店舗退会率 ${a.chr.toFixed(1)}%（注意）`,kdi:`離脱前フォローの<b>担当割りを明確化</b>`,tg:`退会率 5%以下`});}
+    if(a.dep!=null&&a.dep>25)iss.push({sev:2,c:'var(--ac)',ic:'💪',t:`新規売上依存度 ${a.dep.toFixed(0)}%（ストックが薄い）— 新規が止まると売上が落ちる構造`,kdi:`<b>継続率を週次モニタリング</b>し、離脱前フォローで会員ストックを積み上げ`,tg:`新規依存度 25%以下`});
+    if(a.rate!=null&&a.rate<25)iss.push({sev:2,c:'var(--vt)',ic:'🎯',t:`店舗成約率 ${a.rate.toFixed(0)}%（低）— 入会提案の型が不足`,kdi:`<b>週1回NCMロープレ</b>、新患の成約結果を全員で共有`,tg:`成約率 ${(a.rate+5).toFixed(0)}%`});
+    if(a.revEff!=null&&a.revEff<0.6)iss.push({sev:1,c:'var(--pk)',ic:'💬',t:`口コミ獲得効率 ${a.revEff.toFixed(2)}（低）— 口コミ資産の積み上げが遅い`,kdi:`<b>口コミ依頼を朝礼のKDIに設定</b>、週次の依頼件数を目標化`,tg:`口コミ効率 0.8以上`});
+    if(a.gap!=null&&a.gap>1.6)iss.push({sev:1,c:'var(--sk)',ic:'⚖️',t:`スタッフ間売上格差 ${a.gap.toFixed(1)}倍 — トップと下位の差が大きい`,kdi:`トップスタッフの施術・接客を<b>月1回シャドーイングで横展開</b>`,tg:`格差 1.5倍以下`});
+    iss.sort((a,b)=>b.sev-a.sev);
+    return iss.length?iss.slice(0,3):[{sev:0,c:'var(--em)',ic:'✅',t:`主要KPIは良好 — 現状維持`,kdi:`好調要因を言語化し<b>他店へ横展開</b>`,tg:`現水準を維持`}];
+  };
+  // 描画: 店舗別
+  const actItem=x=>`<div class="act" style="border-color:${x.c}"><div class="adg">${x.ic} ${x.t}</div><div class="kdi"><b>KDI</b>：${x.kdi}</div><div class="tgt">🎯 来月KPI目標：${x.tg}</div></div>`;
+  const storeCards=Object.entries(cur).sort((a,b)=>b[1].prod-a[1].prod).map(([st,a])=>{
+    const chip=(l,v,c)=>`<div class="kchip"><div class="kcl">${l}</div><div class="kcv" style="color:${c}">${v}</div></div>`;
+    return`<div class="cd" style="margin-bottom:14px">
+      <div class="ct"><span class="cdot" style="background:${storeColor(st)}"></span>${st}</div>
+      <div class="csu">${Y}年 ${M} の実績にもとづく見直しとKDI</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px">
+        ${chip('売上',yen(a.prod),'var(--gd)')}
+        ${chip('会員',a.mem+'名','var(--tl)')}
+        ${chip('退会率',a.chr!=null?a.chr.toFixed(1)+'%':'-',a.chr==null?'var(--txd)':a.chr>50?'var(--rs)':a.chr<5?'var(--em)':a.chr<10?'var(--am)':'var(--rs)')}
+        ${chip('成約率',a.rate!=null?a.rate.toFixed(0)+'%':'-','var(--vt)')}
+        ${chip('新規依存',a.dep!=null?a.dep.toFixed(0)+'%':'-',a.dep==null?'var(--txd)':a.dep<15?'var(--em)':a.dep<25?'var(--am)':'var(--ac)')}
+        ${chip('口コミ効率',a.revEff!=null?a.revEff.toFixed(2):'-','var(--pk)')}
+      </div>
+      ${diagStore(a).map(actItem).join('')}
+    </div>`;
+  }).join('');
+  // 描画: 個人別（店舗ごと）
+  const personCards=STAFF_LIST.filter(g=>g.staff.length).map(g=>{
+    const cards=g.staff.map(nm=>{
+      const k=kpiOf(g.store,nm,Y,M);if(!k)return'';k.st=g.store;k.nm=nm;
+      const d=diagStaff(k);const e=effOf(g.store,nm);
+      const pk=kpiOf(g.store,nm,pY,pM);
+      const chr=k.chr,pchr=pk?pk.chr:null;
+      const trend=(c,p,inv)=>{if(c==null||p==null)return'';const dd=c-p;if(Math.abs(dd)<0.05)return'';const good=inv?dd<0:dd>0;return`<span style="font-size:9px;color:${good?'var(--em)':'var(--rs)'};margin-left:3px">${dd>0?'▲':'▼'}</span>`;};
+      const phb=d.phase==='new'?'<span class="phb" style="background:var(--tls);color:var(--tl)">🌱 新人フェーズ</span>':'<span class="phb" style="background:var(--sf3);color:var(--txm)">中堅</span>';
+      const chip=(l,v,c,tr)=>`<div class="kchip"><div class="kcl">${l}</div><div class="kcv" style="color:${c}">${v}${tr||''}</div></div>`;
+      return`<div class="cd" style="margin-bottom:12px">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+          <div style="font-size:14px;font-weight:700;color:#E6EDF3">${nm}<span style="font-size:10px;color:var(--txm);font-weight:400;margin-left:6px">${g.store.replace('院','')}</span></div>${phb}
+        </div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px">
+          ${chip('売上',yen(k.prod),'var(--gd)')}
+          ${chip('会員',k.mem+'名','var(--tl)')}
+          ${chip('退会率',chr!=null?chr.toFixed(1)+'%':'-',chr==null?'var(--txd)':chr>50?'var(--rs)':chr<5?'var(--em)':chr<10?'var(--am)':'var(--rs)',trend(chr,pchr,true))}
+          ${chip('成約率',k.rate!=null?k.rate+'%':'-','var(--vt)')}
+          ${chip('新患',k.np!=null?k.np+'件':'-','var(--bl)')}
+          ${chip('口コミ効率',e.eff!=null?e.eff.toFixed(2):'-','var(--pk)')}
+        </div>
+        ${d.top.map(actItem).join('')}
+      </div>`;
+    }).join('');
+    return`<div style="margin-bottom:8px"><div style="font-size:12px;font-weight:700;color:${storeColor(g.store)};margin:4px 0 10px;display:flex;align-items:center;gap:7px"><span class="cdot" style="background:${storeColor(g.store)}"></span>${g.store}</div>${cards}</div>`;
+  }).join('');
+  if(!prodDataLoaded&&!prodDataLoading)fetchProdData(null);
+  el.innerHTML=`<div class="fade">
+    <div class="ph">
+      <div><div class="pt"><span style="color:#FBBF24">🎯</span> 改善アクション＆KDI</div><div class="pd">${Y}年 ${M} — 店舗別・個人別の月次見直しと行動目標</div></div>
+      <div style="display:flex;gap:8px;align-items:center"><div class="mp" style="margin:0">${[2025,2026].map(y=>`<button class="pl ${curProdYear===y?'on':''}" onclick="curProdYear=${y};renderMain()">${y}年</button>`).join('')}</div><div class="mp" style="margin:0">${MO.map(m=>`<button class="pl ${curProdMonth===m?'on':''}" onclick="curProdMonth='${m}';renderMain()">${m}</button>`).join('')}</div></div>
+    </div>
+    ${prodDataLoading?'<div class="stb"><span class="sd lv"></span>スプレッドシートからデータを取得しています…</div>':''}
+    <div class="stb"><span class="sd" style="background:var(--gd)"></span><b style="color:var(--tx)">KPI</b>＝結果指標（退会率・成約率など）｜<b style="color:var(--sk)">KDI</b>＝そのために毎日・毎週やる行動指標。実績から弱点を診断し、見直しポイント・KDI・来月のKPI目標を自動提案します。</div>
+    <div class="cd" style="margin-bottom:16px;padding:14px 18px"><div class="ct" style="margin-bottom:2px"><span class="cdot" style="background:var(--tl)"></span>🏥 店舗別 見直し＆KDI</div></div>
+    ${storeCards}
+    <div class="cd" style="margin:22px 0 16px;padding:14px 18px"><div class="ct" style="margin-bottom:2px"><span class="cdot" style="background:var(--vt)"></span>👤 個人別 見直し＆KDI</div><div class="csu" style="margin:4px 0 0">会員数30名未満は「新人フェーズ」として定着を最優先に判定</div></div>
+    ${personCards}
   </div>`;
 }
 function initProductivityCharts(){
