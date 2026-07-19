@@ -1553,6 +1553,17 @@ function renderProductivity(el){
     });
   });
   annualRanked.sort((a,b)=>b.annual-a.annual);
+  // 年間口コミ数：Google+HPB合計を当年全月分合算
+  const reviewRanked=[];
+  STAFF_LIST.forEach(g=>{
+    if(!g.staff.length)return;
+    g.staff.forEach(name=>{
+      const months=staffProdData?.[g.store]?.[name]?.[curProdYear+'年']||{};
+      const total=Object.values(months).reduce((a,m)=>a+(Number(m.hpR)||0)+(Number(m.hpbR)||0),0);
+      if(total>0)reviewRanked.push({store:g.store,name,reviews:total});
+    });
+  });
+  reviewRanked.sort((a,b)=>b.reviews-a.reviews);
   const mkRankingCol=(arr,key,fmt,col)=>arr.filter(x=>x[key]>0).map((x,i)=>{
     const medal=i===0?'🥇':i===1?'🥈':i===2?'🥉':'';
     return`<div class="ri" style="padding:6px 0;border-bottom:1px solid var(--bd);display:flex;align-items:center;gap:8px">
@@ -1570,26 +1581,31 @@ function renderProductivity(el){
       <span style="font-family:'Outfit';font-size:14px;font-weight:700;color:${col}">${x.cancel}名</span>
     </div>`;
   }).join('');
-  const rankingSection=`<div style="display:flex;gap:12px;margin-bottom:16px">
-    <div class="cd" style="flex:1;min-width:0">
+  const rankingSection=`<div style="display:flex;flex-wrap:wrap;gap:12px;margin-bottom:16px">
+    <div class="cd" style="flex:1;min-width:220px">
       <div class="ct"><span class="cdot" style="background:#F0C846"></span>💰 個人売上ランキング</div>
       <div class="csu">${curProdYear}年 ${curProdMonth} — 全スタッフ</div>
       <div class="rl">${mkRankingCol(prodRanked,'prod',v=>'¥'+Number(v).toLocaleString(),'#F0C846')}</div>
     </div>
-    <div class="cd" style="flex:1;min-width:0">
+    <div class="cd" style="flex:1;min-width:220px">
       <div class="ct"><span class="cdot" style="background:#8B7CF6"></span>🏆 年間売上ランキング</div>
       <div class="csu">${curProdYear}年 累計 — 全スタッフ</div>
       <div class="rl">${annualRanked.map((x,i)=>{const medal=i===0?'🥇':i===1?'🥈':i===2?'🥉':'';return`<div class="ri" style="padding:6px 0;border-bottom:1px solid var(--bd);display:flex;align-items:center;gap:8px"><span style="width:22px;text-align:center;font-size:12px;font-weight:700;color:var(--txd);flex-shrink:0">${medal||i+1}</span><span style="flex:1;min-width:0"><span style="font-size:12px;font-weight:600;color:#E6EDF3">${x.name}</span><span style="font-size:10px;color:var(--txm);margin-left:5px">${x.store.replace('院','')}</span></span><span style="font-family:'Outfit';font-size:14px;font-weight:700;color:#8B7CF6">¥${Number(x.annual).toLocaleString()}</span></div>`;}).join('')}</div>
     </div>
-    <div class="cd" style="flex:1;min-width:0">
+    <div class="cd" style="flex:1;min-width:220px">
       <div class="ct"><span class="cdot" style="background:#38BDF8"></span>🔻 退会数ランキング<span style="font-size:10px;color:var(--txm);font-weight:400;margin-left:6px">少ない順</span></div>
       <div class="csu">${curProdYear}年 ${curProdMonth} — 全スタッフ</div>
       <div class="rl">${mkCancelRanking(cancelRanked)}</div>
     </div>
-    <div class="cd" style="flex:1;min-width:0">
+    <div class="cd" style="flex:1;min-width:220px">
       <div class="ct"><span class="cdot" style="background:#3ECFB4"></span>👥 会員数ランキング</div>
       <div class="csu">${curProdYear}年 ${curProdMonth} — 全スタッフ</div>
       <div class="rl">${mkRankingCol(membersRanked,'members',v=>v+'名','#3ECFB4')}</div>
+    </div>
+    <div class="cd" style="flex:1;min-width:220px">
+      <div class="ct"><span class="cdot" style="background:#F472B6"></span>💬 年間口コミ数ランキング</div>
+      <div class="csu">${curProdYear}年 累計 — Google＋HPB合計</div>
+      <div class="rl">${mkRankingCol(reviewRanked,'reviews',v=>v+'件','#F472B6')}</div>
     </div>
   </div>`;
   const storeCards=activeList.map(g=>{
