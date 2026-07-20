@@ -23,7 +23,8 @@
 .mp{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:12px;}.pl{padding:4px 11px;border-radius:5px;font-size:10px;font-weight:500;border:1px solid var(--bd);background:transparent;color:var(--txm);cursor:pointer;font-family:inherit;transition:all .2s;}.pl.on{background:var(--ac);color:#fff;border-color:var(--ac);}.pl:hover:not(.on){border-color:var(--bdh);color:var(--tx);}
 .mo{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:1000;display:none;align-items:center;justify-content:center;backdrop-filter:blur(4px);}.mo.show{display:flex;}.ml{background:var(--sf);border:1px solid var(--bd);border-radius:var(--r);padding:26px;width:600px;max-width:94vw;max-height:85vh;overflow-y:auto;}.ml h2{font-family:'Outfit';font-size:17px;font-weight:700;margin-bottom:4px;}.ml-sub{font-size:11px;color:var(--txm);margin-bottom:18px;}.fg{margin-bottom:12px;}.fl{font-size:9px;color:var(--txm);font-weight:600;text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px;display:block;}.fi{width:100%;padding:8px 11px;background:var(--bg);border:1px solid var(--bd);border-radius:var(--rr);color:var(--tx);font-size:12px;font-family:'Outfit',monospace;outline:none;transition:border-color .2s;}.fi:focus{border-color:var(--ac);}.sl-edit{margin-bottom:14px;max-height:300px;overflow-y:auto;}.se-row{display:flex;gap:5px;align-items:center;padding:6px 0;border-bottom:1px solid var(--bd);font-size:11px;}.se-row input{flex:1;min-width:0;}.se-nm{width:90px;flex-shrink:0;}.del-b{background:transparent;border:1px solid rgba(251,113,133,.3);color:var(--rs);border-radius:4px;padding:4px 8px;cursor:pointer;font-size:9px;font-family:inherit;}.del-b:hover{background:rgba(251,113,133,.1);}.ma{display:flex;gap:6px;justify-content:flex-end;margin-top:18px;}.btn{padding:7px 14px;border-radius:var(--rr);font-size:11px;font-weight:600;border:1px solid var(--bd);background:var(--sf2);color:var(--txm);cursor:pointer;font-family:inherit;transition:all .2s;}.btn:hover{background:var(--sf3);color:var(--tx);}.btn-p{background:var(--ac);color:#fff;border-color:var(--ac);}.btn-p:hover{box-shadow:0 4px 16px var(--acs);opacity:.9;}
 @media(max-width:900px){.sb{transform:translateX(-100%);}.sb.open{transform:translateX(0);}.mn{margin-left:0;padding:16px 12px 36px;}.g2{grid-template-columns:1fr;}.mt{display:flex!important;}}.mt{display:none;position:fixed;top:8px;left:8px;z-index:200;background:var(--sf2);border-radius:var(--rr);padding:6px 10px;cursor:pointer;color:var(--tx);font-size:15px;border:none;}.sbtg{position:fixed;top:12px;left:250px;z-index:150;background:var(--sf2);border:1px solid var(--bd);border-left:none;border-radius:0 8px 8px 0;padding:10px 5px;cursor:pointer;color:var(--txm);font-size:11px;transition:left .3s;}body.sbHid .sb{transform:translateX(-100%);}body.sbHid .mn{margin-left:0;}body.sbHid .sbtg{left:0;}body.sbHid .sb.open{transform:translateX(0);}@media(max-width:900px){.sbtg{display:none;}}@keyframes fadeIn{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}.fade{animation:fadeIn .3s ease forwards;}
-.act{border-left:3px solid var(--bd);padding:7px 0 7px 12px;margin-bottom:9px;}.act .adg{font-size:12px;color:#E6EDF3;font-weight:600;line-height:1.4;}.act .kdi{font-size:11.5px;color:var(--txm);margin-top:4px;line-height:1.45;}.act .kdi b{color:var(--sk);font-weight:700;}.act .tgt{font-size:11px;color:var(--em);margin-top:3px;font-weight:600;}.kchip{display:inline-flex;flex-direction:column;background:var(--sf2);border:1px solid var(--bd);border-radius:var(--rr);padding:6px 10px;min-width:64px;}.kchip .kcl{font-size:9px;color:var(--txd);margin-bottom:2px;}.kchip .kcv{font-family:'Outfit';font-size:15px;font-weight:700;line-height:1;}.phb{font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;}
+.act{border-left:3px solid var(--bd);padding:7px 0 7px 12px;margin-bottom:9px;}.act .adg{font-size:12px;color:#E6EDF3;font-weight:600;line-height:1.4;}.act .kdi{font-size:11.5px;color:var(--txm);margin-top:4px;line-height:1.45;}.act .kdi b{color:var(--sk);font-weight:700;}.act .tgt{font-size:11px;color:var(--em);margin-top:3px;font-weight:600;}.pitem{display:flex;gap:10px;padding:11px 0;border-bottom:1px solid var(--bd);align-items:flex-start;}.pitem.pdone{opacity:.42;}.pitem.pdone .ptitle{text-decoration:line-through;}.pcb{width:16px;height:16px;margin-top:2px;cursor:pointer;accent-color:#34D399;flex-shrink:0;}.ptitle{font-size:12.5px;font-weight:600;color:#E6EDF3;line-height:1.45;}.pstep{font-size:11.5px;color:var(--txm);line-height:1.75;margin-top:5px;}.pdue{font-size:10px;color:var(--am);font-weight:700;margin-top:5px;}.pimp{font-family:'Outfit';font-size:13px;font-weight:700;color:var(--em);white-space:nowrap;text-align:right;}.prank{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Outfit';font-size:11px;font-weight:700;flex-shrink:0;color:#06090F;}
+.kchip{display:inline-flex;flex-direction:column;background:var(--sf2);border:1px solid var(--bd);border-radius:var(--rr);padding:6px 10px;min-width:64px;}.kchip .kcl{font-size:9px;color:var(--txd);margin-bottom:2px;}.kchip .kcv{font-family:'Outfit';font-size:15px;font-weight:700;line-height:1;}.phb{font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;}
 .staff-row{cursor:pointer;user-select:none;}.staff-row:hover td{background:rgba(167,139,250,.05)!important;}.staff-row.expanded td{background:rgba(167,139,250,.04);}.staff-chart-row td{padding:0!important;border-bottom:1px solid var(--bd);}.staff-chart-wrap{height:240px;padding:12px 12px 10px;background:rgba(167,139,250,.04);animation:fadeIn .25s ease forwards;}
 </style>
 </head>
@@ -420,7 +421,7 @@ function getStoreYear(idx,year){return storeData[idx]?.[year]||null;}
 function aggAll(){const map={};stores.forEach((_,i)=>{const d=getStoreYear(i,curYear);if(!d)return;const months=curFilterMonth?d.monthly.filter(m=>m.month===curFilterMonth):d.monthly;months.forEach(m=>{if(!map[m.month]){map[m.month]={month:m.month,total:0};CH.forEach(k=>map[m.month][k]=0);}CH.forEach(k=>map[m.month][k]+=(m[k]||0));map[m.month].total+=m.total;});});return MO.filter(m=>map[m]).map(m=>map[m]);}
 function getMonths(){const s=new Set();stores.forEach((_,i)=>{const d=getStoreYear(i,curYear);if(d)d.monthly.forEach(m=>s.add(m.month));});return MO.filter(m=>s.has(m));}
 
-function renderSidebar(){let h=`<div class="sb-sec">総合</div><div class="ni sp ${curView==='all'?'on':''}" onclick="nav('all')"><span class="nd"></span>全店舗 合計</div><div class="ni cp ${curView==='compare'?'on':''}" onclick="nav('compare')"><span class="nd"></span>店舗比較</div><div class="ni ${curView==='sales'?'on':''}" onclick="nav('sales')" style="color:#F0C846"><span class="nd" style="background:#F0C846"></span>売上管理</div><div class="ni ${curView==='hpb'?'on':''}" onclick="nav('hpb')" style="color:#FF6B4A"><span class="nd" style="background:#FF6B4A"></span>ホットペッパーマーケティング</div><div class="ni ${curView==='hp'?'on':''}" onclick="nav('hp')" style="color:#3ECFB4"><span class="nd" style="background:#3ECFB4"></span>HPマーケティング</div><div class="ni ${curView==='adcost'?'on':''}" onclick="nav('adcost')" style="color:#FBBF24"><span class="nd" style="background:#FBBF24"></span>💴 広告費管理</div><div class="ni ${curView==='insight'?'on':''}" onclick="nav('insight')" style="color:#34D399"><span class="nd" style="background:#34D399"></span>🤖 AIインサイト</div><div class="ni ${curView==='alerts'?'on':''}" onclick="nav('alerts')" style="color:#F472B6"><span class="nd" style="background:#F472B6"></span>💬 口コミ数値管理</div><div class="ni ${curView==='productivity'?'on':''}" onclick="nav('productivity')" style="color:#A78BFA"><span class="nd" style="background:#A78BFA"></span>📊 個人生産性管理</div><div class="ni ${curView==='keiei'?'on':''}" onclick="nav('keiei')" style="color:#34D399"><span class="nd" style="background:#34D399"></span>📈 経営分析</div><div class="ni ${curView==='action'?'on':''}" onclick="nav('action')" style="color:#FBBF24"><span class="nd" style="background:#FBBF24"></span>🎯 改善アクション＆KDI</div><div class="sb-sec">店舗別</div>`;stores.forEach((s,i)=>{const lv=liveStores.has(i);h+=`<div class="ni ${curView===i?'on':''}" onclick="nav(${i})"><span class="nd" style="background:${SC[i%SC.length]}"></span>${s.name}${lv?'<span class="live-dot">●</span>':''}</div>`;});document.getElementById('sbNav').innerHTML=h;}
+function renderSidebar(){let h=`<div class="sb-sec">総合</div><div class="ni sp ${curView==='all'?'on':''}" onclick="nav('all')"><span class="nd"></span>全店舗 合計</div><div class="ni cp ${curView==='compare'?'on':''}" onclick="nav('compare')"><span class="nd"></span>店舗比較</div><div class="ni ${curView==='sales'?'on':''}" onclick="nav('sales')" style="color:#F0C846"><span class="nd" style="background:#F0C846"></span>売上管理</div><div class="ni ${curView==='hpb'?'on':''}" onclick="nav('hpb')" style="color:#FF6B4A"><span class="nd" style="background:#FF6B4A"></span>ホットペッパーマーケティング</div><div class="ni ${curView==='hp'?'on':''}" onclick="nav('hp')" style="color:#3ECFB4"><span class="nd" style="background:#3ECFB4"></span>HPマーケティング</div><div class="ni ${curView==='adcost'?'on':''}" onclick="nav('adcost')" style="color:#FBBF24"><span class="nd" style="background:#FBBF24"></span>💴 広告費管理</div><div class="ni ${curView==='insight'?'on':''}" onclick="nav('insight')" style="color:#34D399"><span class="nd" style="background:#34D399"></span>🤖 AIインサイト</div><div class="ni ${curView==='alerts'?'on':''}" onclick="nav('alerts')" style="color:#F472B6"><span class="nd" style="background:#F472B6"></span>💬 口コミ数値管理</div><div class="ni ${curView==='productivity'?'on':''}" onclick="nav('productivity')" style="color:#A78BFA"><span class="nd" style="background:#A78BFA"></span>📊 個人生産性管理</div><div class="ni ${curView==='keiei'?'on':''}" onclick="nav('keiei')" style="color:#34D399"><span class="nd" style="background:#34D399"></span>📈 経営分析</div><div class="ni ${curView==='action'?'on':''}" onclick="nav('action')" style="color:#FBBF24"><span class="nd" style="background:#FBBF24"></span>🎯 改善アクション＆KDI</div><div class="ni ${curView==='plan'?'on':''}" onclick="nav('plan')" style="color:#34D399"><span class="nd" style="background:#34D399"></span>✅ アクションプラン</div><div class="sb-sec">店舗別</div>`;stores.forEach((s,i)=>{const lv=liveStores.has(i);h+=`<div class="ni ${curView===i?'on':''}" onclick="nav(${i})"><span class="nd" style="background:${SC[i%SC.length]}"></span>${s.name}${lv?'<span class="live-dot">●</span>':''}</div>`;});document.getElementById('sbNav').innerHTML=h;}
 function nav(v){curView=v;renderSidebar();renderMain();document.querySelector('.sb').classList.remove('open');}
 function setYear(y){curYear=y;curFilterMonth=null;renderMain();}
 function setFilterMonth(m){curFilterMonth=m;renderMain();}
@@ -433,7 +434,7 @@ function mkBar(id,labels,ds){const c=document.getElementById(id);if(!c)return;ch
 function mkLine(id,labels,ds){const c=document.getElementById(id);if(!c)return;charts[id]=new Chart(c,{type:'line',data:{labels,datasets:ds},options:CO});}
 function mkDoughnut(id,labels,data,colors){const c=document.getElementById(id);if(!c)return;const total=data.reduce((a,b)=>a+b,0);charts[id]=new Chart(c,{type:'doughnut',data:{labels,datasets:[{data,backgroundColor:colors,borderColor:'#0D1117',borderWidth:3}]},options:{responsive:true,maintainAspectRatio:false,cutout:'58%',plugins:{legend:{position:'right',labels:{color:'#7D8CA1',font:{family:'Noto Sans JP',size:10},padding:10,boxWidth:10}},tooltip:CO.plugins.tooltip,datalabels:{display:true,color:'#fff',font:{weight:'bold',size:11,family:'Noto Sans JP'},formatter:(v)=>{if(!total||v===0)return '';const p=(v/total*100).toFixed(1);return parseFloat(p)<5?'':p+'%';},textShadowColor:'rgba(0,0,0,0.7)',textShadowBlur:4}}}});}
 
-function renderMain(){destroyCharts();const el=document.getElementById('mainC');if(curView==='all')renderAll(el);else if(curView==='compare')renderCompare(el);else if(curView==='sales')renderSales(el);else if(curView==='hpb')renderHPB(el);else if(curView==='hp')renderHPPage(el);else if(curView==='alerts')renderAlerts(el);else if(curView==='productivity')renderProductivity(el);else if(curView==='insight')renderInsight(el);else if(curView==='keiei')renderKeiei(el);else if(curView==='action')renderAction(el);else if(curView==='adcost')renderAdCost(el);else renderStore(el,curView);requestAnimationFrame(()=>initCharts());}
+function renderMain(){destroyCharts();const el=document.getElementById('mainC');if(curView==='all')renderAll(el);else if(curView==='compare')renderCompare(el);else if(curView==='sales')renderSales(el);else if(curView==='hpb')renderHPB(el);else if(curView==='hp')renderHPPage(el);else if(curView==='alerts')renderAlerts(el);else if(curView==='productivity')renderProductivity(el);else if(curView==='insight')renderInsight(el);else if(curView==='keiei')renderKeiei(el);else if(curView==='action')renderAction(el);else if(curView==='plan')renderPlan(el);else if(curView==='adcost')renderAdCost(el);else renderStore(el,curView);requestAnimationFrame(()=>initCharts());}
 function showMonthEndBanner(){
   // 月末（25日以降）に登録フォームバナーを表示
   const day=new Date().getDate();
@@ -1938,6 +1939,146 @@ function renderAction(el){
     <div class="cd" style="margin:22px 0 16px;padding:14px 18px"><div class="ct" style="margin-bottom:2px"><span class="cdot" style="background:var(--vt)"></span>👤 個人別 見直し＆KDI</div><div class="csu" style="margin:4px 0 0">会員数30名未満は「新人フェーズ」として定着を最優先に判定</div></div>
     ${personCards}
   </div>`;
+}
+// ===== アクションプラン（これから行う具体的アクション）=====
+function planKey(){return `hpb_plan_${curProdYear}_${curProdMonth}`;}
+function planDone(){try{return JSON.parse(localStorage.getItem(planKey())||'[]');}catch(e){return[];}}
+function togglePlan(id){
+  let d=planDone();const i=d.indexOf(id);
+  if(i>=0)d.splice(i,1);else d.push(id);
+  try{localStorage.setItem(planKey(),JSON.stringify(d));}catch(e){}
+  const on=d.indexOf(id)>=0;
+  document.querySelectorAll('[data-pid]').forEach(el=>{if(el.getAttribute('data-pid')===id)el.classList.toggle('pdone',on);});
+  updatePlanProgress();
+}
+function updatePlanProgress(){
+  // 同じアクションは複数セクションに出るのでユニークID数で集計
+  const seen=new Set(),fin=new Set();
+  document.querySelectorAll('[data-pid]').forEach(el=>{const id=el.getAttribute('data-pid');seen.add(id);if(el.classList.contains('pdone'))fin.add(id);});
+  const all={length:seen.size},done={length:fin.size};
+  if(!all.length)return;
+  const pct=Math.round(done.length/all.length*100);
+  const bar=document.getElementById('planBar'),txt=document.getElementById('planTxt');
+  if(bar)bar.style.width=pct+'%';
+  if(txt)txt.textContent=`${done.length} / ${all.length} 完了（${pct}%）`;
+}
+function renderPlan(el){
+  const Y=curProdYear,M=curProdMonth,midx=MO.indexOf(M);
+  const yen=v=>'¥'+Math.round(v).toLocaleString();
+  const storeColor=n=>{const ci=stores.findIndex(s=>s.name===n);return ci>=0?SC[ci%SC.length]:'#7D8CA1';};
+  const done=planDone();
+  // 会員単価（中堅スタッフの 個人売上÷会員数 の中央値）
+  const units=[];STAFF_LIST.forEach(g=>g.staff.forEach(nm=>{const d=staffProdData?.[g.store]?.[nm]?.[Y+'年']?.[M];if(d&&(Number(d.members)||0)>=30&&(Number(d.prod)||0)>0)units.push(d.prod/d.members);}));
+  units.sort((a,b)=>a-b);
+  const UNIT=units.length?Math.round(units[Math.floor(units.length/2)]/1000)*1000:17000;
+  // 個人の当年累計口コミ効率
+  const effOf=(st,nm)=>{let rev=0,np=0;for(let i=0;i<=midx;i++){const m=MO[i];const d=staffProdData?.[st]?.[nm]?.[Y+'年']?.[m];if(d)rev+=(Number(d.hpbR)||0)+(Number(d.hpR)||0);const rr=receptionCache[`${st}|${Y}|${m}`]?.find(x=>x.name===nm);if(rr)np+=rr.newCount||0;}return np>=5?rev/np:null;};
+  // ===== アクション生成 =====
+  const acts=[];
+  STAFF_LIST.forEach(g=>g.staff.forEach(nm=>{
+    const d=staffProdData?.[g.store]?.[nm]?.[Y+'年']?.[M];if(!d)return;
+    const mem=Number(d.members)||0,can=d.cancel!=null?Number(d.cancel):null,rate=d.rate!=null?Number(d.rate):null;
+    const rr=receptionCache[`${g.store}|${Y}|${M}`]?.find(x=>x.name===nm);const np=rr?rr.newCount:null;
+    const chr=mem>0&&can!=null?can/mem*100:null;
+    const who=`${nm}<span style="font-size:10px;color:var(--txm);font-weight:400;margin-left:5px">${g.store.replace('院','')}</span>`;
+    if(chr!=null&&chr>5&&chr<=50){
+      const ex=(chr-5)/100*mem;
+      acts.push({id:`churn|${g.store}|${nm}`,imp:ex*UNIT,store:g.store,name:nm,who,cad:'weekly',ic:'🔻',col:'var(--rs)',
+        title:`退会を止める — 退会率 ${chr.toFixed(1)}%（${can}/${mem}名）`,
+        steps:['直近2ヶ月で来店ペースが落ちている会員をリストアップする','リストの全員へフォロー連絡（LINE・電話）を入れる','施術後は必ずその場で次回予約を取る（未予約ゼロ）'],
+        due:'今週中にリスト作成 → 来週中に連絡完了',eff:`月 ${yen(ex*UNIT)} 相当（超過退会 ${ex.toFixed(1)}名の抑制）`});
+    }
+    const anomaly=chr!=null&&chr>50;
+    if(anomaly){
+      acts.push({id:`check|${g.store}|${nm}`,imp:0,store:g.store,name:nm,who,cad:'monthly',ic:'⚠️',col:'var(--rs)',
+        title:`まず数値の確認を — 退会 ${can}名／会員 ${mem}名（退会率 ${chr.toFixed(1)}%）`,
+        steps:['この退会数が実態か、店舗移管・名簿整理などの特殊要因かを確認する','特殊要因ならスプレッドシートの記録を訂正する','実態であれば原因をヒアリングし、個別の対策を立てる'],
+        due:'今週中に確認',eff:`数値が確定するまで他の判断を保留`});
+    }
+    if(!anomaly&&rate!=null&&np!=null&&np>=3&&rate<40){
+      const miss=np*(40-rate)/100;
+      acts.push({id:`conv|${g.store}|${nm}`,imp:miss*UNIT,store:g.store,name:nm,who,cad:'weekly',ic:'🎯',col:'var(--vt)',
+        title:`成約率を上げる — 現在 ${rate}%（新患${np}件）`,
+        steps:['初回カウンセリングの流れを確認（①原因の説明 → ②改善プランの提示 → ③回数券の提案）','店長と週2回ロープレを行う（NCM）','入会に至らなかった新患の理由を記録し、週1回みんなで共有する'],
+        due:'今週中にロープレ1回目',eff:`月 ${yen(miss*UNIT)} 相当（入会 +${miss.toFixed(1)}名）`});
+    }
+    const e=effOf(g.store,nm);
+    if(e!=null&&e<0.5){
+      const tgt=np!=null?Math.max(1,Math.round(np*0.5)):3;
+      acts.push({id:`review|${g.store}|${nm}`,imp:0,store:g.store,name:nm,who,cad:'daily',ic:'💬',col:'var(--pk)',
+        title:`口コミ依頼を習慣にする — 現在 ${e.toFixed(2)}件/新患`,
+        steps:['施術後の最後の会話で必ず口コミ依頼を入れる','口コミのQRコードを施術ベッドの横に常設する','その日に依頼した件数を日報に記録する'],
+        due:'今日から毎回',eff:`月 ${tgt}件以上の口コミ獲得ペースへ`});
+    }
+    if(!anomaly&&mem>=30&&(Number(d.prod)||0)>0&&d.prod<1000000){
+      const diff=1000000-d.prod;
+      // 売上ギャップは退会・成約の改善と重複するため、金額ランキングには載せない（imp:0）
+      acts.push({id:`sales|${g.store}|${nm}`,imp:0,store:g.store,name:nm,who,cad:'monthly',ic:'💰',col:'var(--gd)',
+        title:`月商を一人前ラインへ — 現在 ${yen(d.prod)}`,
+        steps:['1日の施術枠がどれだけ空いているか曜日別に確認する','空きが多い曜日に既存会員の予約を寄せる','継続の提案を全会員に一度ずつ行う'],
+        due:`${M}末まで`,eff:`月商 +${yen(diff)} で100万円ライン到達`});
+    }
+  }));
+  // 店長（店舗）タスク
+  Object.keys(staffProdData).forEach(st=>{
+    const g=STAFF_LIST.find(x=>x.store===st);if(!g||!g.staff.length)return;
+    let mem=0,can=0,hasCan=false,rn=0,rd=0,prods=[];
+    g.staff.forEach(nm=>{const d=staffProdData?.[st]?.[nm]?.[Y+'年']?.[M];if(!d)return;mem+=Number(d.members)||0;if(d.cancel!=null){can+=Number(d.cancel)||0;hasCan=true;}const p=Number(d.prod)||0;if(p>0)prods.push(p);const rr=receptionCache[`${st}|${Y}|${M}`]?.find(x=>x.name===nm);if(d.rate!=null&&rr&&rr.newCount>0){rn+=d.rate*rr.newCount;rd+=rr.newCount;}});
+    const chr=hasCan&&mem>0?can/mem*100:null,srate=rd>0?rn/rd:null,gap=prods.length>=2?Math.max(...prods)/Math.min(...prods):null;
+    const who=`店長<span style="font-size:10px;color:var(--txm);font-weight:400;margin-left:5px">${st.replace('院','')}</span>`;
+    if(chr!=null&&chr>10&&chr<=50)acts.push({id:`s-churn|${st}|`,imp:0,store:st,name:'店長',who,cad:'daily',ic:'🏥',col:'var(--rs)',title:`【店長】会員維持を店舗の最優先に — 退会率 ${chr.toFixed(1)}%`,steps:['朝礼で「今日フォローする会員」を全員で共有する','次回予約をその場で取れているか毎日チェックする','退会理由を記録し、月末に全員で振り返る'],due:'今週の朝礼から',eff:`店舗の会員ストック維持`});
+    if(srate!=null&&srate<25)acts.push({id:`s-conv|${st}|`,imp:0,store:st,name:'店長',who,cad:'weekly',ic:'🏥',col:'var(--vt)',title:`【店長】入会提案の型をそろえる — 店舗成約率 ${srate.toFixed(0)}%`,steps:['週1回、全スタッフでNCMロープレの時間を取る','新患の成約結果をその日のうちに共有する','成約できたトークを店舗で横展開する'],due:'今週中に1回目を実施',eff:`店舗成約率 ${(srate+5).toFixed(0)}%へ`});
+    if(gap!=null&&gap>1.6)acts.push({id:`s-gap|${st}|`,imp:0,store:st,name:'店長',who,cad:'monthly',ic:'🏥',col:'var(--sk)',title:`【店長】スタッフ間の差を埋める — 売上格差 ${gap.toFixed(1)}倍`,steps:['トップスタッフの施術・接客を他スタッフが見学する（シャドーイング）','良かった点を言語化して店舗マニュアルに追記する'],due:`${M}末までに1回`,eff:`格差 1.5倍以下へ`});
+  });
+  acts.sort((a,b)=>b.imp-a.imp);
+  // ===== 描画パーツ =====
+  const item=(a,rank)=>{
+    const isDone=done.indexOf(a.id)>=0;
+    const rk=rank?`<div class="prank" style="background:${rank<=3?['#F0C846','#C0C8D4','#CD7F45'][rank-1]:'var(--sf3)'};color:${rank<=3?'#06090F':'var(--txm)'}">${rank}</div>`:'';
+    return`<div class="pitem${isDone?' pdone':''}" data-pid="${a.id}">
+      <input type="checkbox" class="pcb" ${isDone?'checked':''} onchange="togglePlan('${a.id}')">
+      ${rk}
+      <div style="flex:1;min-width:0">
+        <div class="ptitle">${a.ic} ${a.who} — ${a.title}</div>
+        <div class="pstep">${a.steps.map(s=>'・'+s).join('<br>')}</div>
+        <div class="pdue">⏰ ${a.due}</div>
+      </div>
+      ${a.imp>0?`<div class="pimp">${yen(a.imp)}<div style="font-size:9px;color:var(--txd);font-weight:400">/月 効果</div></div>`:''}
+    </div>`;
+  };
+  const top5=acts.filter(a=>a.imp>0).slice(0,5);
+  const topSum=top5.reduce((s,a)=>s+a.imp,0);
+  const byCad=c=>acts.filter(a=>a.cad===c);
+  const cadBlock=(c,ic,label,note)=>{const l=byCad(c);return l.length?`<div class="cd" style="margin-bottom:14px"><div class="ct"><span class="cdot" style="background:var(--tl)"></span>${ic} ${label}</div><div class="csu">${note}</div>${l.map(a=>item(a)).join('')}</div>`:'';};
+  const byStore={};acts.forEach(a=>{(byStore[a.store]=byStore[a.store]||[]).push(a);});
+  const storeBlocks=Object.keys(byStore).map(st=>`<div class="cd" style="margin-bottom:14px"><div class="ct"><span class="cdot" style="background:${storeColor(st)}"></span>${st}</div><div class="csu">${byStore[st].length}件のアクション</div>${byStore[st].map(a=>item(a)).join('')}</div>`).join('');
+  if(!prodDataLoaded&&!prodDataLoading)fetchProdData(null);
+  el.innerHTML=`<div class="fade">
+    <div class="ph">
+      <div><div class="pt"><span style="color:#34D399">✅</span> アクションプラン</div><div class="pd">${Y}年 ${M} の実績にもとづく、これから行う具体的アクション</div></div>
+      <div style="display:flex;gap:8px;align-items:center"><div class="mp" style="margin:0">${[2025,2026].map(y=>`<button class="pl ${curProdYear===y?'on':''}" onclick="curProdYear=${y};renderMain()">${y}年</button>`).join('')}</div><div class="mp" style="margin:0">${MO.map(m=>`<button class="pl ${curProdMonth===m?'on':''}" onclick="curProdMonth='${m}';renderMain()">${m}</button>`).join('')}</div></div>
+    </div>
+    ${prodDataLoading?'<div class="stb"><span class="sd lv"></span>スプレッドシートからデータを取得しています…</div>':''}
+    <div class="cd" style="margin-bottom:16px">
+      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:10px">
+        <div><div class="ct" style="margin-bottom:2px"><span class="cdot" style="background:var(--em)"></span>実行チェック</div><div class="csu" style="margin:0">チェックはこの端末に保存されます（月ごと）</div></div>
+        <div id="planTxt" style="font-family:'Outfit';font-size:13px;font-weight:700;color:var(--em)">0 / ${acts.length} 完了（0%）</div>
+      </div>
+      <div style="height:8px;background:var(--sf3);border-radius:4px;overflow:hidden"><div id="planBar" style="height:100%;width:0%;background:linear-gradient(90deg,#34D399,#3ECFB4);border-radius:4px;transition:width .3s"></div></div>
+    </div>
+    <div class="cd" style="margin-bottom:14px">
+      <div class="ct"><span class="cdot" style="background:var(--gd)"></span>🔥 今月の最重要アクション TOP5</div>
+      <div class="csu">売上インパクトの大きい順（会員単価 ${yen(UNIT)}/月で試算）｜5件やりきると <b style="color:var(--em)">月 ${yen(topSum)} 相当</b></div>
+      ${top5.length?top5.map((a,i)=>item(a,i+1)).join(''):'<div style="color:var(--txd);font-size:12px">データ取得中、または該当なし</div>'}
+    </div>
+    <div class="cd" style="margin:20px 0 14px;padding:14px 18px"><div class="ct" style="margin-bottom:2px"><span class="cdot" style="background:var(--tl)"></span>🗓 いつやるか（時間軸別）</div></div>
+    ${cadBlock('daily','🌅','毎日やること','今日から習慣にする行動')}
+    ${cadBlock('weekly','📅','毎週やること','週の予定に組み込む行動')}
+    ${cadBlock('monthly','📆','今月中にやること','月内に必ず終わらせる行動')}
+    <div class="cd" style="margin:20px 0 14px;padding:14px 18px"><div class="ct" style="margin-bottom:2px"><span class="cdot" style="background:var(--vt)"></span>👥 担当者別 アクション一覧</div><div class="csu" style="margin:4px 0 0">誰が何をやるか（店舗ごと）</div></div>
+    ${storeBlocks||'<div style="color:var(--txd);font-size:12px">データ取得中…</div>'}
+  </div>`;
+  updatePlanProgress();
 }
 function initProductivityCharts(){
   Object.keys(expandedStaff).forEach(key=>{
