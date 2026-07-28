@@ -1232,8 +1232,8 @@ function initSalesC(){
 // dk  … EMBEDDED_STORE_DATA（店舗の集客集計）側の列名
 const CH_PAGES={
   hp:   {ch:'HP',     dk:'HP',     icon:'🌐', title:'HPマーケティング',       sub:'ホームページ＋MEO＋Googleマップ 統合データ', color:'#3ECFB4', label:'HP'},
-  meta: {ch:'メタ広告', dk:'メタ広告', icon:'📱', title:'メタ広告マーケティング', sub:'Instagram・Facebook広告経由',                color:'#8B7CF6', label:'メタ広告'},
-  flyer:{ch:'チラシ',   dk:'チラシ',   icon:'📄', title:'チラシマーケティング',   sub:'チラシ・ポスティング経由',                    color:'#F0C846', label:'チラシ'},
+  meta: {ch:'メタ広告', dk:'メタ広告', icon:'📱', title:'メタ広告マーケティング', sub:'Instagram・Facebook広告経由',                color:'#F97316', label:'メタ広告'},
+  flyer:{ch:'チラシ',   dk:'チラシ',   icon:'📄', title:'チラシマーケティング',   sub:'チラシ・ポスティング経由',                    color:'#A3E635', label:'チラシ'},
 };
 let chPageStore={hp:'大森院',meta:'大森院',flyer:'大森院'};
 let chPageCmp={hp:false,meta:false,flyer:false};
@@ -1292,8 +1292,9 @@ function renderChannelPage(el,v){
     <div class="kp" style="--kc:#F0C846"><div class="kl">最多来院月</div><div class="kv" style="color:#F0C846">${peakMonth}</div><div class="kn">${curYear}年</div></div>
     <div class="kp" style="--kc:#38BDF8"><div class="kl">${L} 新患数</div><div class="kv" style="color:#38BDF8">${hasFn?yNp:'<span style="font-size:18px;color:var(--txd)">—</span>'}<span style="font-size:13px;color:var(--txm);margin-left:4px">名</span></div><div class="kn">${hasFn?`${curYear}年累計（受付履歴ベース）`:'受付データ未取得'}${hasPrev?`<br>前年同期 ${pNp}名${yoy(yNp,pNp)}`:''}</div></div>
     <div class="kp" style="--kc:#8B7CF6"><div class="kl">${L} 入会率</div><div class="kv" style="color:#8B7CF6">${yRate!=null?yRate.toFixed(1)+'<span style="font-size:13px;color:var(--txm);margin-left:2px">%</span>':'<span style="font-size:18px;color:var(--txd)">—</span>'}</div><div class="kn">${hasFn?`入会${yJoin}／新患${yNp}名（${curYear}年累計）`:'受付データ未取得'}${hasPrev&&pRate!=null?`<br>前年同期 ${pRate.toFixed(1)}%${yoy(yRate,pRate,'pt')}`:''}</div></div>
-    <div class="kp" style="--kc:#34D399"><div class="kl">${L} 新規売上</div><div class="kv" style="color:#34D399">${hasFn?yen(ySales):'<span style="font-size:18px;color:var(--txd)">—</span>'}</div><div class="kn">${hasFn?`${curYear}年累計｜初回来院ぶん`:'受付データ未取得'}${hasPrev?`<br>前年同期 ${yen(pSales)}${yoy(ySales,pSales)}`:''}</div></div>
-    <div class="kp" style="--kc:#F472B6"><div class="kl">${L} リピート売上</div><div class="kv" style="color:#F472B6">${hasFn?yen(yRep):'<span style="font-size:18px;color:var(--txd)">—</span>'}</div><div class="kn">${hasFn?`${curYear}年累計｜${L}経由で来た人の2回目以降`:'受付データ未取得'}${hasPrev?`<br>前年同期 ${yen(pRep)}${yoy(yRep,pRep)}`:''}</div></div>
+    <div class="kp" style="--kc:#34D399"><div class="kl">${L} 初診売上</div><div class="kv" style="color:#34D399">${hasFn?yen(ySales):'<span style="font-size:18px;color:var(--txd)">—</span>'}</div><div class="kn">${hasFn?`${curYear}年累計｜初回来院時に計上した売上`:'受付データ未取得'}${hasPrev?`<br>前年同期 ${yen(pSales)}${yoy(ySales,pSales)}`:''}</div></div>
+    <div class="kp" style="--kc:#F472B6"><div class="kl">${L} リピート売上</div><div class="kv" style="color:#F472B6">${hasFn?yen(yRep):'<span style="font-size:18px;color:var(--txd)">—</span>'}</div><div class="kn">${hasFn?`${curYear}年累計｜2回目以降（約95%が回数券）`:'受付データ未取得'}${hasPrev?`<br>前年同期 ${yen(pRep)}${yoy(yRep,pRep)}`:''}</div></div>
+    <div class="kp" style="--kc:#F0C846"><div class="kl">${L} 売上合計</div><div class="kv" style="color:#F0C846">${hasFn?yen(ySales+yRep):'<span style="font-size:18px;color:var(--txd)">—</span>'}</div><div class="kn">${hasFn?`${curYear}年累計｜初診 ${ySales+yRep>0?Math.round(ySales/(ySales+yRep)*100):0}% ＋ リピート ${ySales+yRep>0?Math.round(yRep/(ySales+yRep)*100):0}%`:'受付データ未取得'}${hasPrev?`<br>前年同期 ${yen(pSales+pRep)}${yoy(ySales+yRep,pSales+pRep)}`:''}</div></div>
   </div>
   ${hasPrev?`<div class="stb" style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
     <span class="sd" style="background:#8B7CF6"></span>
@@ -1306,8 +1307,8 @@ function renderChannelPage(el,v){
     ${hasFn?'<div class="cb" style="height:300px"><canvas id="cCHF"></canvas></div>':'<div style="padding:26px 0;text-align:center;color:var(--txd);font-size:12px">受付履歴データがまだ読み込まれていません（⚙設定でAPIキーを登録してください）</div>'}
   </div></div>
   <div class="gf"><div class="cd">
-    <div class="ct"><span class="cdot" style="background:#F472B6"></span>💰 ${L}経由の売上（新規＋リピート）</div>
-    <div class="csu">${curYear}年${cmp&&hasPrev?`（薄い枠＝${curYear-1}年）`:''} — ${store}｜<span style="color:#34D399">緑＝初回来院ぶん</span>／<span style="color:#F472B6">ピンク＝${L}経由で来た人が2回目以降に落とした売上</span></div>
+    <div class="ct"><span class="cdot" style="background:#F0C846"></span>💰 ${L}経由の売上合計</div>
+    <div class="csu">${curYear}年${cmp&&hasPrev?`（薄い枠＝${curYear-1}年）`:''} — ${store}｜棒の高さ＝<b style="color:#F0C846">売上合計</b>（棒の上に金額）。内訳は <span style="color:#34D399">緑＝初診売上</span>／<span style="color:#F472B6">ピンク＝リピート売上（回数券など2回目以降）</span></div>
     ${hasFn?'<div class="cb" style="height:300px"><canvas id="cCHS"></canvas></div>':'<div style="padding:26px 0;text-align:center;color:var(--txd);font-size:12px">受付履歴データがまだ読み込まれていません</div>'}
   </div></div>
   <div class="g2">
@@ -1333,7 +1334,7 @@ function renderChFunnelTable(monthly,fn,pv,cmpOn,L){
     const d=c-p;const col=d===0?'var(--txm)':d>0?'var(--em)':'var(--rs)';
     return`<span style="color:${col};font-weight:600">${d>0?'▲':d<0?'▼':''}${unit==='pt'?Math.abs(d).toFixed(1)+'pt':unit==='¥'?yen(Math.abs(d)):Math.abs(d)+unit}</span>`;
   };
-  let h=`<table><thead><tr><th>月</th><th>${L}来店数</th><th>前月比</th><th>入会</th><th>入会率</th><th>新規売上</th><th>リピート売上</th><th>合計</th>`
+  let h=`<table><thead><tr><th>月</th><th>${L}来店数</th><th>前月比</th><th>入会</th><th>入会率</th><th>初診売上</th><th>リピート売上</th><th>売上合計</th>`
     +(cmp?`<th style="color:var(--txd)">前年 新患</th><th style="color:var(--txd)">前年比</th><th style="color:var(--txd)">前年 入会率</th><th style="color:var(--txd)">前年比</th><th style="color:var(--txd)">前年 リピート売上</th><th style="color:var(--txd)">前年比</th>`:'')
     +`</tr></thead><tbody>`;
   let tJ=0,tN=0,tS=0,tR=0,pJ=0,pN=0,pR=0;
@@ -1397,20 +1398,28 @@ function initChannelC(v){
     }
     const cs=document.getElementById('cCHS');
     if(cs){
+      // 積み上げの一番上の系列にだけラベルを出し、その月の「売上合計」を表示する。
+      const tot=i=>fn[i].sales+fn[i].rep;
+      const ptot=i=>P(i)?P(i).sales+P(i).rep:null;
+      const man=v=>v>=10000?'¥'+(v/10000).toFixed(v>=100000?0:1)+'万':'¥'+v.toLocaleString();
       const ds=[
-        {label:`${curYear}年 新規売上`,data:idx.map(i=>fn[i].sales),backgroundColor:'rgba(52,211,153,.6)',borderColor:'#34D399',borderWidth:1,borderRadius:3,stack:'cur'},
-        {label:`${curYear}年 リピート売上`,data:idx.map(i=>fn[i].rep),backgroundColor:'rgba(244,114,182,.6)',borderColor:'#F472B6',borderWidth:1,borderRadius:3,stack:'cur'}
+        {label:`${curYear}年 初診売上`,data:idx.map(i=>fn[i].sales),backgroundColor:'rgba(52,211,153,.6)',borderColor:'#34D399',borderWidth:1,borderRadius:3,stack:'cur'},
+        {label:`${curYear}年 リピート売上`,data:idx.map(i=>fn[i].rep),backgroundColor:'rgba(244,114,182,.6)',borderColor:'#F472B6',borderWidth:1,borderRadius:3,stack:'cur',
+         datalabels:{display:true,anchor:'end',align:'end',offset:2,color:'#F0C846',font:{weight:'bold',size:11,family:'Outfit'},
+           formatter:(v,c)=>{const t=tot(idx[c.dataIndex]);return t>0?man(t):'';}}}
       ];
       if(cmp){
-        ds.push({label:`${curYear-1}年 新規売上`,data:idx.map(i=>P(i)?P(i).sales:null),backgroundColor:'rgba(52,211,153,.14)',borderColor:'rgba(52,211,153,.5)',borderWidth:1,borderDash:[4,3],borderRadius:3,stack:'prev'});
-        ds.push({label:`${curYear-1}年 リピート売上`,data:idx.map(i=>P(i)?P(i).rep:null),backgroundColor:'rgba(244,114,182,.14)',borderColor:'rgba(244,114,182,.5)',borderWidth:1,borderDash:[4,3],borderRadius:3,stack:'prev'});
+        ds.push({label:`${curYear-1}年 初診売上`,data:idx.map(i=>P(i)?P(i).sales:null),backgroundColor:'rgba(52,211,153,.14)',borderColor:'rgba(52,211,153,.5)',borderWidth:1,borderDash:[4,3],borderRadius:3,stack:'prev'});
+        ds.push({label:`${curYear-1}年 リピート売上`,data:idx.map(i=>P(i)?P(i).rep:null),backgroundColor:'rgba(244,114,182,.14)',borderColor:'rgba(244,114,182,.5)',borderWidth:1,borderDash:[4,3],borderRadius:3,stack:'prev',
+         datalabels:{display:true,anchor:'end',align:'end',offset:2,color:'rgba(240,200,70,.55)',font:{size:10,family:'Outfit'},
+           formatter:(v,c)=>{const t=ptot(idx[c.dataIndex]);return t>0?man(t):'';}}});
       }
       charts['cCHS']=new Chart(cs,{type:'bar',data:{labels,datasets:ds},
         options:{...CO,
           plugins:{...CO.plugins,tooltip:{...CO.plugins.tooltip,callbacks:{
             label:c=>c.dataset.label+' '+yen(c.parsed.y),
             afterBody:(it)=>{const i=idx[it[0].dataIndex];const f=fn[i],p=P(i);
-              return `合計 ${yen(f.total)}${cmp&&p?` （前年 ${yen(p.total)}）`:''}\nリピート比率 ${f.total>0?(f.rep/f.total*100).toFixed(0):'—'}%`;}}}},
+              return `売上合計 ${yen(f.total)}${cmp&&p?` （前年 ${yen(p.total)}／${p.total>0?(f.total>=p.total?'+':'')+((f.total/p.total-1)*100).toFixed(0)+'%':'—'}）`:''}\n内訳 初診 ${yen(f.sales)}／リピート ${yen(f.rep)}（${f.total>0?(f.rep/f.total*100).toFixed(0):'—'}%）`;}}}},
           scales:{x:{...CO.scales.x,stacked:true},y:{...CO.scales.y,stacked:true,ticks:{color:'#7D8CA1',callback:v2=>'¥'+(v2/10000)+'万'}}}}});
     }
   }
