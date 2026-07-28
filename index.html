@@ -1589,12 +1589,12 @@ function renderHPB(el){
     <div class="cb" style="height:280px"><canvas id="cHM"></canvas></div>
   </div></div>
   <div class="gf"><div class="cd">
-    <div><div class="ct"><span class="cdot" style="background:#8B7CF6"></span>📈 HPB 新患数 × 成約率</div><div class="csu">${curYear}年${cmp&&hasPrev?`（薄い棒・点線＝${curYear-1}年）`:''} — ${curHpbStore}｜棒＝HPB経由の新患数（左軸）／線＝その成約率（右軸）。<b style="color:var(--tx)">両方が上がっている月が理想</b></div></div>
+    <div><div class="ct"><span class="cdot" style="background:#8B7CF6"></span>📈 HPB 新患数 × 成約率</div><div class="csu">${curYear}年${cmp&&hasPrev?`（<span style="color:#38BDF8">青い棒</span>＝${curYear-1}年の新患数／<span style="color:#F0C846">黄の点線</span>＝${curYear-1}年の成約率）`:''} — ${curHpbStore}｜棒＝HPB経由の新患数（左軸）／線＝その成約率（右軸）。<b style="color:var(--tx)">両方が上がっている月が理想</b></div></div>
     ${hasFn?'<div class="cb" style="height:300px"><canvas id="cHF"></canvas></div>':'<div style="padding:26px 0;text-align:center;color:var(--txd);font-size:12px">受付履歴データがまだ読み込まれていません（⚙設定でAPIキーを登録してください）</div>'}
   </div></div>
   <div class="gf"><div class="cd">
     <div class="ct"><span class="cdot" style="background:#34D399"></span>💰 HPB 新規売上 推移</div>
-    <div class="csu">${curYear}年${cmp&&hasPrev?`（薄い棒＝${curYear-1}年）`:''} — ${curHpbStore}｜HPB経由で来院した新患が初回に計上した売上</div>
+    <div class="csu">${curYear}年${cmp&&hasPrev?`（<span style="color:#38BDF8">青い棒</span>＝${curYear-1}年）`:''} — ${curHpbStore}｜HPB経由で来院した新患が初回に計上した売上</div>
     ${hasFn?'<div class="cb" style="height:260px"><canvas id="cHS"></canvas></div>':'<div style="padding:26px 0;text-align:center;color:var(--txd);font-size:12px">受付履歴データがまだ読み込まれていません</div>'}
   </div></div>
   <div class="gf"><div class="cd">
@@ -1697,6 +1697,10 @@ function renderHpbTable(monthly,fn,pv){
 }
 
 // HPB経由の 新患数(棒) × 成約率(線) の複合グラフ。両方が右肩上がりなら「集客も接客も伸びている」。
+// 前年系列の色。今年と「同じ色の薄い版」にすると見分けがつかないので、別の色相を割り当てる。
+// 棒＝スカイブルー（今年のオレンジ／エメラルドと補色関係）、率の線＝ゴールド（今年のバイオレットと最大コントラスト）。
+const PY_BAR='#38BDF8', PY_BAR_FILL='rgba(56,189,248,.45)';
+const PY_LINE='#F0C846', PY_LINE_FILL='rgba(240,200,70,.9)';
 function initHpbFunnelC(){
   const fn=chFunnelYear(curHpbStore,curYear,'HPB');
   const pv=chFunnelYear(curHpbStore,curYear-1,'HPB');
@@ -1714,8 +1718,8 @@ function initHpbFunnelC(){
       {type:'line',label:`${curYear}年 成約率`,yAxisID:'y1',data:idx.map(i=>fn[i].rate),borderColor:'#8B7CF6',backgroundColor:'transparent',borderWidth:3,pointRadius:5,pointBackgroundColor:'#8B7CF6',pointBorderColor:'#0D1117',pointBorderWidth:2,tension:.35,spanGaps:true,order:1}
     ];
     if(cmp){
-      ds.push({type:'bar',label:`${curYear-1}年 新患数`,yAxisID:'y',data:idx.map(i=>P(i)?P(i).np:null),backgroundColor:'rgba(255,107,74,.16)',borderColor:'rgba(255,107,74,.45)',borderWidth:1,borderRadius:4,order:4});
-      ds.push({type:'line',label:`${curYear-1}年 成約率`,yAxisID:'y1',data:idx.map(i=>P(i)?P(i).rate:null),borderColor:'rgba(139,124,246,.5)',backgroundColor:'transparent',borderWidth:2,borderDash:[6,4],pointRadius:3,pointBackgroundColor:'rgba(139,124,246,.6)',pointBorderColor:'#0D1117',pointBorderWidth:1,tension:.35,spanGaps:true,order:2});
+      ds.push({type:'bar',label:`${curYear-1}年 新患数`,yAxisID:'y',data:idx.map(i=>P(i)?P(i).np:null),backgroundColor:PY_BAR_FILL,borderColor:PY_BAR,borderWidth:1,borderRadius:4,order:4});
+      ds.push({type:'line',label:`${curYear-1}年 成約率`,yAxisID:'y1',data:idx.map(i=>P(i)?P(i).rate:null),borderColor:PY_LINE,backgroundColor:'transparent',borderWidth:2.5,borderDash:[7,4],pointRadius:4,pointBackgroundColor:PY_LINE_FILL,pointBorderColor:'#0D1117',pointBorderWidth:1,tension:.35,spanGaps:true,order:2});
     }
     charts['cHF']=new Chart(cf,{
       type:'bar',
@@ -1733,7 +1737,7 @@ function initHpbFunnelC(){
   const cs=document.getElementById('cHS');
   if(cs){
     const ds=[{label:`${curYear}年`,data:idx.map(i=>fn[i].sales),backgroundColor:'rgba(52,211,153,.55)',borderColor:'#34D399',borderWidth:1,borderRadius:4}];
-    if(cmp)ds.push({label:`${curYear-1}年`,data:idx.map(i=>P(i)?P(i).sales:null),backgroundColor:'rgba(52,211,153,.16)',borderColor:'rgba(52,211,153,.45)',borderWidth:1,borderRadius:4});
+    if(cmp)ds.push({label:`${curYear-1}年`,data:idx.map(i=>P(i)?P(i).sales:null),backgroundColor:PY_BAR_FILL,borderColor:PY_BAR,borderWidth:1,borderRadius:4});
     charts['cHS']=new Chart(cs,{
       type:'bar',
       data:{labels,datasets:ds},
@@ -1750,7 +1754,7 @@ function initHPBC(){
   if(!monthly.length)return;
   const c=document.getElementById('cHM');if(!c)return;
   const ds=[{label:curYear+'年 HPB来店数',data:MO.map(mo=>{const f=monthly.find(x=>x.month===mo);return f?f.hpb:null;}),borderColor:'#FF6B4A',backgroundColor:'rgba(255,107,74,.12)',borderWidth:3,pointRadius:6,pointBackgroundColor:'#FF6B4A',pointBorderColor:'#0D1117',pointBorderWidth:2,pointHoverRadius:8,tension:.35,fill:true,spanGaps:true}];
-  if(window._hpbCompare){const otherYr=curYear===2026?2025:2026;const m2=getHpbMonthly(otherYr);ds.push({label:otherYr+'年 HPB来店数',data:MO.map(mo=>{const f=m2.find(x=>x.month===mo);return f?f.hpb:null;}),borderColor:'rgba(255,107,74,.35)',backgroundColor:'transparent',borderWidth:2,borderDash:[6,4],pointRadius:4,pointBackgroundColor:'rgba(255,107,74,.5)',pointBorderColor:'#0D1117',pointBorderWidth:1,tension:.35,fill:false,spanGaps:true});}
+  if(window._hpbCompare){const otherYr=curYear===2026?2025:2026;const m2=getHpbMonthly(otherYr);ds.push({label:otherYr+'年 HPB来店数',data:MO.map(mo=>{const f=m2.find(x=>x.month===mo);return f?f.hpb:null;}),borderColor:PY_BAR,backgroundColor:'transparent',borderWidth:2.5,borderDash:[7,4],pointRadius:4,pointBackgroundColor:PY_BAR,pointBorderColor:'#0D1117',pointBorderWidth:1,tension:.35,fill:false,spanGaps:true});}
   const labels=MO.filter(mo=>ds.some(d=>d.data[MO.indexOf(mo)]!=null));const filtered=ds.map(d=>({...d,data:labels.map(mo=>d.data[MO.indexOf(mo)])}));
   charts['cHM']=new Chart(c,{
     type:'line',
