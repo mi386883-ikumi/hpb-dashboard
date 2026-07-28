@@ -1542,6 +1542,24 @@ function renderHPB(el){
   const ySales=fnRows.reduce((s,x)=>s+x.f.sales,0);
   const yRate=yNp>0?yJoin/yNp*100:null;
   const hasFn=fnRows.length>0;
+  // 前年「同期」＝今年データがある月と同じ月だけを前年から拾う（1〜7月 vs 1〜7月で公平に比べる）
+  const sameIdx=MO.map((m,i)=>i).filter(i=>fn[i]&&fnPrev[i]);
+  const pNp=sameIdx.reduce((s,i)=>s+fnPrev[i].np,0);
+  const pJoin=sameIdx.reduce((s,i)=>s+fnPrev[i].join,0);
+  const pSales=sameIdx.reduce((s,i)=>s+fnPrev[i].sales,0);
+  const pRate=pNp>0?pJoin/pNp*100:null;
+  const hasPrev=sameIdx.length>0;
+  // 前年比の表示。pt=率の差、%=金額や人数の増減率。良し悪しの色つき。
+  const yoy=(cur,prev,kind)=>{
+    if(!hasPrev||prev==null||cur==null)return'';
+    const d=cur-prev;
+    const col=Math.abs(d)<1e-9?'var(--txm)':d>0?'var(--em)':'var(--rs)';
+    const ar=d>0?'▲':d<0?'▼':'';
+    const txt=kind==='pt'?Math.abs(d).toFixed(1)+'pt'
+      :prev===0?'—':Math.abs(d/prev*100).toFixed(0)+'%';
+    return`<span style="color:${col};margin-left:6px">${ar}${txt}</span>`;
+  };
+  const cmp=!!window._hpbCompare;
   const storeTabs=stores.map(s=>`<button class="pl${curHpbStore===s.name?' on':''}" onclick="curHpbStore='${s.name}';renderMain()">${s.name}</button>`).join('');
   el.innerHTML=`<div class="fade">
   <div class="ph"><div><div class="pt">🔥 ホットペッパーマーケティング</div><div class="pd">${periodLabel} — NAORU整体 ${curHpbStore}</div></div></div>
@@ -1553,23 +1571,30 @@ function renderHPB(el){
     <div class="kp" style="--kc:#3ECFB4"><div class="kl">ブログ投稿数</div><div class="kv" style="color:#3ECFB4">${hs.blogs}<span style="font-size:13px;color:var(--txm);margin-left:6px">件</span></div><div class="kn">最終確認 ${hs.lastUpdated}</div></div>
     <div class="kp" style="--kc:#F0C846"><div class="kl">最多来院月</div><div class="kv" style="color:#F0C846">${maxObj.month}</div><div class="kn">${maxObj.hpb}人来院</div></div>
     <div class="kp" style="--kc:#38BDF8"><div class="kl">掲載順位（${hs.rankingKeyword||curHpbStore}）</div><div class="kv" style="color:#38BDF8">${hs.ranking?hs.ranking+'<span style="font-size:13px;color:var(--txm);margin-left:4px">位</span>':'<span style="font-size:18px;color:var(--txd)">圏外</span>'}</div><div class="kn">最終確認 ${hs.lastUpdated}</div></div>
-    <div class="kp" style="--kc:#34D399"><div class="kl">HPB 新規売上</div><div class="kv" style="color:#34D399">${hasFn?yen(ySales):'<span style="font-size:18px;color:var(--txd)">—</span>'}</div><div class="kn">${hasFn?`${curYear}年累計（${fnRows.length}ヶ月）｜1人あたり ${yNp>0?yen(Math.round(ySales/yNp)):'—'}`:'受付データ未取得'}</div></div>
-    <div class="kp" style="--kc:#8B7CF6"><div class="kl">HPB 成約率</div><div class="kv" style="color:#8B7CF6">${yRate!=null?yRate.toFixed(1)+'<span style="font-size:13px;color:var(--txm);margin-left:2px">%</span>':'<span style="font-size:18px;color:var(--txd)">—</span>'}</div><div class="kn">${hasFn?`入会${yJoin}／新患${yNp}名（${curYear}年累計）`:'受付データ未取得'}</div></div>
+    <div class="kp" style="--kc:#34D399"><div class="kl">HPB 新規売上</div><div class="kv" style="color:#34D399">${hasFn?yen(ySales):'<span style="font-size:18px;color:var(--txd)">—</span>'}</div><div class="kn">${hasFn?`${curYear}年累計（${fnRows.length}ヶ月）｜1人あたり ${yNp>0?yen(Math.round(ySales/yNp)):'—'}`:'受付データ未取得'}${hasPrev?`<br>前年同期 ${yen(pSales)}${yoy(ySales,pSales)}`:''}</div></div>
+    <div class="kp" style="--kc:#8B7CF6"><div class="kl">HPB 成約率</div><div class="kv" style="color:#8B7CF6">${yRate!=null?yRate.toFixed(1)+'<span style="font-size:13px;color:var(--txm);margin-left:2px">%</span>':'<span style="font-size:18px;color:var(--txd)">—</span>'}</div><div class="kn">${hasFn?`入会${yJoin}／新患${yNp}名（${curYear}年累計）`:'受付データ未取得'}${hasPrev&&pRate!=null?`<br>前年同期 ${pRate.toFixed(1)}%${yoy(yRate,pRate,'pt')}`:''}</div></div>
+    <div class="kp" style="--kc:#FF6B4A"><div class="kl">HPB 新患数</div><div class="kv" style="color:#FF6B4A">${hasFn?yNp:'<span style="font-size:18px;color:var(--txd)">—</span>'}<span style="font-size:13px;color:var(--txm);margin-left:4px">名</span></div><div class="kn">${hasFn?`${curYear}年累計（受付履歴ベース）`:'受付データ未取得'}${hasPrev?`<br>前年同期 ${pNp}名${yoy(yNp,pNp)}`:''}</div></div>
   </div>
+  ${hasPrev?`<div class="stb" style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+    <span class="sd" style="background:#8B7CF6"></span>
+    <span>前年（${curYear-1}年）と重ねて表示：</span>
+    <span style="display:flex;gap:4px"><button class="yr-btn ${!cmp?'on':''}" onclick="window._hpbCompare=false;renderMain()">${curYear}年のみ</button><button class="yr-btn ${cmp?'on':''}" onclick="window._hpbCompare=true;renderMain()">前年と比較</button></span>
+    <span style="color:var(--txd);font-size:11px">前年同期＝今年データがある${sameIdx.length}ヶ月ぶんだけを前年から拾って比べています</span>
+  </div>`:''}
   <div class="gf"><div class="cd">
     <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px">
       <div><div class="ct"><span class="cdot" style="background:#FF6B4A"></span>月別 HPB来店数</div><div class="csu">ホットペッパー経由 月次推移 — ${curHpbStore}</div></div>
-      <div style="display:flex;gap:4px"><button class="yr-btn ${!window._hpbCompare?'on':''}" onclick="window._hpbCompare=false;renderMain()">${curYear}年のみ</button><button class="yr-btn ${window._hpbCompare?'on':''}" onclick="window._hpbCompare=true;renderMain()">年比較</button></div>
+      ${hasPrev?'':`<div style="display:flex;gap:4px"><button class="yr-btn ${!cmp?'on':''}" onclick="window._hpbCompare=false;renderMain()">${curYear}年のみ</button><button class="yr-btn ${cmp?'on':''}" onclick="window._hpbCompare=true;renderMain()">年比較</button></div>`}
     </div>
     <div class="cb" style="height:280px"><canvas id="cHM"></canvas></div>
   </div></div>
   <div class="gf"><div class="cd">
-    <div><div class="ct"><span class="cdot" style="background:#8B7CF6"></span>📈 HPB 新患数 × 成約率</div><div class="csu">${curYear}年 — ${curHpbStore}｜棒＝HPB経由の新患数（左軸）／線＝その成約率（右軸）。<b style="color:var(--tx)">両方が上がっている月が理想</b></div></div>
+    <div><div class="ct"><span class="cdot" style="background:#8B7CF6"></span>📈 HPB 新患数 × 成約率</div><div class="csu">${curYear}年${cmp&&hasPrev?`（薄い棒・点線＝${curYear-1}年）`:''} — ${curHpbStore}｜棒＝HPB経由の新患数（左軸）／線＝その成約率（右軸）。<b style="color:var(--tx)">両方が上がっている月が理想</b></div></div>
     ${hasFn?'<div class="cb" style="height:300px"><canvas id="cHF"></canvas></div>':'<div style="padding:26px 0;text-align:center;color:var(--txd);font-size:12px">受付履歴データがまだ読み込まれていません（⚙設定でAPIキーを登録してください）</div>'}
   </div></div>
   <div class="gf"><div class="cd">
     <div class="ct"><span class="cdot" style="background:#34D399"></span>💰 HPB 新規売上 推移</div>
-    <div class="csu">${curYear}年 — ${curHpbStore}｜HPB経由で来院した新患が初回に計上した売上</div>
+    <div class="csu">${curYear}年${cmp&&hasPrev?`（薄い棒＝${curYear-1}年）`:''} — ${curHpbStore}｜HPB経由で来院した新患が初回に計上した売上</div>
     ${hasFn?'<div class="cb" style="height:260px"><canvas id="cHS"></canvas></div>':'<div style="padding:26px 0;text-align:center;color:var(--txd);font-size:12px">受付履歴データがまだ読み込まれていません</div>'}
   </div></div>
   <div class="gf"><div class="cd">
@@ -1624,32 +1649,49 @@ function renderHPB(el){
     </div>
   </div></div>
   </div>`;
-  renderHpbTable(monthly,fn);
+  renderHpbTable(monthly,fn,fnPrev);
 }
 
-function renderHpbTable(monthly,fn){
+function renderHpbTable(monthly,fn,pv){
   const el=document.getElementById('hpbTbl');if(!el)return;
   const F=m=>{const i=MO.indexOf(m);return fn&&i>=0?fn[i]:null;};
-  let h=`<table><thead><tr><th>月</th><th>HPB来店数</th><th>前月比</th><th>累計</th><th>成約</th><th>成約率</th><th>新規売上</th><th>客単価</th></tr></thead><tbody>`;
-  let cum=0,tJ=0,tN=0,tS=0;
+  const P=m=>{const i=MO.indexOf(m);return pv&&i>=0?pv[i]:null;};
+  const cmp=!!window._hpbCompare&&!!pv&&MO.some((m,i)=>fn[i]&&pv[i]);
+  // 前年同月との差。良い方向を緑、悪い方向を赤で出す。
+  const dc=(c,p,unit)=>{
+    if(p==null||c==null)return'<span style="color:var(--txd)">—</span>';
+    const d=c-p;const col=d===0?'var(--txm)':d>0?'var(--em)':'var(--rs)';
+    return`<span style="color:${col};font-weight:600">${d>0?'▲':d<0?'▼':''}${unit==='pt'?Math.abs(d).toFixed(1)+'pt':Math.abs(d)+unit}</span>`;
+  };
+  let h=`<table><thead><tr><th>月</th><th>HPB来店数</th><th>前月比</th><th>累計</th><th>成約</th><th>成約率</th><th>新規売上</th><th>客単価</th>`
+    +(cmp?`<th style="color:var(--txd)">前年 新患</th><th style="color:var(--txd)">前年比</th><th style="color:var(--txd)">前年 成約率</th><th style="color:var(--txd)">前年比</th>`:'')
+    +`</tr></thead><tbody>`;
+  let cum=0,tJ=0,tN=0,tS=0,pJ=0,pN=0;
   monthly.forEach((x,i)=>{
     cum+=x.hpb;
     const prev=i>0?monthly[i-1].hpb:null;
-    let diff='—',dc='var(--txm)';
-    if(prev!==null){const d=x.hpb-prev;diff=(d>=0?'+':'')+d;dc=d>0?'var(--em)':d<0?'var(--rs)':'var(--txm)';}
-    const f=F(x.month);
+    let diff='—',dcol='var(--txm)';
+    if(prev!==null){const d=x.hpb-prev;diff=(d>=0?'+':'')+d;dcol=d>0?'var(--em)':d<0?'var(--rs)':'var(--txm)';}
+    const f=F(x.month),p=P(x.month);
     if(f){tJ+=f.join;tN+=f.np;tS+=f.sales;}
+    if(f&&p){pJ+=p.join;pN+=p.np;}
     // 成約率の色は全店の中央値まわり（30%台）を基準に、40%以上=好調 / 25%未満=要改善
     const rc=!f||f.rate==null?'var(--txd)':f.rate>=40?'var(--em)':f.rate>=25?'var(--vt)':'var(--rs)';
-    h+=`<tr><td style="font-weight:600">${x.month}</td><td class="hl">${x.hpb}</td><td style="color:${dc};font-weight:600">${diff}</td><td style="color:var(--txm)">${cum}</td>`
+    h+=`<tr><td style="font-weight:600">${x.month}</td><td class="hl">${x.hpb}</td><td style="color:${dcol};font-weight:600">${diff}</td><td style="color:var(--txm)">${cum}</td>`
       +`<td style="color:var(--bl)">${f?f.join+'名':'—'}</td>`
       +`<td style="color:${rc};font-weight:600">${f&&f.rate!=null?f.rate.toFixed(1)+'%':'—'}${f&&f.np>0?`<span style="font-size:10px;color:var(--txd);font-weight:400;margin-left:4px">${f.join}/${f.np}</span>`:''}</td>`
       +`<td style="color:var(--em);font-weight:600">${f?yen(f.sales):'—'}</td>`
-      +`<td style="color:var(--txm)">${f&&f.np>0?yen(Math.round(f.sales/f.np)):'—'}</td></tr>`;
+      +`<td style="color:var(--txm)">${f&&f.np>0?yen(Math.round(f.sales/f.np)):'—'}</td>`
+      +(cmp?`<td style="color:var(--txm)">${p?p.np+'名':'—'}</td><td>${dc(f?f.np:null,p?p.np:null,'名')}</td>`
+           +`<td style="color:var(--txm)">${p&&p.rate!=null?p.rate.toFixed(1)+'%':'—'}</td><td>${dc(f?f.rate:null,p&&p.rate!=null?p.rate:null,'pt')}</td>`:'')
+      +`</tr>`;
   });
   const tot=monthly.reduce((s,x)=>s+x.hpb,0);
-  const tR=tN>0?(tJ/tN*100).toFixed(1)+'%':'—';
-  h+=`<tr class="rws"><td colspan="2">合計</td><td></td><td class="hl">${tot}</td><td>${tN>0?tJ+'名':'—'}</td><td>${tR}${tN>0?`<span style="font-size:10px;color:var(--txd);font-weight:400;margin-left:4px">${tJ}/${tN}</span>`:''}</td><td>${tN>0?yen(tS):'—'}</td><td>${tN>0?yen(Math.round(tS/tN)):'—'}</td></tr>`;
+  const tR=tN>0?tJ/tN*100:null;
+  const pR=pN>0?pJ/pN*100:null;
+  h+=`<tr class="rws"><td colspan="2">合計</td><td></td><td class="hl">${tot}</td><td>${tN>0?tJ+'名':'—'}</td><td>${tR!=null?tR.toFixed(1)+'%':'—'}${tN>0?`<span style="font-size:10px;color:var(--txd);font-weight:400;margin-left:4px">${tJ}/${tN}</span>`:''}</td><td>${tN>0?yen(tS):'—'}</td><td>${tN>0?yen(Math.round(tS/tN)):'—'}</td>`
+    +(cmp?`<td>${pN>0?pN+'名':'—'}</td><td>${dc(tN||null,pN||null,'名')}</td><td>${pR!=null?pR.toFixed(1)+'%':'—'}</td><td>${dc(tR,pR,'pt')}</td>`:'')
+    +`</tr>`;
   h+=`</tbody></table>`;
   el.innerHTML=h;
 }
@@ -1657,19 +1699,30 @@ function renderHpbTable(monthly,fn){
 // HPB経由の 新患数(棒) × 成約率(線) の複合グラフ。両方が右肩上がりなら「集客も接客も伸びている」。
 function initHpbFunnelC(){
   const fn=chFunnelYear(curHpbStore,curYear,'HPB');
+  const pv=chFunnelYear(curHpbStore,curYear-1,'HPB');
   const idx=MO.map((m,i)=>i).filter(i=>fn[i]);
   if(!idx.length)return;
+  const cmp=!!window._hpbCompare&&MO.some((m,i)=>fn[i]&&pv[i]);
   const labels=idx.map(i=>MO[i]);
+  const P=i=>pv[i]||null;// 前年同月（無ければnull＝グラフを繋がない）
+  // 前年の値を併記するツールチップ。増減も一緒に出して「伸びたのか」を1画面で判断できるようにする。
+  const dl=(c,p,unit)=>{if(p==null)return'';const d=c-p;return ` （前年 ${p}${unit}／${d>0?'+':''}${unit==='%'?d.toFixed(1)+'pt':d+unit}）`;};
   const cf=document.getElementById('cHF');
   if(cf){
+    const ds=[
+      {type:'bar',label:`${curYear}年 新患数`,yAxisID:'y',data:idx.map(i=>fn[i].np),backgroundColor:'rgba(255,107,74,.55)',borderColor:'#FF6B4A',borderWidth:1,borderRadius:4,order:3},
+      {type:'line',label:`${curYear}年 成約率`,yAxisID:'y1',data:idx.map(i=>fn[i].rate),borderColor:'#8B7CF6',backgroundColor:'transparent',borderWidth:3,pointRadius:5,pointBackgroundColor:'#8B7CF6',pointBorderColor:'#0D1117',pointBorderWidth:2,tension:.35,spanGaps:true,order:1}
+    ];
+    if(cmp){
+      ds.push({type:'bar',label:`${curYear-1}年 新患数`,yAxisID:'y',data:idx.map(i=>P(i)?P(i).np:null),backgroundColor:'rgba(255,107,74,.16)',borderColor:'rgba(255,107,74,.45)',borderWidth:1,borderRadius:4,order:4});
+      ds.push({type:'line',label:`${curYear-1}年 成約率`,yAxisID:'y1',data:idx.map(i=>P(i)?P(i).rate:null),borderColor:'rgba(139,124,246,.5)',backgroundColor:'transparent',borderWidth:2,borderDash:[6,4],pointRadius:3,pointBackgroundColor:'rgba(139,124,246,.6)',pointBorderColor:'#0D1117',pointBorderWidth:1,tension:.35,spanGaps:true,order:2});
+    }
     charts['cHF']=new Chart(cf,{
       type:'bar',
-      data:{labels,datasets:[
-        {type:'bar',label:'HPB新患数',yAxisID:'y',data:idx.map(i=>fn[i].np),backgroundColor:'rgba(255,107,74,.55)',borderColor:'#FF6B4A',borderWidth:1,borderRadius:4,order:2},
-        {type:'line',label:'成約率(%)',yAxisID:'y1',data:idx.map(i=>fn[i].rate),borderColor:'#8B7CF6',backgroundColor:'transparent',borderWidth:3,pointRadius:5,pointBackgroundColor:'#8B7CF6',pointBorderColor:'#0D1117',pointBorderWidth:2,tension:.35,spanGaps:true,order:1}
-      ]},
+      data:{labels,datasets:ds},
       options:{...CO,
-        plugins:{...CO.plugins,tooltip:{...CO.plugins.tooltip,callbacks:{afterBody:(it)=>{const f=fn[idx[it[0].dataIndex]];return `入会 ${f.join} / 新患 ${f.np}名\n新規売上 ${yen(f.sales)}`;}}}},
+        plugins:{...CO.plugins,tooltip:{...CO.plugins.tooltip,callbacks:{afterBody:(it)=>{const i=idx[it[0].dataIndex];const f=fn[i],p=P(i);
+          return `入会 ${f.join} / 新患 ${f.np}名${cmp?dl(f.np,p?p.np:null,'名'):''}\n成約率 ${f.rate!=null?f.rate.toFixed(1)+'%':'—'}${cmp&&p&&p.rate!=null?dl(f.rate,p.rate,'%'):''}\n新規売上 ${yen(f.sales)}${cmp&&p?` （前年 ${yen(p.sales)}）`:''}`;}}}},
         scales:{
           x:CO.scales.x,
           y:{...CO.scales.y,position:'left',title:{display:true,text:'新患数（人）',color:'#FF6B4A',font:{size:10}}},
@@ -1679,11 +1732,14 @@ function initHpbFunnelC(){
   }
   const cs=document.getElementById('cHS');
   if(cs){
+    const ds=[{label:`${curYear}年`,data:idx.map(i=>fn[i].sales),backgroundColor:'rgba(52,211,153,.55)',borderColor:'#34D399',borderWidth:1,borderRadius:4}];
+    if(cmp)ds.push({label:`${curYear-1}年`,data:idx.map(i=>P(i)?P(i).sales:null),backgroundColor:'rgba(52,211,153,.16)',borderColor:'rgba(52,211,153,.45)',borderWidth:1,borderRadius:4});
     charts['cHS']=new Chart(cs,{
       type:'bar',
-      data:{labels,datasets:[{label:'HPB新規売上',data:idx.map(i=>fn[i].sales),backgroundColor:'rgba(52,211,153,.55)',borderColor:'#34D399',borderWidth:1,borderRadius:4}]},
+      data:{labels,datasets:ds},
       options:{...CO,
-        plugins:{...CO.plugins,legend:{display:false},tooltip:{...CO.plugins.tooltip,callbacks:{label:c=>yen(c.parsed.y),afterBody:(it)=>{const f=fn[idx[it[0].dataIndex]];return `新患 ${f.np}名｜1人あたり ${f.np>0?yen(Math.round(f.sales/f.np)):'—'}`;}}}},
+        plugins:{...CO.plugins,legend:{display:cmp},tooltip:{...CO.plugins.tooltip,callbacks:{label:c=>c.dataset.label+' '+yen(c.parsed.y),afterBody:(it)=>{const i=idx[it[0].dataIndex];const f=fn[i],p=P(i);
+          return `新患 ${f.np}名｜1人あたり ${f.np>0?yen(Math.round(f.sales/f.np)):'—'}`+(cmp&&p&&p.sales>0?`\n前年比 ${f.sales>=p.sales?'+':''}${((f.sales/p.sales-1)*100).toFixed(0)}%`:'');}}}},
         scales:{x:CO.scales.x,y:{...CO.scales.y,ticks:{color:'#7D8CA1',callback:v=>'¥'+(v/10000)+'万'}}}}
     });
   }
