@@ -1315,9 +1315,9 @@ function renderChannelPage(el,v){
     ${hasFn?'<div class="cb" style="height:300px"><canvas id="cCHF"></canvas></div>':'<div style="padding:26px 0;text-align:center;color:var(--txd);font-size:12px">受付履歴データがまだ読み込まれていません（⚙設定でAPIキーを登録してください）</div>'}
   </div></div>
   <div class="gf"><div class="cd">
-    <div class="ct"><span class="cdot" style="background:#F0C846"></span>💰 ${L}経由の売上合計</div>
-    <div class="csu">${curYear}年${cmp&&hasPrev?`（薄い枠＝${curYear-1}年）`:''} — ${store}｜棒の高さ＝<b style="color:#F0C846">売上合計</b>（棒の上に金額）。内訳は <span style="color:#34D399">緑＝初診売上</span>／<span style="color:#F472B6">ピンク＝リピート売上（回数券など2回目以降）</span></div>
-    ${hasFn?'<div class="cb" style="height:300px"><canvas id="cCHS"></canvas></div>':'<div style="padding:26px 0;text-align:center;color:var(--txd);font-size:12px">受付履歴データがまだ読み込まれていません</div>'}
+    <div class="ct"><span class="cdot" style="background:#34D399"></span>💰 ${L} 初診売上 推移</div>
+    <div class="csu">${curYear}年${cmp&&hasPrev?`（<span style="color:#38BDF8">青い棒</span>＝${curYear-1}年）`:''} — ${store}｜${L}経由で来院した新患が初回に計上した売上</div>
+    ${hasFn?'<div class="cb" style="height:260px"><canvas id="cCHS"></canvas></div>':'<div style="padding:26px 0;text-align:center;color:var(--txd);font-size:12px">受付履歴データがまだ読み込まれていません</div>'}
   </div></div>
   <div class="g2">
     <div class="cd"><div class="ct"><span class="cdot" style="background:${cfg.color}"></span>${L}来店 月別推移</div><div class="csu">${cfg.sub} — ${store}</div><div class="cb" style="height:260px"><canvas id="cCHM"></canvas></div></div>
@@ -1406,29 +1406,16 @@ function initChannelC(v){
     }
     const cs=document.getElementById('cCHS');
     if(cs){
-      // 積み上げの一番上の系列にだけラベルを出し、その月の「売上合計」を表示する。
-      const tot=i=>fn[i].sales+fn[i].rep;
-      const ptot=i=>P(i)?P(i).sales+P(i).rep:null;
-      const man=v=>v>=10000?'¥'+(v/10000).toFixed(v>=100000?0:1)+'万':'¥'+v.toLocaleString();
-      const ds=[
-        {label:`${curYear}年 初診売上`,data:idx.map(i=>fn[i].sales),backgroundColor:'rgba(52,211,153,.6)',borderColor:'#34D399',borderWidth:1,borderRadius:3,stack:'cur'},
-        {label:`${curYear}年 リピート売上`,data:idx.map(i=>fn[i].rep),backgroundColor:'rgba(244,114,182,.6)',borderColor:'#F472B6',borderWidth:1,borderRadius:3,stack:'cur',
-         datalabels:{display:true,anchor:'end',align:'end',offset:2,color:'#F0C846',font:{weight:'bold',size:11,family:'Outfit'},
-           formatter:(v,c)=>{const t=tot(idx[c.dataIndex]);return t>0?man(t):'';}}}
-      ];
-      if(cmp){
-        ds.push({label:`${curYear-1}年 初診売上`,data:idx.map(i=>P(i)?P(i).sales:null),backgroundColor:'rgba(52,211,153,.14)',borderColor:'rgba(52,211,153,.5)',borderWidth:1,borderDash:[4,3],borderRadius:3,stack:'prev'});
-        ds.push({label:`${curYear-1}年 リピート売上`,data:idx.map(i=>P(i)?P(i).rep:null),backgroundColor:'rgba(244,114,182,.14)',borderColor:'rgba(244,114,182,.5)',borderWidth:1,borderDash:[4,3],borderRadius:3,stack:'prev',
-         datalabels:{display:true,anchor:'end',align:'end',offset:2,color:'rgba(240,200,70,.55)',font:{size:10,family:'Outfit'},
-           formatter:(v,c)=>{const t=ptot(idx[c.dataIndex]);return t>0?man(t):'';}}});
-      }
+      // HPBページの「新規売上 推移」と同じ形：初診売上だけの棒グラフ（積み上げ・合計表示はしない）
+      const ds=[{label:`${curYear}年`,data:idx.map(i=>fn[i].sales),backgroundColor:'rgba(52,211,153,.55)',borderColor:'#34D399',borderWidth:1,borderRadius:4}];
+      if(cmp)ds.push({label:`${curYear-1}年`,data:idx.map(i=>P(i)?P(i).sales:null),backgroundColor:PY_BAR_FILL,borderColor:PY_BAR,borderWidth:1,borderRadius:4});
       charts['cCHS']=new Chart(cs,{type:'bar',data:{labels,datasets:ds},
         options:{...CO,
-          plugins:{...CO.plugins,tooltip:{...CO.plugins.tooltip,callbacks:{
+          plugins:{...CO.plugins,legend:{display:cmp},tooltip:{...CO.plugins.tooltip,callbacks:{
             label:c=>c.dataset.label+' '+yen(c.parsed.y),
             afterBody:(it)=>{const i=idx[it[0].dataIndex];const f=fn[i],p=P(i);
-              return `売上合計 ${yen(f.total)}${cmp&&p?` （前年 ${yen(p.total)}／${p.total>0?(f.total>=p.total?'+':'')+((f.total/p.total-1)*100).toFixed(0)+'%':'—'}）`:''}\n内訳 初診 ${yen(f.sales)}／リピート ${yen(f.rep)}（${f.total>0?(f.rep/f.total*100).toFixed(0):'—'}%）`;}}}},
-          scales:{x:{...CO.scales.x,stacked:true},y:{...CO.scales.y,stacked:true,ticks:{color:'#7D8CA1',callback:v2=>'¥'+(v2/10000)+'万'}}}}});
+              return `新患 ${f.np}名｜1人あたり ${f.np>0?yen(Math.round(f.sales/f.np)):'—'}`+(cmp&&p&&p.sales>0?`\n前年比 ${f.sales>=p.sales?'+':''}${((f.sales/p.sales-1)*100).toFixed(0)}%`:'');}}}},
+          scales:{x:CO.scales.x,y:{...CO.scales.y,ticks:{color:'#7D8CA1',callback:v2=>'¥'+(v2/10000)+'万'}}}}});
     }
   }
   // 来店数の月別推移（店舗の集客集計ベース）
