@@ -699,6 +699,10 @@ const manYen=v=>v==null?'':v>=1000000?'¥'+Math.round(v/10000)+'万':v>=10000?'�
 const DL_CUR={display:true,anchor:'end',align:'end',offset:2,clamp:true,color:'#6EE7B7',font:{weight:'bold',size:11,family:'Outfit'},formatter:manYen};
 const DL_PREV={display:'auto',anchor:'end',align:'end',offset:2,clamp:true,color:'rgba(125,200,248,.9)',font:{size:10,family:'Outfit'},formatter:manYen};
 const DL_AD={display:'auto',anchor:'center',align:'bottom',offset:6,clamp:true,color:'#FBBF24',font:{size:10,family:'Outfit'},textShadowColor:'rgba(0,0,0,.85)',textShadowBlur:4,formatter:manYen};
+// 新患数グラフ用。棒の上に人数、線の上に率を出す（棒の色はページごとに違うので引数で受ける）
+const DL_NP=c=>({display:true,anchor:'end',align:'end',offset:2,clamp:true,color:c,font:{weight:'bold',size:11,family:'Outfit'},formatter:v=>v==null?'':v+'人'});
+const DL_NP_PREV={display:'auto',anchor:'end',align:'end',offset:2,clamp:true,color:'rgba(125,200,248,.9)',font:{size:10,family:'Outfit'},formatter:v=>v==null?'':v+'人'};
+const DL_RATE={display:true,anchor:'center',align:'bottom',offset:8,clamp:true,color:'#C4B8FF',font:{weight:'bold',size:10,family:'Outfit'},textShadowColor:'rgba(0,0,0,.95)',textShadowBlur:6,formatter:v=>v==null?'':Math.round(v)+'%'};
 // #RRGGBB → rgba(...) 。経路ごとにテーマ色から塗りを作るのに使う。
 const hexA=(hex,a)=>{const n=parseInt(hex.slice(1),16);return `rgba(${(n>>16)&255},${(n>>8)&255},${n&255},${a})`;};
 function mkBar(id,labels,ds){const c=document.getElementById(id);if(!c)return;charts[id]=new Chart(c,{type:'bar',data:{labels,datasets:ds},options:CO});}
@@ -1503,17 +1507,18 @@ function initChannelC(v){
     const cf=document.getElementById('cCHF');
     if(cf){
       const ds=[
-        {type:'bar',label:`${curYear}年 新患数`,yAxisID:'y',data:idx.map(i=>fn[i].np),backgroundColor:hexA(cfg.color,.55),borderColor:cfg.color,borderWidth:1,borderRadius:4,order:3},
-        {type:'line',label:`${curYear}年 入会率`,yAxisID:'y1',data:idx.map(i=>fn[i].rate),borderColor:'#8B7CF6',backgroundColor:'transparent',borderWidth:3,pointRadius:5,pointBackgroundColor:'#8B7CF6',pointBorderColor:'#0D1117',pointBorderWidth:2,tension:.35,spanGaps:true,order:1}
+        {type:'bar',label:`${curYear}年 新患数`,yAxisID:'y',data:idx.map(i=>fn[i].np),backgroundColor:hexA(cfg.color,.55),borderColor:cfg.color,borderWidth:1,borderRadius:4,order:3,datalabels:DL_NP(cfg.color)},
+        {type:'line',label:`${curYear}年 入会率`,yAxisID:'y1',data:idx.map(i=>fn[i].rate),borderColor:'#8B7CF6',backgroundColor:'transparent',borderWidth:3,pointRadius:5,pointBackgroundColor:'#8B7CF6',pointBorderColor:'#0D1117',pointBorderWidth:2,tension:.35,spanGaps:true,order:1,datalabels:cmp?{display:false}:DL_RATE}
       ];
       if(cmp){
-        ds.push({type:'bar',label:`${curYear-1}年 新患数`,yAxisID:'y',data:idx.map(i=>P(i)?P(i).np:null),backgroundColor:PY_BAR_FILL,borderColor:PY_BAR,borderWidth:1,borderRadius:4,order:4});
+        ds.push({type:'bar',label:`${curYear-1}年 新患数`,yAxisID:'y',data:idx.map(i=>P(i)?P(i).np:null),backgroundColor:PY_BAR_FILL,borderColor:PY_BAR,borderWidth:1,borderRadius:4,order:4,datalabels:DL_NP_PREV});
         ds.push({type:'line',label:`${curYear-1}年 入会率`,yAxisID:'y1',data:idx.map(i=>P(i)?P(i).rate:null),borderColor:PY_LINE,backgroundColor:'transparent',borderWidth:2.5,borderDash:[7,4],pointRadius:4,pointBackgroundColor:PY_LINE_FILL,pointBorderColor:'#0D1117',pointBorderWidth:1,tension:.35,spanGaps:true,order:2});
       }
       charts['cCHF']=new Chart(cf,{type:'bar',data:{labels,datasets:ds},
         options:{...CO,
           plugins:{...CO.plugins,tooltip:{...CO.plugins.tooltip,callbacks:{afterBody:(it)=>{const i=idx[it[0].dataIndex];const f=fn[i],p=P(i);
             return `入会 ${f.join} / 新患 ${f.np}名${cmp?dl(f.np,p?p.np:null,'名'):''}\n入会率 ${f.rate!=null?f.rate.toFixed(1)+'%':'—'}${cmp&&p&&p.rate!=null?dl(f.rate,p.rate,'%'):''}\n新規売上 ${yen(f.sales)}／リピート売上 ${yen(f.rep)}`;}}}},
+          layout:{padding:{top:26}},
           scales:{x:CO.scales.x,
             y:{...CO.scales.y,position:'left',title:{display:true,text:'新患数（人）',color:cfg.color,font:{size:10}}},
             y1:{position:'right',beginAtZero:true,suggestedMax:100,grid:{drawOnChartArea:false},ticks:{color:'#8B7CF6',callback:v2=>v2+'%'},title:{display:true,text:'入会率',color:'#8B7CF6',font:{size:10}}}
@@ -1692,11 +1697,11 @@ function initHpbFunnelC(){
   const cf=document.getElementById('cHF');
   if(cf){
     const ds=[
-      {type:'bar',label:`${curYear}年 新患数`,yAxisID:'y',data:idx.map(i=>fn[i].np),backgroundColor:'rgba(255,107,74,.55)',borderColor:'#FF6B4A',borderWidth:1,borderRadius:4,order:3},
-      {type:'line',label:`${curYear}年 成約率`,yAxisID:'y1',data:idx.map(i=>fn[i].rate),borderColor:'#8B7CF6',backgroundColor:'transparent',borderWidth:3,pointRadius:5,pointBackgroundColor:'#8B7CF6',pointBorderColor:'#0D1117',pointBorderWidth:2,tension:.35,spanGaps:true,order:1}
+      {type:'bar',label:`${curYear}年 新患数`,yAxisID:'y',data:idx.map(i=>fn[i].np),backgroundColor:'rgba(255,107,74,.55)',borderColor:'#FF6B4A',borderWidth:1,borderRadius:4,order:3,datalabels:DL_NP('#FF8A6B')},
+      {type:'line',label:`${curYear}年 成約率`,yAxisID:'y1',data:idx.map(i=>fn[i].rate),borderColor:'#8B7CF6',backgroundColor:'transparent',borderWidth:3,pointRadius:5,pointBackgroundColor:'#8B7CF6',pointBorderColor:'#0D1117',pointBorderWidth:2,tension:.35,spanGaps:true,order:1,datalabels:cmp?{display:false}:DL_RATE}
     ];
     if(cmp){
-      ds.push({type:'bar',label:`${curYear-1}年 新患数`,yAxisID:'y',data:idx.map(i=>P(i)?P(i).np:null),backgroundColor:PY_BAR_FILL,borderColor:PY_BAR,borderWidth:1,borderRadius:4,order:4});
+      ds.push({type:'bar',label:`${curYear-1}年 新患数`,yAxisID:'y',data:idx.map(i=>P(i)?P(i).np:null),backgroundColor:PY_BAR_FILL,borderColor:PY_BAR,borderWidth:1,borderRadius:4,order:4,datalabels:DL_NP_PREV});
       ds.push({type:'line',label:`${curYear-1}年 成約率`,yAxisID:'y1',data:idx.map(i=>P(i)?P(i).rate:null),borderColor:PY_LINE,backgroundColor:'transparent',borderWidth:2.5,borderDash:[7,4],pointRadius:4,pointBackgroundColor:PY_LINE_FILL,pointBorderColor:'#0D1117',pointBorderWidth:1,tension:.35,spanGaps:true,order:2});
     }
     charts['cHF']=new Chart(cf,{
@@ -1705,6 +1710,7 @@ function initHpbFunnelC(){
       options:{...CO,
         plugins:{...CO.plugins,tooltip:{...CO.plugins.tooltip,callbacks:{afterBody:(it)=>{const i=idx[it[0].dataIndex];const f=fn[i],p=P(i);
           return `入会 ${f.join} / 新患 ${f.np}名${cmp?dl(f.np,p?p.np:null,'名'):''}\n成約率 ${f.rate!=null?f.rate.toFixed(1)+'%':'—'}${cmp&&p&&p.rate!=null?dl(f.rate,p.rate,'%'):''}\n新規売上 ${yen(f.sales)}${cmp&&p?` （前年 ${yen(p.sales)}）`:''}`;}}}},
+        layout:{padding:{top:26}},
         scales:{
           x:CO.scales.x,
           y:{...CO.scales.y,position:'left',title:{display:true,text:'新患数（人）',color:'#FF6B4A',font:{size:10}}},
