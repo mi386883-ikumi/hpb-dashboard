@@ -693,6 +693,12 @@ function destroyCharts(){Object.values(charts).forEach(c=>{try{c.destroy();}catc
 Chart.register(ChartDataLabels);
 const CO={responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#7D8CA1',font:{family:'Noto Sans JP',size:10},boxWidth:10,padding:12}},tooltip:{backgroundColor:'#1C2333',titleColor:'#E6EDF3',bodyColor:'#E6EDF3',borderColor:'rgba(255,255,255,.08)',borderWidth:1},datalabels:{display:false}},scales:{x:{grid:{color:'rgba(255,255,255,.03)'},ticks:{color:'#7D8CA1',font:{family:'Noto Sans JP',size:10}}},y:{grid:{color:'rgba(255,255,255,.03)'},ticks:{color:'#7D8CA1'},beginAtZero:true}}};
 const yen=v=>'¥'+Math.round(v||0).toLocaleString();
+// グラフの棒の上に直接出す金額。桁が多いと重なるので万円に丸める。
+const manYen=v=>v==null?'':v>=1000000?'¥'+Math.round(v/10000)+'万':v>=10000?'¥'+(v/10000).toFixed(1)+'万':'¥'+Math.round(v).toLocaleString();
+// 売上グラフのラベル設定。今年の棒は常時表示、前年と広告費は重なったら自動で隠す。
+const DL_CUR={display:true,anchor:'end',align:'end',offset:2,clamp:true,color:'#6EE7B7',font:{weight:'bold',size:11,family:'Outfit'},formatter:manYen};
+const DL_PREV={display:'auto',anchor:'end',align:'end',offset:2,clamp:true,color:'rgba(125,200,248,.9)',font:{size:10,family:'Outfit'},formatter:manYen};
+const DL_AD={display:'auto',anchor:'center',align:'bottom',offset:6,clamp:true,color:'#FBBF24',font:{size:10,family:'Outfit'},textShadowColor:'rgba(0,0,0,.85)',textShadowBlur:4,formatter:manYen};
 // #RRGGBB → rgba(...) 。経路ごとにテーマ色から塗りを作るのに使う。
 const hexA=(hex,a)=>{const n=parseInt(hex.slice(1),16);return `rgba(${(n>>16)&255},${(n>>8)&255},${n&255},${a})`;};
 function mkBar(id,labels,ds){const c=document.getElementById(id);if(!c)return;charts[id]=new Chart(c,{type:'bar',data:{labels,datasets:ds},options:CO});}
@@ -879,7 +885,7 @@ function adCostDatasets(store,chKey,idx,cmp){
   const cur=adCostMonths(store,curYear,chKey);
   if(cur)out.push({type:'line',label:`${curYear}年 広告費`,data:idx.map(i=>cur[i+1]!=null?cur[i+1]:null),
     borderColor:'#FBBF24',backgroundColor:'transparent',borderWidth:2.5,pointRadius:4,
-    pointBackgroundColor:'#FBBF24',pointBorderColor:'#0D1117',pointBorderWidth:2,tension:.35,spanGaps:false,order:0});
+    pointBackgroundColor:'#FBBF24',pointBorderColor:'#0D1117',pointBorderWidth:2,tension:.35,spanGaps:false,order:0,datalabels:cmp?{display:false}:DL_AD});
   if(cmp){
     const pr=adCostMonths(store,curYear-1,chKey);
     if(pr)out.push({type:'line',label:`${curYear-1}年 広告費`,data:idx.map(i=>pr[i+1]!=null?pr[i+1]:null),
@@ -1516,8 +1522,8 @@ function initChannelC(v){
     const cs=document.getElementById('cCHS');
     if(cs){
       // HPBページの「新規売上 推移」と同じ形：初診売上だけの棒グラフ（積み上げ・合計表示はしない）
-      const ds=[{type:'bar',label:`${curYear}年 初診売上`,data:idx.map(i=>fn[i].sales),backgroundColor:'rgba(52,211,153,.55)',borderColor:'#34D399',borderWidth:1,borderRadius:4,order:3}];
-      if(cmp)ds.push({type:'bar',label:`${curYear-1}年 初診売上`,data:idx.map(i=>P(i)?P(i).sales:null),backgroundColor:PY_BAR_FILL,borderColor:PY_BAR,borderWidth:1,borderRadius:4,order:4});
+      const ds=[{type:'bar',label:`${curYear}年 初診売上`,data:idx.map(i=>fn[i].sales),backgroundColor:'rgba(52,211,153,.55)',borderColor:'#34D399',borderWidth:1,borderRadius:4,order:3,datalabels:DL_CUR}];
+      if(cmp)ds.push({type:'bar',label:`${curYear-1}年 初診売上`,data:idx.map(i=>P(i)?P(i).sales:null),backgroundColor:PY_BAR_FILL,borderColor:PY_BAR,borderWidth:1,borderRadius:4,order:4,datalabels:DL_PREV});
       ds.push(...adCostDatasets(store,v,idx,cmp));
       charts['cCHS']=new Chart(cs,{type:'bar',data:{labels,datasets:ds},
         options:{...CO,
@@ -1525,7 +1531,7 @@ function initChannelC(v){
             label:c=>c.dataset.label+' '+yen(c.parsed.y),
             afterBody:(it)=>{const i=idx[it[0].dataIndex];const f=fn[i],p=P(i);
               return `新患 ${f.np}名｜1人あたり ${f.np>0?yen(Math.round(f.sales/f.np)):'—'}`+(cmp&&p&&p.sales>0?`\n前年比 ${f.sales>=p.sales?'+':''}${((f.sales/p.sales-1)*100).toFixed(0)}%`:'')+adCostNote(store,v,i,f.sales,f.np);}}}},
-          scales:{x:CO.scales.x,y:{...CO.scales.y,ticks:{color:'#7D8CA1',callback:v2=>'¥'+(v2/10000)+'万'}}}}});
+          layout:{padding:{top:24}},scales:{x:CO.scales.x,y:{...CO.scales.y,ticks:{color:'#7D8CA1',callback:v2=>'¥'+(v2/10000)+'万'}}}}});
     }
   }
   // 来店数の月別推移（店舗の集客集計ベース）
@@ -1708,8 +1714,8 @@ function initHpbFunnelC(){
   }
   const cs=document.getElementById('cHS');
   if(cs){
-    const ds=[{type:'bar',label:`${curYear}年 初診売上`,data:idx.map(i=>fn[i].sales),backgroundColor:'rgba(52,211,153,.55)',borderColor:'#34D399',borderWidth:1,borderRadius:4,order:3}];
-    if(cmp)ds.push({type:'bar',label:`${curYear-1}年 初診売上`,data:idx.map(i=>P(i)?P(i).sales:null),backgroundColor:PY_BAR_FILL,borderColor:PY_BAR,borderWidth:1,borderRadius:4,order:4});
+    const ds=[{type:'bar',label:`${curYear}年 初診売上`,data:idx.map(i=>fn[i].sales),backgroundColor:'rgba(52,211,153,.55)',borderColor:'#34D399',borderWidth:1,borderRadius:4,order:3,datalabels:DL_CUR}];
+    if(cmp)ds.push({type:'bar',label:`${curYear-1}年 初診売上`,data:idx.map(i=>P(i)?P(i).sales:null),backgroundColor:PY_BAR_FILL,borderColor:PY_BAR,borderWidth:1,borderRadius:4,order:4,datalabels:DL_PREV});
     ds.push(...adCostDatasets(curHpbStore,'hpb',idx,cmp));
     charts['cHS']=new Chart(cs,{
       type:'bar',
@@ -1717,7 +1723,7 @@ function initHpbFunnelC(){
       options:{...CO,
         plugins:{...CO.plugins,legend:{display:true},tooltip:{...CO.plugins.tooltip,callbacks:{label:c=>c.dataset.label+' '+yen(c.parsed.y),afterBody:(it)=>{const i=idx[it[0].dataIndex];const f=fn[i],p=P(i);
           return `新患 ${f.np}名｜1人あたり ${f.np>0?yen(Math.round(f.sales/f.np)):'—'}`+(cmp&&p&&p.sales>0?`\n前年比 ${f.sales>=p.sales?'+':''}${((f.sales/p.sales-1)*100).toFixed(0)}%`:'')+adCostNote(curHpbStore,'hpb',i,f.sales,f.np);}}}},
-        scales:{x:CO.scales.x,y:{...CO.scales.y,ticks:{color:'#7D8CA1',callback:v=>'¥'+(v/10000)+'万'}}}}
+        layout:{padding:{top:24}},scales:{x:CO.scales.x,y:{...CO.scales.y,ticks:{color:'#7D8CA1',callback:v=>'¥'+(v/10000)+'万'}}}}
     });
   }
 }
