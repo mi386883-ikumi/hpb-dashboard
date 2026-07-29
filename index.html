@@ -711,18 +711,24 @@ let adDataLoading=false;
 const AD_NAME_MAP={'大森':'大森','新馬場':'新馬場','日暮里':'日暮里','住吉':'住吉','京都花園':'京都花園','人形町':'人形町','札幌':'札幌円山','浦添':'浦添','沖縄浦添':'浦添','沖縄市コザ':'沖縄コザ','コザ':'沖縄コザ','大里':'大里','中野':'中野院','中野院':'中野院'};
 const AD_STORES=['大森','新馬場','日暮里','住吉','京都花園','人形町','札幌円山','浦添','沖縄コザ','大里','中野院'];
 const AD_COLORS=['#FF6B4A','#F0C846','#3ECFB4','#8B7CF6','#F472B6','#38BDF8','#A3E635','#FB7185','#FBBF24','#34D399','#60A5FA'];
-const AD_CACHE_KEY='ad_data_cache_v3';
+// 経路別の広告費（費用対効果シートの「費用」行）。{シート上の院名:{年:{経路:{月:円}}}}
+// 経路キーは CH_PAGES と同じ hpb/hp/meta/flyer。シート側の内訳名は店舗ごとに揺れる
+//（メタ広告＝「その他SNS」「メタ広告」「meta広告」）ので取り込み時に寄せている。
+// その月に1つでも数字が入っていれば空欄は¥0。全経路が空欄の月＝未入力なのでキー自体を持たない。
+let AD_COST_CH={"大森":{"2025":{"hpb":{"1":66000,"2":66000,"3":66000,"4":66000,"5":66000,"6":66000,"7":66000,"8":66000,"9":66000,"10":66000,"11":66000,"12":66000},"hp":{"1":0,"2":49007,"3":48499,"4":29746,"5":35540,"6":47654,"7":24021,"8":31584,"9":30278,"10":30565,"11":30392,"12":30000},"meta":{"1":0,"2":0,"3":0,"4":0,"5":20000,"6":0,"7":34814,"8":29135,"9":0,"10":33127,"11":0,"12":0},"flyer":{"1":16390,"2":0,"3":0,"4":0,"5":61128,"6":59631,"7":55108,"8":42185,"9":35933,"10":35933,"11":21490,"12":28506}},"2026":{"hpb":{"1":55000,"2":55000,"3":55000,"4":55000,"5":55000,"6":55000},"hp":{"1":34741,"2":38056,"3":29168,"4":0,"5":0,"6":0},"meta":{"1":0,"2":29832,"3":68055,"4":72947,"5":70748,"6":95711},"flyer":{"1":34728,"2":22884,"3":28426,"4":38107,"5":41000,"6":0}}},"新馬場":{"2025":{"hpb":{"1":55000,"2":55000,"3":55000,"4":55000,"5":55000,"6":55000,"7":55000,"8":55000,"9":55000,"10":55000,"11":55000,"12":55000},"hp":{"1":0,"2":0,"3":0,"4":0,"5":0,"6":0,"7":0,"8":0,"9":0,"10":0,"11":0,"12":0},"meta":{"1":0,"2":0,"3":56257,"4":0,"5":0,"6":0,"7":60134,"8":48513,"9":49938,"10":0,"11":0,"12":49952},"flyer":{"1":26852,"2":0,"3":0,"4":0,"5":22429,"6":0,"7":0,"8":0,"9":0,"10":0,"11":0,"12":0}},"2026":{"hpb":{"1":55000,"2":55000,"3":55000,"4":55000,"5":55000,"6":55000},"hp":{"1":0,"2":0,"3":0,"4":0,"5":0,"6":0},"meta":{"1":0,"2":149207,"3":0,"4":19679,"5":0,"6":103358},"flyer":{"1":0,"2":33394,"3":0,"4":0,"5":0,"6":0}}},"浦添":{"2025":{"hpb":{"1":44000,"2":44000,"3":44000,"4":44000,"5":44000,"6":44000,"7":44000,"8":44000,"9":44000,"10":44000,"11":44000,"12":44000},"hp":{"1":0,"2":0,"3":0,"4":0,"5":0,"6":0,"7":0,"8":0,"9":0,"10":0,"11":0,"12":0},"meta":{"1":90320,"2":62498,"3":97200,"4":89569,"5":92952,"6":67608,"7":68343,"8":63672,"9":47263,"10":88592,"11":35015,"12":56008},"flyer":{"1":0,"2":0,"3":19879,"4":0,"5":0,"6":0,"7":0,"8":0,"9":0,"10":0,"11":0,"12":0}},"2026":{"hpb":{"1":44000,"2":44000,"3":44000,"4":44000,"5":44000,"6":44000},"hp":{"1":0,"2":0,"3":0,"4":0,"5":0,"6":0},"meta":{"1":47503,"2":48003,"3":0,"4":0,"5":41811,"6":51442},"flyer":{"1":0,"2":0,"3":0,"4":0,"5":0,"6":0}}},"日暮里":{"2025":{"hpb":{"1":44000,"2":44000,"3":44000,"4":44000,"5":44000,"6":44000,"7":44000,"8":44000,"9":44000,"10":44000,"11":44000,"12":44000},"hp":{"1":0,"2":0,"3":0,"4":0,"5":0,"6":0,"7":0,"8":0,"9":0,"10":0,"11":0,"12":0},"meta":{"1":0,"2":0,"3":40366,"4":0,"5":0,"6":0,"7":0,"8":10292,"9":0,"10":0,"11":58732,"12":18981},"flyer":{"1":59631,"2":47113,"3":9520,"4":48675,"5":40327,"6":41539,"7":44418,"8":13003,"9":13003,"10":0,"11":0,"12":0}},"2026":{"hpb":{"1":44000,"2":44000,"3":44000,"4":44000,"5":44000,"6":44000},"hp":{"1":0,"2":0,"3":0,"4":0,"5":0,"6":0},"meta":{"1":0,"2":0,"3":96913,"4":48353,"5":0,"6":53577},"flyer":{"1":18981,"2":28217,"3":12685,"4":57246,"5":54550,"6":57180}}},"住吉":{"2025":{"hpb":{"1":55000,"2":55000,"3":55000,"4":55000,"5":55000,"6":55000,"7":55000,"8":55000,"9":55000,"10":55000,"11":55000,"12":55000},"hp":{"1":0,"2":0,"3":0,"4":0,"5":0,"6":0,"7":0,"8":0,"9":0,"10":0,"11":0,"12":0},"meta":{"1":0,"2":0,"3":50000,"4":0,"5":60000,"6":0,"7":0,"8":0,"9":0,"10":0,"11":0,"12":0},"flyer":{"1":0,"2":0,"3":0,"4":0,"5":0,"6":0,"7":0,"8":0,"9":0,"10":0,"11":0,"12":0}},"2026":{"hpb":{"1":55000,"2":55000,"3":55000,"4":55000,"5":55000,"6":55000},"hp":{"1":0,"2":0,"3":0,"4":0,"5":0,"6":0},"meta":{"1":0,"2":49881,"3":49954,"4":0,"5":50524,"6":45837},"flyer":{"1":0,"2":0,"3":0,"4":0,"5":0,"6":0}}},"人形町":{"2025":{"hpb":{"1":44000,"2":44000,"3":44000,"4":44000,"5":44000,"6":44000,"7":44000,"8":44000,"9":44000,"10":44000,"11":44000,"12":44000},"hp":{"1":0,"2":0,"3":0,"4":0,"5":0,"6":0,"7":0,"8":0,"9":0,"10":0,"11":0,"12":0},"meta":{"1":74986,"2":0,"3":101068,"4":0,"5":0,"6":32181,"7":50056,"8":67230,"9":59729,"10":69773,"11":0,"12":15966},"flyer":{"1":0,"2":29250,"3":0,"4":37180,"5":0,"6":21788,"7":0,"8":0,"9":0,"10":0,"11":0,"12":0}},"2026":{"hpb":{"1":44000,"2":44000,"3":44000,"4":44000,"5":44000,"6":44000},"hp":{"1":0,"2":0,"3":0,"4":0,"5":0,"6":0},"meta":{"1":51698,"2":44319,"3":61839,"4":141100,"5":0,"6":66727},"flyer":{"1":0,"2":0,"3":0,"4":0,"5":0,"6":0}}},"京都花園":{"2025":{"hpb":{"1":40000,"2":40000,"3":40000,"4":40000,"5":40000,"6":40000,"7":40000,"8":40000,"9":40000,"10":40000,"11":40000,"12":40000},"hp":{"1":0,"2":0,"3":0,"4":0,"5":0,"6":0,"7":0,"8":0,"9":0,"10":0,"11":0,"12":0},"meta":{"1":62774,"2":29858,"3":38628,"4":49631,"5":51289,"6":48921,"7":48832,"8":49652,"9":59332,"10":49924,"11":0,"12":21993},"flyer":{"1":0,"2":22726,"3":14449,"4":0,"5":0,"6":0,"7":13810,"8":11721,"9":0,"10":0,"11":0,"12":0}},"2026":{"hpb":{"1":40000,"2":40000,"3":40000,"4":40000,"5":40000,"6":40000},"hp":{"1":0,"2":0,"3":0,"4":0,"5":0,"6":0},"meta":{"1":0,"2":25002,"3":59369,"4":98871,"5":98962,"6":100348},"flyer":{"1":0,"2":0,"3":13204,"4":35358,"5":0,"6":0}}},"札幌円山":{"2025":{"hpb":{"1":45000,"2":45000,"3":45000,"4":45000,"5":45000,"6":45000,"7":45000,"8":45000,"9":45000,"10":45000,"11":45000,"12":45000},"hp":{"1":0,"2":0,"3":0,"4":0,"5":0,"6":0,"7":0,"8":0,"9":0,"10":0,"11":0,"12":0},"meta":{"1":0,"2":39979,"3":37529,"4":44800,"5":49854,"6":0,"7":49981,"8":49078,"9":134873,"10":14905,"11":0,"12":79953},"flyer":{"1":0,"2":0,"3":0,"4":0,"5":0,"6":98162,"7":49234,"8":49234,"9":0,"10":0,"11":0,"12":0}},"2026":{"hpb":{"1":45000,"2":45000,"3":45000,"4":45000,"5":45000,"6":45000},"hp":{"1":0,"2":0,"3":0,"4":0,"5":0,"6":0},"meta":{"1":0,"2":49891,"3":79885,"4":139350,"5":198303,"6":155781},"flyer":{"1":0,"2":0,"3":0,"4":70613,"5":0,"6":0}}},"沖縄コザ":{"2025":{"hpb":{"1":44000,"2":44000,"3":44000,"4":44000,"5":44000,"6":44000,"7":44000,"8":44000,"9":44000,"10":0,"11":0,"12":0},"hp":{"1":0,"2":0,"3":0,"4":0,"5":0,"6":0,"7":0,"8":0,"9":0,"10":0,"11":0,"12":0},"meta":{"1":0,"2":0,"3":0,"4":0,"5":0,"6":0,"7":0,"8":0,"9":0,"10":0,"11":0,"12":0},"flyer":{"1":0,"2":0,"3":0,"4":0,"5":0,"6":0,"7":0,"8":0,"9":0,"10":0,"11":0,"12":0}},"2026":{"hpb":{"1":0,"2":0,"3":0,"5":0,"6":0},"hp":{"1":0,"2":0,"3":0,"5":0,"6":0},"meta":{"1":0,"2":0,"3":0,"5":98497,"6":93213},"flyer":{"1":0,"2":0,"3":0,"5":0,"6":0}}},"大里":{"2025":{"hpb":{"1":44000,"2":44000,"3":44000,"4":44000,"5":44000,"6":44000,"7":44000,"8":44000,"9":44000,"10":44000,"11":44000,"12":44000},"hp":{"1":0,"2":0,"3":0,"4":0,"5":0,"6":0,"7":0,"8":0,"9":0,"10":0,"11":0,"12":0},"meta":{"1":21541,"2":20119,"3":0,"4":0,"5":0,"6":15914,"7":126647,"8":0,"9":0,"10":24188,"11":27814,"12":0},"flyer":{"1":0,"2":0,"3":0,"4":0,"5":0,"6":0,"7":0,"8":0,"9":0,"10":0,"11":0,"12":0}},"2026":{"hpb":{"1":44000,"2":44000,"3":44000,"4":44000,"5":44000,"6":44000},"hp":{"1":0,"2":0,"3":0,"4":0,"5":0,"6":0},"meta":{"1":0,"2":0,"3":0,"4":31715,"5":98655,"6":99134},"flyer":{"1":0,"2":0,"3":0,"4":0,"5":0,"6":0}}},"中野院":{"2025":{"hpb":{"1":55000,"2":55000,"3":55000,"4":55000,"5":55000,"6":55000,"7":55000,"8":55000,"9":55000,"10":55000,"11":55000,"12":55000},"hp":{"1":0,"2":0,"3":0,"4":0,"5":0,"6":0,"7":0,"8":0,"9":0,"10":0,"11":0,"12":0},"meta":{"1":29830,"2":0,"3":20632,"4":58494,"5":64624,"6":0,"7":48145,"8":98020,"9":145847,"10":109847,"11":69832,"12":27879},"flyer":{"1":0,"2":0,"3":0,"4":0,"5":0,"6":0,"7":49234,"8":38748,"9":0,"10":0,"11":0,"12":0}},"2026":{"hpb":{"1":55000,"2":55000,"3":55000,"4":55000,"5":55000,"6":55000},"hp":{"1":0,"2":0,"3":0,"4":0,"5":0,"6":0},"meta":{"1":43062,"2":47403,"3":129928,"4":149014,"5":154842,"6":94705},"flyer":{"1":0,"2":0,"3":0,"4":0,"5":0,"6":0}}}};
+const AD_CH_ROW={hpb:['ホットペッパー'],hp:['HP'],flyer:['チラシ'],meta:['その他SNS','メタ広告','meta広告','Instagram']};
+const AD_CACHE_KEY='ad_data_cache_v4';
 const AD_CACHE_TTL=60*60*1000; // 1時間
 
 function loadAdCache(){
   try{
     const c=JSON.parse(localStorage.getItem(AD_CACHE_KEY)||'null');
-    if(c&&Date.now()-c.ts<AD_CACHE_TTL){AD_COST_DATA=c.cost;AD_CPA_DATA=c.cpa;return true;}
+    if(c&&Date.now()-c.ts<AD_CACHE_TTL){AD_COST_DATA=c.cost;AD_CPA_DATA=c.cpa;if(c.chCost)AD_COST_CH=c.chCost;return true;}
   }catch(e){}
   return false;
 }
 function saveAdCache(){
-  try{localStorage.setItem(AD_CACHE_KEY,JSON.stringify({ts:Date.now(),cost:AD_COST_DATA,cpa:AD_CPA_DATA}));}catch(e){}
+  try{localStorage.setItem(AD_CACHE_KEY,JSON.stringify({ts:Date.now(),cost:AD_COST_DATA,cpa:AD_CPA_DATA,chCost:AD_COST_CH}));}catch(e){}
 }
 
 function parseAdCSV(text){
@@ -767,6 +773,30 @@ async function fetchAdData(btn){
           if(c1==='費用対効果'){cpaRow=r;break;}
         }
       }
+      // 経路別の費用行も拾う（グラフに広告費を重ねるため）
+      const chRows={};
+      for(let j=i;j<i+45&&j<rows.length;j++){
+        const r=rows[j];
+        if((r[1]||'').trim()==='費用対効果')break;
+        if((r[1]||'').trim()!=='費用')continue;
+        const lb=(r[2]||'').trim().replace(/　/g,'');
+        for(const k in AD_CH_ROW){
+          if(AD_CH_ROW[k].some(p=>lb.startsWith(p))&&!chRows[k])chRows[k]=r;
+        }
+      }
+      if(Object.keys(chRows).length){
+        const ent={'2025':{},'2026':{}};
+        [['2025',50],['2026',63]].forEach(([yr,base])=>{
+          ['hpb','hp','meta','flyer'].forEach(k=>ent[yr][k]={});
+          for(let m=0;m<12;m++){
+            // その月にひとつでも数字があれば入力済みの月。空欄は¥0扱い。全部空欄の月は持たせない。
+            const cells={};['hpb','hp','meta','flyer'].forEach(k=>cells[k]=chRows[k]?(chRows[k][base+m]||''):'');
+            if(!Object.values(cells).some(c=>String(c).trim()))continue;
+            ['hpb','hp','meta','flyer'].forEach(k=>ent[yr][k][m+1]=pn(cells[k]));
+          }
+        });
+        AD_COST_CH[displayName]=ent;
+      }
       if(feeRow){
         AD_COST_DATA[displayName]={'2025':{},'2026':{}};
         for(let j=0;j<12;j++){AD_COST_DATA[displayName]['2025'][j+1]=pn(feeRow[50+j]);AD_COST_DATA[displayName]['2026'][j+1]=pn(feeRow[63+j]);}
@@ -787,6 +817,37 @@ async function fetchAdData(btn){
 const AD_TO_STORE={'大森':'大森院','新馬場':'新馬場院','日暮里':'日暮里院','住吉':'神戸住吉院',
   '京都花園':'京都花園院','人形町':'人形町院','札幌円山':'札幌丸山院','浦添':'浦添院',
   '沖縄コザ':'コザ院','大里':'大里院','中野院':'中野院'};
+// 店舗名 → 費用対効果シート上の院名（AD_TO_STOREの逆引き）
+const STORE_TO_AD={};Object.entries(AD_TO_STORE).forEach(([a,st])=>{STORE_TO_AD[st]=a;});
+// その店・その年・その経路の月別広告費 {月:円}。未入力の月はキーが無い＝グラフに点を打たない。
+function adCostMonths(store,yr,chKey){
+  const k=STORE_TO_AD[store];if(!k)return null;
+  const m=AD_COST_CH[k]&&AD_COST_CH[k][yr]&&AD_COST_CH[k][yr][chKey];
+  return m&&Object.keys(m).length?m:null;
+}
+// 売上グラフに重ねる「広告費」の線。売上と同じ¥軸に乗せて、棒より線が上＝赤字と読めるようにする。
+function adCostDatasets(store,chKey,idx,cmp){
+  const out=[];
+  const cur=adCostMonths(store,curYear,chKey);
+  if(cur)out.push({type:'line',label:`${curYear}年 広告費`,data:idx.map(i=>cur[i+1]!=null?cur[i+1]:null),
+    borderColor:'#FBBF24',backgroundColor:'transparent',borderWidth:2.5,pointRadius:4,
+    pointBackgroundColor:'#FBBF24',pointBorderColor:'#0D1117',pointBorderWidth:2,tension:.35,spanGaps:false,order:0});
+  if(cmp){
+    const pr=adCostMonths(store,curYear-1,chKey);
+    if(pr)out.push({type:'line',label:`${curYear-1}年 広告費`,data:idx.map(i=>pr[i+1]!=null?pr[i+1]:null),
+      borderColor:'rgba(251,191,36,.6)',backgroundColor:'transparent',borderWidth:2,borderDash:[6,4],pointRadius:3,
+      pointBackgroundColor:'rgba(251,191,36,.6)',pointBorderColor:'#0D1117',pointBorderWidth:1,tension:.35,spanGaps:false,order:0});
+  }
+  return out;
+}
+// ツールチップ用：広告費・獲得単価・初診売上での回収率
+function adCostNote(store,chKey,monthIdx,sales,np){
+  const cur=adCostMonths(store,curYear,chKey);
+  const c=cur?cur[monthIdx+1]:null;
+  if(c==null)return '\n広告費 —（費用対効果シートに未入力）';
+  if(c===0)return '\n広告費 ¥0';
+  return `\n広告費 ${yen(c)}｜獲得単価 ${np>0?yen(Math.round(c/np)):'—'}｜初診売上で ${Math.round(sales/c*100)}% 回収`;
+}
 let curAdMonth=null; // null=全月合計
 
 function renderAdCost(el){
@@ -1316,7 +1377,7 @@ function renderChannelPage(el,v){
   </div></div>
   <div class="gf"><div class="cd">
     <div class="ct"><span class="cdot" style="background:#34D399"></span>💰 ${L} 初診売上 推移</div>
-    <div class="csu">${curYear}年${cmp&&hasPrev?`（<span style="color:#38BDF8">青い棒</span>＝${curYear-1}年）`:''} — ${store}｜${L}経由で来院した新患が初回に計上した売上</div>
+    <div class="csu">${curYear}年${cmp&&hasPrev?`（<span style="color:#38BDF8">青い棒</span>＝${curYear-1}年）`:''} — ${store}｜${L}経由で来院した新患が初回に計上した売上／<span style="color:#FBBF24">黄色い線＝その月の${L}広告費</span>（費用対効果シート）。<b style="color:var(--tx)">棒が線より高い月は初診だけで広告費を回収</b></div>
     ${hasFn?'<div class="cb" style="height:260px"><canvas id="cCHS"></canvas></div>':'<div style="padding:26px 0;text-align:center;color:var(--txd);font-size:12px">受付履歴データがまだ読み込まれていません</div>'}
   </div></div>
   <div class="g2">
@@ -1407,14 +1468,15 @@ function initChannelC(v){
     const cs=document.getElementById('cCHS');
     if(cs){
       // HPBページの「新規売上 推移」と同じ形：初診売上だけの棒グラフ（積み上げ・合計表示はしない）
-      const ds=[{label:`${curYear}年`,data:idx.map(i=>fn[i].sales),backgroundColor:'rgba(52,211,153,.55)',borderColor:'#34D399',borderWidth:1,borderRadius:4}];
-      if(cmp)ds.push({label:`${curYear-1}年`,data:idx.map(i=>P(i)?P(i).sales:null),backgroundColor:PY_BAR_FILL,borderColor:PY_BAR,borderWidth:1,borderRadius:4});
+      const ds=[{type:'bar',label:`${curYear}年 初診売上`,data:idx.map(i=>fn[i].sales),backgroundColor:'rgba(52,211,153,.55)',borderColor:'#34D399',borderWidth:1,borderRadius:4,order:3}];
+      if(cmp)ds.push({type:'bar',label:`${curYear-1}年 初診売上`,data:idx.map(i=>P(i)?P(i).sales:null),backgroundColor:PY_BAR_FILL,borderColor:PY_BAR,borderWidth:1,borderRadius:4,order:4});
+      ds.push(...adCostDatasets(store,v,idx,cmp));
       charts['cCHS']=new Chart(cs,{type:'bar',data:{labels,datasets:ds},
         options:{...CO,
-          plugins:{...CO.plugins,legend:{display:cmp},tooltip:{...CO.plugins.tooltip,callbacks:{
+          plugins:{...CO.plugins,legend:{display:true},tooltip:{...CO.plugins.tooltip,callbacks:{
             label:c=>c.dataset.label+' '+yen(c.parsed.y),
             afterBody:(it)=>{const i=idx[it[0].dataIndex];const f=fn[i],p=P(i);
-              return `新患 ${f.np}名｜1人あたり ${f.np>0?yen(Math.round(f.sales/f.np)):'—'}`+(cmp&&p&&p.sales>0?`\n前年比 ${f.sales>=p.sales?'+':''}${((f.sales/p.sales-1)*100).toFixed(0)}%`:'');}}}},
+              return `新患 ${f.np}名｜1人あたり ${f.np>0?yen(Math.round(f.sales/f.np)):'—'}`+(cmp&&p&&p.sales>0?`\n前年比 ${f.sales>=p.sales?'+':''}${((f.sales/p.sales-1)*100).toFixed(0)}%`:'')+adCostNote(store,v,i,f.sales,f.np);}}}},
           scales:{x:CO.scales.x,y:{...CO.scales.y,ticks:{color:'#7D8CA1',callback:v2=>'¥'+(v2/10000)+'万'}}}}});
     }
   }
@@ -1501,7 +1563,7 @@ function renderHPB(el){
   </div></div>
   <div class="gf"><div class="cd">
     <div class="ct"><span class="cdot" style="background:#34D399"></span>💰 HPB 新規売上 推移</div>
-    <div class="csu">${curYear}年${cmp&&hasPrev?`（<span style="color:#38BDF8">青い棒</span>＝${curYear-1}年）`:''} — ${curHpbStore}｜HPB経由で来院した新患が初回に計上した売上</div>
+    <div class="csu">${curYear}年${cmp&&hasPrev?`（<span style="color:#38BDF8">青い棒</span>＝${curYear-1}年）`:''} — ${curHpbStore}｜HPB経由で来院した新患が初回に計上した売上／<span style="color:#FBBF24">黄色い線＝その月のHPB月額費用</span>（費用対効果シート）。<b style="color:var(--tx)">棒が線より高い月は初診だけで広告費を回収</b></div>
     ${hasFn?'<div class="cb" style="height:260px"><canvas id="cHS"></canvas></div>':'<div style="padding:26px 0;text-align:center;color:var(--txd);font-size:12px">受付履歴データがまだ読み込まれていません</div>'}
   </div></div>
   <div class="gf"><div class="cd">
@@ -1598,14 +1660,15 @@ function initHpbFunnelC(){
   }
   const cs=document.getElementById('cHS');
   if(cs){
-    const ds=[{label:`${curYear}年`,data:idx.map(i=>fn[i].sales),backgroundColor:'rgba(52,211,153,.55)',borderColor:'#34D399',borderWidth:1,borderRadius:4}];
-    if(cmp)ds.push({label:`${curYear-1}年`,data:idx.map(i=>P(i)?P(i).sales:null),backgroundColor:PY_BAR_FILL,borderColor:PY_BAR,borderWidth:1,borderRadius:4});
+    const ds=[{type:'bar',label:`${curYear}年 初診売上`,data:idx.map(i=>fn[i].sales),backgroundColor:'rgba(52,211,153,.55)',borderColor:'#34D399',borderWidth:1,borderRadius:4,order:3}];
+    if(cmp)ds.push({type:'bar',label:`${curYear-1}年 初診売上`,data:idx.map(i=>P(i)?P(i).sales:null),backgroundColor:PY_BAR_FILL,borderColor:PY_BAR,borderWidth:1,borderRadius:4,order:4});
+    ds.push(...adCostDatasets(curHpbStore,'hpb',idx,cmp));
     charts['cHS']=new Chart(cs,{
       type:'bar',
       data:{labels,datasets:ds},
       options:{...CO,
-        plugins:{...CO.plugins,legend:{display:cmp},tooltip:{...CO.plugins.tooltip,callbacks:{label:c=>c.dataset.label+' '+yen(c.parsed.y),afterBody:(it)=>{const i=idx[it[0].dataIndex];const f=fn[i],p=P(i);
-          return `新患 ${f.np}名｜1人あたり ${f.np>0?yen(Math.round(f.sales/f.np)):'—'}`+(cmp&&p&&p.sales>0?`\n前年比 ${f.sales>=p.sales?'+':''}${((f.sales/p.sales-1)*100).toFixed(0)}%`:'');}}}},
+        plugins:{...CO.plugins,legend:{display:true},tooltip:{...CO.plugins.tooltip,callbacks:{label:c=>c.dataset.label+' '+yen(c.parsed.y),afterBody:(it)=>{const i=idx[it[0].dataIndex];const f=fn[i],p=P(i);
+          return `新患 ${f.np}名｜1人あたり ${f.np>0?yen(Math.round(f.sales/f.np)):'—'}`+(cmp&&p&&p.sales>0?`\n前年比 ${f.sales>=p.sales?'+':''}${((f.sales/p.sales-1)*100).toFixed(0)}%`:'')+adCostNote(curHpbStore,'hpb',i,f.sales,f.np);}}}},
         scales:{x:CO.scales.x,y:{...CO.scales.y,ticks:{color:'#7D8CA1',callback:v=>'¥'+(v/10000)+'万'}}}}
     });
   }
