@@ -1,0 +1,882 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>二人体制の損益シミュレーター</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Noto+Sans+JP:wght@400;500;700&family=Outfit:wght@500;600;700&display=swap">
+
+<style>
+/* ── tokens ───────────────────────────────────────────── */
+:root{
+  color-scheme:light;
+  --bg:#EEF1F5; --surface:#FFFFFF; --surface2:#F6F8FB; --inset:#EBEFF5;
+  --line:#DFE5EE; --line2:#C3CDDB;
+  --ink:#10151E; --ink2:#4C596B; --ink3:#8493A6;
+  --accent:#D9481F; --accent-soft:rgba(217,72,31,.10);
+  --cost:#4A73B8; --cost-soft:rgba(74,115,184,.14);
+  --good:#12876A; --good-soft:rgba(18,135,106,.14);
+  --bad:#C22F49; --bad-soft:rgba(194,47,73,.14);
+  --neutral-bar:#5C6B7F;
+  --shadow:0 1px 2px rgba(16,21,30,.05), 0 8px 24px -16px rgba(16,21,30,.28);
+  --r:10px;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme:dark;
+    --bg:#0A0E14; --surface:#121821; --surface2:#161E29; --inset:#0E141C;
+    --line:rgba(255,255,255,.08); --line2:rgba(255,255,255,.17);
+    --ink:#E7EDF4; --ink2:#9AA8BA; --ink3:#66768A;
+    --accent:#FF7A57; --accent-soft:rgba(255,122,87,.14);
+    --cost:#6E93D6; --cost-soft:rgba(110,147,214,.18);
+    --good:#35C79A; --good-soft:rgba(53,199,154,.16);
+    --bad:#FB7185; --bad-soft:rgba(251,113,133,.16);
+    --neutral-bar:#7C8DA3;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 12px 28px -18px rgba(0,0,0,.9);
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --bg:#0A0E14; --surface:#121821; --surface2:#161E29; --inset:#0E141C;
+  --line:rgba(255,255,255,.08); --line2:rgba(255,255,255,.17);
+  --ink:#E7EDF4; --ink2:#9AA8BA; --ink3:#66768A;
+  --accent:#FF7A57; --accent-soft:rgba(255,122,87,.14);
+  --cost:#6E93D6; --cost-soft:rgba(110,147,214,.18);
+  --good:#35C79A; --good-soft:rgba(53,199,154,.16);
+  --bad:#FB7185; --bad-soft:rgba(251,113,133,.16);
+  --neutral-bar:#7C8DA3;
+  --shadow:0 1px 2px rgba(0,0,0,.4), 0 12px 28px -18px rgba(0,0,0,.9);
+}
+
+*{box-sizing:border-box}
+body{
+  margin:0; background:var(--bg); color:var(--ink);
+  font-family:"Noto Sans JP","Outfit",system-ui,sans-serif;
+  font-size:15px; line-height:1.7; -webkit-font-smoothing:antialiased;
+}
+.num{font-family:"IBM Plex Mono","Outfit",ui-monospace,monospace; font-variant-numeric:tabular-nums; letter-spacing:-.01em}
+
+.page{max-width:1220px; margin:0 auto; padding:36px 20px 72px}
+
+/* ── masthead ─────────────────────────────────────────── */
+.masthead{display:flex; flex-direction:column; gap:8px; padding-bottom:22px; border-bottom:1px solid var(--line2)}
+.eyebrow{
+  margin:0; font-family:"Outfit","Noto Sans JP",sans-serif; font-weight:600;
+  font-size:11px; letter-spacing:.18em; text-transform:uppercase; color:var(--accent);
+}
+.masthead h1{
+  margin:0; font-family:"Outfit","Noto Sans JP",sans-serif; font-weight:700;
+  font-size:clamp(26px,4.2vw,38px); line-height:1.2; letter-spacing:-.01em; text-wrap:balance;
+}
+.lede{margin:0; max-width:62ch; color:var(--ink2); font-size:14px}
+.lede strong{white-space:nowrap; color:var(--ink); font-weight:700}
+
+/* ── layout ───────────────────────────────────────────── */
+.layout{display:grid; grid-template-columns:minmax(0,340px) minmax(0,1fr); gap:26px; margin-top:26px; align-items:start}
+@media (max-width:940px){ .layout{grid-template-columns:1fr} }
+
+.rail{position:sticky; top:20px; display:flex; flex-direction:column; gap:14px}
+@media (max-width:940px){ .rail{position:static} }
+.results{display:flex; flex-direction:column; gap:18px; min-width:0}
+
+.card{background:var(--surface); border:1px solid var(--line); border-radius:var(--r); box-shadow:var(--shadow)}
+.card-hd{display:flex; align-items:baseline; justify-content:space-between; gap:10px; padding:14px 16px 0}
+.card-hd h2{
+  margin:0; font-family:"Outfit","Noto Sans JP",sans-serif; font-weight:600;
+  font-size:12px; letter-spacing:.13em; text-transform:uppercase; color:var(--ink3);
+}
+.card-hd .hint{font-size:11.5px; color:var(--ink3)}
+.card-bd{padding:14px 16px 16px}
+
+/* ── fields ───────────────────────────────────────────── */
+.field{display:flex; flex-direction:column; gap:5px; padding:9px 0; border-top:1px dashed var(--line)}
+.field:first-child{border-top:0; padding-top:2px}
+.field-top{display:flex; align-items:center; justify-content:space-between; gap:10px}
+.field label{font-size:13px; color:var(--ink2); font-weight:500; line-height:1.5}
+.field .unit{white-space:nowrap}
+.field .unit{font-size:11px; color:var(--ink3); margin-left:4px; font-weight:400}
+.field input[type="number"]{
+  width:118px; padding:5px 8px; text-align:right; font-size:14px;
+  font-family:"IBM Plex Mono",ui-monospace,monospace; font-variant-numeric:tabular-nums;
+  color:var(--ink); background:var(--inset); border:1px solid var(--line); border-radius:6px;
+}
+.field input[type="number"]:focus-visible,
+.seg button:focus-visible, .btn:focus-visible, input[type="range"]:focus-visible{
+  outline:2px solid var(--accent); outline-offset:2px;
+}
+input[type="range"]{width:100%; accent-color:var(--accent); height:18px; margin:0; cursor:pointer}
+
+.sum{
+  display:flex; align-items:baseline; justify-content:space-between;
+  margin-top:10px; padding:9px 11px; background:var(--inset); border-radius:7px;
+}
+.sum span{font-size:12px; color:var(--ink2)}
+.sum strong{font-size:17px; font-weight:600}
+
+.seg{display:flex; gap:0; border:1px solid var(--line2); border-radius:7px; overflow:hidden}
+.seg button{
+  flex:1; padding:8px 6px; font:inherit; font-size:11.5px; line-height:1.45; cursor:pointer;
+  background:var(--surface2); color:var(--ink2); border:0; border-left:1px solid var(--line);
+}
+.seg button:first-child{border-left:0}
+.seg button[aria-pressed="true"]{background:var(--accent); color:#fff; font-weight:700}
+
+.btn{
+  padding:7px 12px; font:inherit; font-size:12px; cursor:pointer; color:var(--ink2);
+  background:var(--surface2); border:1px solid var(--line2); border-radius:6px;
+}
+.btn:hover{color:var(--ink); border-color:var(--ink3)}
+.btn-accent{background:var(--accent-soft); color:var(--accent); border-color:var(--accent); font-weight:600}
+
+/* ── tier table ───────────────────────────────────────── */
+.tiers{width:100%; border-collapse:collapse; font-size:12.5px}
+.tiers th{
+  text-align:right; padding:0 6px 6px; font-weight:600; font-size:10.5px;
+  letter-spacing:.08em; color:var(--ink3); border-bottom:1px solid var(--line);
+}
+.tiers th:first-child{text-align:left}
+.tiers td{padding:3px 6px; border-bottom:1px solid var(--line)}
+.tiers input{
+  width:100%; padding:4px 6px; text-align:right; font-size:12.5px;
+  font-family:"IBM Plex Mono",ui-monospace,monospace; font-variant-numeric:tabular-nums;
+  color:var(--ink); background:transparent; border:1px solid transparent; border-radius:5px;
+}
+.tiers input:hover{border-color:var(--line2)}
+.tiers input:focus{background:var(--inset); border-color:var(--accent); outline:none}
+.tiers tr.warn td{background:var(--bad-soft)}
+.tiers tr.active td{background:var(--accent-soft)}
+.tiers .mark{display:inline-block; width:14px; font-size:11px; color:var(--bad)}
+
+.note{
+  margin:11px 0 0; padding:10px 12px; border-radius:7px; font-size:12px; line-height:1.65;
+  background:var(--bad-soft); color:var(--ink2); border:1px solid transparent;
+}
+.note b{color:var(--ink)}
+.note .btn{margin-top:7px}
+
+/* ── KPI ──────────────────────────────────────────────── */
+.kpis{display:grid; grid-template-columns:1.35fr 1fr 1fr; gap:14px}
+@media (max-width:720px){ .kpis{grid-template-columns:1fr 1fr} .kpis .kpi:first-child{grid-column:1/-1} }
+.kpi{background:var(--surface); border:1px solid var(--line); border-radius:var(--r); padding:15px 16px 16px; box-shadow:var(--shadow); min-width:0}
+.kpi .k-label{display:flex; align-items:center; gap:7px; font-size:11px; letter-spacing:.1em; text-transform:uppercase; color:var(--ink3); font-family:"Outfit","Noto Sans JP",sans-serif; font-weight:600}
+.kpi .k-val{margin-top:6px; font-size:clamp(20px,2.5vw,26px); font-weight:600; line-height:1.15; white-space:nowrap}
+.kpi.hero .k-val{font-size:clamp(26px,3.8vw,36px)}
+.kpi .k-sub{margin-top:3px; font-size:12px; color:var(--ink3)}
+.kpi.hero .k-val.pos{color:var(--good)}
+.kpi.hero .k-val.neg{color:var(--bad)}
+.chip{
+  display:inline-flex; align-items:center; gap:4px; padding:2px 8px; border-radius:999px;
+  font-size:10.5px; font-weight:700; letter-spacing:.06em; line-height:1.7; text-transform:none;
+}
+.chip.pos{background:var(--good-soft); color:var(--good)}
+.chip.neg{background:var(--bad-soft); color:var(--bad)}
+.chip.tag{background:var(--inset); color:var(--ink3); font-weight:500}
+.chip.guar{background:var(--accent-soft); color:var(--accent)}
+
+/* ── waterfall ledger ─────────────────────────────────── */
+.wf{display:flex; flex-direction:column}
+.wf-row{
+  display:grid; grid-template-columns:104px minmax(0,1fr) 108px 54px;
+  align-items:center; gap:10px; padding:7px 0; border-bottom:1px solid var(--line);
+}
+.wf-row:last-child{border-bottom:0}
+.wf-row.total{border-top:1.5px solid var(--line2); border-bottom:0; margin-top:5px; padding-top:11px}
+.wf-row .w-label{font-size:12.5px; color:var(--ink2)}
+.wf-row.total .w-label, .wf-row.gross .w-label{font-weight:700; color:var(--ink)}
+.track{position:relative; height:20px; background:var(--surface2); border-radius:4px; overflow:hidden}
+.bar{position:absolute; top:3px; height:14px; border-radius:3px}
+.bar.gross{background:var(--neutral-bar)}
+.bar.cost{background:var(--cost)}
+.bar.pos{background:var(--good)}
+.bar.neg{background:var(--bad)}
+.zeroline{position:absolute; top:0; bottom:0; width:1px; background:var(--line2)}
+.w-amt{text-align:right; font-size:13.5px; font-weight:500; white-space:nowrap}
+.wf-row.total .w-amt{font-size:16px; font-weight:600}
+.wf-row.total.pos .w-amt{color:var(--good)}
+.wf-row.total.neg .w-amt{color:var(--bad)}
+.w-pct{text-align:right; font-size:11.5px; color:var(--ink3)}
+@media (max-width:620px){
+  .wf-row{grid-template-columns:88px minmax(0,1fr) 92px; }
+  .w-pct{display:none}
+}
+
+/* ── staff ────────────────────────────────────────────── */
+.staff{display:grid; grid-template-columns:1fr 1fr; gap:12px}
+@media (max-width:560px){ .staff{grid-template-columns:1fr} }
+.staff-card{background:var(--surface2); border:1px solid var(--line); border-radius:8px; padding:12px 13px}
+.staff-card h3{margin:0 0 8px; font-size:12px; font-weight:700; color:var(--ink2); display:flex; align-items:center; justify-content:space-between; gap:8px}
+.kv{display:flex; align-items:baseline; justify-content:space-between; gap:8px; padding:3px 0; font-size:12.5px; color:var(--ink2)}
+.kv b{font-weight:600; color:var(--ink); font-size:13.5px}
+.kv.big b{font-size:18px}
+.formula{margin-top:8px; padding-top:8px; border-top:1px dashed var(--line); font-size:11.5px; color:var(--ink3); line-height:1.6}
+
+/* ── chart ────────────────────────────────────────────── */
+.chart-wrap{position:relative}
+#curve{display:block; width:100%; overflow:visible}
+.tt{
+  position:absolute; pointer-events:none; opacity:0; transition:opacity .1s;
+  background:var(--surface); border:1px solid var(--line2); border-radius:7px;
+  padding:7px 10px; font-size:12px; box-shadow:var(--shadow); white-space:nowrap; z-index:3;
+}
+.tt b{font-size:13.5px}
+.legend{display:flex; flex-wrap:wrap; gap:14px; margin-top:10px; font-size:11.5px; color:var(--ink3)}
+.legend i{display:inline-block; width:11px; height:11px; border-radius:3px; margin-right:5px; vertical-align:-1px}
+
+/* ── footer ───────────────────────────────────────────── */
+.assump{margin-top:26px; padding-top:18px; border-top:1px solid var(--line2); font-size:12.5px; color:var(--ink3); line-height:1.85}
+.assump h2{margin:0 0 8px; font-size:11px; letter-spacing:.13em; text-transform:uppercase; color:var(--ink3); font-family:"Outfit","Noto Sans JP",sans-serif; font-weight:600}
+.assump ul{margin:0; padding-left:1.2em}
+.assump li{margin:2px 0}
+.rail-actions{display:flex; gap:8px}
+.rail-actions .btn{flex:1}
+
+/* ── モバイル固定サマリー ─────────────────────────────── */
+.dock{display:none}
+@media (max-width:940px){
+  .dock{
+    display:flex; align-items:center; gap:10px; position:fixed; left:0; right:0; bottom:0; z-index:20;
+    padding:10px 16px calc(10px + env(safe-area-inset-bottom)); background:var(--surface);
+    border-top:1px solid var(--line2); box-shadow:0 -6px 20px -12px rgba(0,0,0,.4);
+  }
+  .dock .d-label{font-size:11px; letter-spacing:.08em; color:var(--ink3); font-weight:600}
+  .dock .d-val{margin-left:auto; font-size:20px; font-weight:600}
+  .dock .d-val.pos{color:var(--good)} .dock .d-val.neg{color:var(--bad)}
+  .dock .d-sub{font-size:12px; color:var(--ink3)}
+  .page{padding-bottom:96px}
+}
+@media (prefers-reduced-motion:reduce){ *{transition:none !important; animation:none !important} }
+</style>
+<style>:root[data-theme="light"]{color-scheme:light}</style>
+</head>
+<body>
+<div class="page">
+  <header class="masthead">
+    <p class="eyebrow">NAORU整体 &middot; 月次損益シミュレーション</p>
+    <h1>二人体制の損益シミュレーター</h1>
+    <p class="lede">スタッフ2人の個人売上と、月ごとに変わる家賃・広告費・雑費を入れると、歩合の人件費・ロイヤリティ15%・Square決済手数料を差し引いた<strong>税引前利益</strong>と<strong>損益分岐点</strong>が出ます。</p>
+  </header>
+
+  <div class="layout">
+    <!-- ══ 入力レール ══ -->
+    <form class="rail" id="rail" onsubmit="return false">
+
+      <section class="card">
+        <div class="card-hd"><h2>売上</h2><span class="hint">個人売上を2人分</span></div>
+        <div class="card-bd">
+          <div class="field">
+            <div class="field-top"><label for="salesA">スタッフ①の個人売上<span class="unit">円</span></label>
+              <input type="number" id="salesA" inputmode="numeric" step="10000" min="0"></div>
+            <input type="range" id="salesA_r" min="0" max="2500000" step="10000" aria-label="スタッフ①の個人売上スライダー">
+          </div>
+          <div class="field">
+            <div class="field-top"><label for="salesB">スタッフ②の個人売上<span class="unit">円</span></label>
+              <input type="number" id="salesB" inputmode="numeric" step="10000" min="0"></div>
+            <input type="range" id="salesB_r" min="0" max="2500000" step="10000" aria-label="スタッフ②の個人売上スライダー">
+          </div>
+          <div class="sum"><span>店舗の総売上</span><strong class="num" id="totalSales">—</strong></div>
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="card-hd"><h2>毎月入れ替える費用</h2><span class="hint">変動費</span></div>
+        <div class="card-bd">
+          <div class="field">
+            <div class="field-top"><label for="rent">家賃<span class="unit">円</span></label>
+              <input type="number" id="rent" inputmode="numeric" step="5000" min="0"></div>
+            <input type="range" id="rent_r" min="100000" max="400000" step="5000" aria-label="家賃スライダー">
+          </div>
+          <div class="field">
+            <div class="field-top"><label for="ad">広告費<span class="unit">円</span></label>
+              <input type="number" id="ad" inputmode="numeric" step="5000" min="0"></div>
+            <input type="range" id="ad_r" min="0" max="400000" step="5000" aria-label="広告費スライダー">
+          </div>
+          <div class="field">
+            <div class="field-top"><label for="misc">雑費<span class="unit">円</span></label>
+              <input type="number" id="misc" inputmode="numeric" step="1000" min="0"></div>
+            <input type="range" id="misc_r" min="0" max="200000" step="1000" aria-label="雑費スライダー">
+          </div>
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="card-hd"><h2>率で引かれるもの</h2><span class="hint">売上に連動</span></div>
+        <div class="card-bd">
+          <div class="field">
+            <div class="field-top"><label for="royalty">ロイヤリティ<span class="unit">%</span></label>
+              <input type="number" id="royalty" inputmode="decimal" step="0.5" min="0" max="50"></div>
+            <input type="range" id="royalty_r" min="0" max="30" step="0.5" aria-label="ロイヤリティ率スライダー">
+          </div>
+          <div class="field">
+            <div class="field-top"><label for="fee">Square決済手数料<span class="unit">%</span></label>
+              <input type="number" id="fee" inputmode="decimal" step="0.05" min="0" max="10"></div>
+            <input type="range" id="fee_r" min="2" max="3.5" step="0.05" aria-label="決済手数料率スライダー">
+          </div>
+          <div class="field">
+            <div class="field-top"><label for="card">カード・電子決済の比率<span class="unit">%</span></label>
+              <input type="number" id="card" inputmode="numeric" step="5" min="0" max="100"></div>
+            <input type="range" id="card_r" min="0" max="100" step="5" aria-label="カード決済比率スライダー">
+          </div>
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="card-hd"><h2>人件費のルール</h2></div>
+        <div class="card-bd">
+          <div class="seg" id="mode" role="group" aria-label="支給方式">
+            <button type="button" data-mode="floor" aria-pressed="true">保証ライン未満は<br>保証額を支給</button>
+            <button type="button" data-mode="higher" aria-pressed="false">つねに歩合と<br>保証額の高い方</button>
+          </div>
+
+          <div class="field" style="margin-top:10px">
+            <div class="field-top"><label for="guar">最低保証額（1人あたり）<span class="unit">円</span></label>
+              <input type="number" id="guar" inputmode="numeric" step="10000" min="0"></div>
+          </div>
+          <div class="field">
+            <div class="field-top"><label for="guarLine">保証額を出す売上ライン<span class="unit">円 未満</span></label>
+              <input type="number" id="guarLine" inputmode="numeric" step="50000" min="0"></div>
+          </div>
+
+          <table class="tiers" style="margin-top:12px">
+            <thead><tr><th>個人売上（以上）</th><th>料率</th></tr></thead>
+            <tbody id="tierBody"></tbody>
+          </table>
+          <div id="tierNote"></div>
+        </div>
+      </section>
+
+      <div class="rail-actions">
+        <button type="button" class="btn" id="reset">初期値に戻す</button>
+        <button type="button" class="btn" id="theme">表示を切替</button>
+      </div>
+    </form>
+
+    <!-- ══ 結果 ══ -->
+    <div class="results">
+      <div class="kpis">
+        <div class="kpi hero">
+          <div class="k-label">税引前利益 <span id="pnlChip"></span></div>
+          <div class="k-val num" id="profit">—</div>
+          <div class="k-sub" id="profitSub">—</div>
+        </div>
+        <div class="kpi">
+          <div class="k-label">利益率</div>
+          <div class="k-val num" id="margin">—</div>
+          <div class="k-sub" id="marginSub">売上に対する割合</div>
+        </div>
+        <div class="kpi">
+          <div class="k-label">損益分岐点</div>
+          <div class="k-val num" id="be">—</div>
+          <div class="k-sub" id="beSub">—</div>
+        </div>
+      </div>
+
+      <section class="card">
+        <div class="card-hd"><h2>売上から利益までの流れ</h2><span class="hint">上から順に引いた残り</span></div>
+        <div class="card-bd"><div class="wf" id="wf"></div></div>
+      </section>
+
+      <section class="card">
+        <div class="card-hd"><h2>人件費の内訳</h2><span class="hint">2人分</span></div>
+        <div class="card-bd"><div class="staff" id="staff"></div></div>
+      </section>
+
+      <section class="card">
+        <div class="card-hd"><h2>売上をいくらにすると利益がどう動くか</h2><span class="hint">2人の売上比は現在のまま</span></div>
+        <div class="card-bd">
+          <div class="chart-wrap">
+            <svg id="curve" role="img" aria-label="総売上に対する税引前利益の推移"></svg>
+            <div class="tt" id="tt"></div>
+          </div>
+          <div class="legend">
+            <span><i style="background:var(--good)"></i>黒字の範囲</span>
+            <span><i style="background:var(--bad)"></i>赤字の範囲</span>
+            <span><i style="background:var(--ink3)"></i>いまの売上</span>
+            <span id="curveRead"></span>
+          </div>
+        </div>
+      </section>
+
+      <div class="assump">
+        <h2>この計算の前提</h2>
+        <ul>
+          <li>人件費は<b>個人売上 × 料率</b>で1人ずつ計算し、最低保証と比べて決めます。表の料率は左のパネルで直接書き換えられます。</li>
+          <li>ロイヤリティと決済手数料は<b>店舗の総売上</b>に対してかけています。決済手数料はカード・電子決済の比率をかけた分だけ発生します。</li>
+          <li>出るのは<b>税引前利益</b>です。法人税・所得税、消費税の納付、社会保険の会社負担分、減価償却は含みません。</li>
+          <li>損益分岐点は、いまの2人の売上比のまま総売上を動かしたときに利益が0円以上になる最小の売上です。</li>
+          <li>入力した値はこのブラウザに保存され、次に開いたときも残ります。</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="dock" id="dock">
+  <span class="d-label">税引前利益</span>
+  <span class="d-val num" id="dockProfit">—</span>
+  <span class="d-sub num" id="dockMargin"></span>
+</div>
+
+<script>
+(function(){
+"use strict";
+
+/* ── 既定値 ────────────────────────────────────────────── */
+var DEFAULT_TIERS = [
+  {t:0,       r:30},
+  {t:1000000, r:32},
+  {t:1100000, r:34},
+  {t:1200000, r:36},
+  {t:1300000, r:37},
+  {t:1400000, r:34},
+  {t:1500000, r:39},
+  {t:1600000, r:40}
+];
+var DEFAULTS = {
+  salesA:1000000, salesB:900000,
+  rent:200000, ad:150000, misc:40000,
+  royalty:15, fee:2.75, card:100,
+  guar:250000, guarLine:1000000,
+  mode:"floor",
+  tiers: DEFAULT_TIERS.map(function(x){return {t:x.t, r:x.r};})
+};
+var KEY = "naoru-pl-sim-v1";
+var S = load();
+
+function load(){
+  var base = JSON.parse(JSON.stringify(DEFAULTS));
+  try{
+    var raw = localStorage.getItem(KEY);
+    if(raw){
+      var o = JSON.parse(raw);
+      for(var k in base){ if(o[k] !== undefined && o[k] !== null) base[k] = o[k]; }
+      if(!Array.isArray(base.tiers) || !base.tiers.length) base.tiers = DEFAULTS.tiers;
+    }
+  }catch(e){}
+  return base;
+}
+function save(){ try{ localStorage.setItem(KEY, JSON.stringify(S)); }catch(e){} }
+
+/* ── 整形 ─────────────────────────────────────────────── */
+function yen(v){ var s = Math.round(Math.abs(v)).toLocaleString("ja-JP"); return (v<0?"▲¥":"¥")+s; }
+function man(v){ return Math.round(v/10000).toLocaleString("ja-JP")+"万"; }
+function pct(v){ var a=(Math.round(Math.abs(v)*10)/10).toFixed(1)+"%"; return (v<0?"▲":"")+a; }
+
+/* ── 計算 ─────────────────────────────────────────────── */
+function sortedTiers(){
+  return S.tiers.slice().filter(function(x){ return isFinite(x.t) && isFinite(x.r); })
+          .sort(function(a,b){ return a.t-b.t; });
+}
+function rateFor(sales){
+  var ts = sortedTiers(), r = ts.length ? ts[0].r : 0;
+  for(var i=0;i<ts.length;i++){ if(sales >= ts[i].t) r = ts[i].r; }
+  return r;
+}
+function payFor(sales){
+  var rate = rateFor(sales);
+  var comm = sales * rate / 100;
+  if(S.mode === "floor" && sales < S.guarLine){
+    return {pay:S.guar, rate:rate, comm:comm, basis:"保証", sales:sales};
+  }
+  if(comm < S.guar) return {pay:S.guar, rate:rate, comm:comm, basis:"保証", sales:sales};
+  return {pay:comm, rate:rate, comm:comm, basis:"歩合", sales:sales};
+}
+function calc(a, b){
+  var total = a + b;
+  var pa = payFor(a), pb = payFor(b);
+  var labor = pa.pay + pb.pay;
+  var royalty = total * S.royalty / 100;
+  var fee = total * (S.card/100) * (S.fee/100);
+  var costs = [
+    {key:"人件費",     v:labor},
+    {key:"ロイヤリティ", v:royalty},
+    {key:"決済手数料",  v:fee},
+    {key:"家賃",       v:S.rent},
+    {key:"広告費",     v:S.ad},
+    {key:"雑費",       v:S.misc}
+  ];
+  var totalCost = costs.reduce(function(s,c){ return s+c.v; }, 0);
+  return {total:total, pa:pa, pb:pb, costs:costs, totalCost:totalCost,
+          profit: total - totalCost, margin: total>0 ? (total-totalCost)/total*100 : 0};
+}
+function ratio(){
+  var t = S.salesA + S.salesB;
+  return t > 0 ? S.salesA/t : 0.5;
+}
+function profitAt(total){
+  var k = ratio();
+  return calc(total*k, total*(1-k)).profit;
+}
+function breakeven(){
+  var step = 10000;
+  for(var v = 0; v <= 8000000; v += step){ if(profitAt(v) >= 0) return v; }
+  return null;
+}
+
+/* ── 描画: ウォーターフォール ──────────────────────────── */
+function renderWF(R){
+  var lo = Math.min(0, R.profit);
+  var hi = Math.max(R.total, R.totalCost, 1);
+  var span = hi - lo;
+  var x = function(v){ return (v - lo) / span * 100; };
+  var zero = x(0);
+  var showZero = lo < 0;
+
+  var html = "";
+  function row(cls, label, barHTML, amt, pctText){
+    html += '<div class="wf-row '+cls+'">'
+          +   '<div class="w-label">'+label+'</div>'
+          +   '<div class="track">'+ (showZero ? '<div class="zeroline" style="left:'+zero+'%"></div>' : '') + barHTML +'</div>'
+          +   '<div class="w-amt num">'+amt+'</div>'
+          +   '<div class="w-pct num">'+pctText+'</div>'
+          + '</div>';
+  }
+  function bar(cls, from, to){
+    var l = Math.min(x(from), x(to)), w = Math.abs(x(to) - x(from));
+    return '<div class="bar '+cls+'" style="left:'+l+'%;width:'+Math.max(w,0.4)+'%"></div>';
+  }
+
+  row("gross", "売上", bar("gross", 0, R.total), yen(R.total), "100%");
+
+  var run = R.total;
+  R.costs.forEach(function(c){
+    var to = run - c.v;
+    row("", c.key, bar("cost", run, to), "−"+yen(c.v),
+        R.total>0 ? pct(c.v/R.total*100) : "—");
+    run = to;
+  });
+
+  var sign = R.profit >= 0 ? "pos" : "neg";
+  row("total "+sign, "税引前利益", bar(sign, 0, R.profit), yen(R.profit),
+      R.total>0 ? pct(R.margin) : "—");
+
+  document.getElementById("wf").innerHTML = html;
+}
+
+/* ── 描画: スタッフ ───────────────────────────────────── */
+function renderStaff(R){
+  var html = "";
+  [["スタッフ①", R.pa], ["スタッフ②", R.pb]].forEach(function(p){
+    var name = p[0], d = p[1];
+    var chip = d.basis === "保証"
+      ? '<span class="chip guar">最低保証を適用</span>'
+      : '<span class="chip tag">歩合</span>';
+    var f = d.basis === "保証"
+      ? (S.mode==="floor" && d.sales < S.guarLine
+          ? "個人売上が保証ライン "+man(S.guarLine)+"円 に届かないため、保証額 "+yen(S.guar)+" を支給。（歩合なら "+yen(d.comm)+"）"
+          : "歩合 "+yen(d.comm)+" が保証額 "+yen(S.guar)+" を下回るため保証額を支給。")
+      : yen(d.sales)+" × "+d.rate+"% = "+yen(d.comm);
+    html += '<div class="staff-card">'
+          +   '<h3><span>'+name+'</span>'+chip+'</h3>'
+          +   '<div class="kv"><span>個人売上</span><b class="num">'+yen(d.sales)+'</b></div>'
+          +   '<div class="kv"><span>適用料率</span><b class="num">'+d.rate+'%</b></div>'
+          +   '<div class="kv big"><span>支給額</span><b class="num">'+yen(d.pay)+'</b></div>'
+          +   '<div class="formula">'+f+'</div>'
+          + '</div>';
+  });
+  document.getElementById("staff").innerHTML = html;
+}
+
+/* ── 描画: 感度カーブ ─────────────────────────────────── */
+var tt = document.getElementById("tt");
+var curveData = null;
+
+function renderCurve(R, be){
+  var svg = document.getElementById("curve");
+  var W = svg.parentNode.clientWidth;
+  if(!W || W < 200){ W = Math.max(svg.parentNode.getBoundingClientRect().width, 320); }
+  var H = 260;
+  var P = {t:18, r:16, b:30, l:66};
+  var iw = Math.max(W - P.l - P.r, 60), ih = H - P.t - P.b;
+
+  var cur = R.total;
+  var anchor = be != null ? be : cur;
+  var lo = Math.max(0, Math.min(cur*0.55, anchor*0.7));
+  var hi = Math.max(cur*1.45, anchor*1.35, lo + 900000);
+  lo = Math.floor(lo/100000)*100000;
+  hi = Math.ceil(hi/100000)*100000;
+
+  var N = 140, pts = [];
+  for(var i=0;i<=N;i++){
+    var s = lo + (hi-lo)*i/N;
+    pts.push({s:s, p:profitAt(s)});
+  }
+  var pMin = Math.min(0, Math.min.apply(null, pts.map(function(d){return d.p;})));
+  var pMax = Math.max(0, Math.max.apply(null, pts.map(function(d){return d.p;})));
+  var padY = Math.max((pMax - pMin) * 0.12, 20000);
+  pMin -= padY; pMax += padY;
+
+  var X = function(s){ return P.l + (s - lo)/(hi - lo) * iw; };
+  var Y = function(p){ return P.t + (pMax - p)/(pMax - pMin) * ih; };
+  var zeroY = Y(0);
+
+  // y ticks
+  var rawStep = (pMax - pMin)/4;
+  var mag = Math.pow(10, Math.floor(Math.log(rawStep)/Math.LN10));
+  var step = Math.ceil(rawStep/mag)*mag;
+  var yt = [], start = Math.ceil(pMin/step)*step;
+  for(var v = start; v <= pMax; v += step) yt.push(v);
+
+  var g = "";
+  yt.forEach(function(v){
+    var y = Y(v);
+    g += '<line x1="'+P.l+'" y1="'+y+'" x2="'+(P.l+iw)+'" y2="'+y+'" stroke="var(--line)" stroke-width="1"/>';
+    g += '<text x="'+(P.l-9)+'" y="'+(y+4)+'" text-anchor="end" font-size="10.5" fill="var(--ink3)" font-family="IBM Plex Mono, monospace">'
+       + (v===0 ? "0" : (v<0?"−":"")+man(Math.abs(v))) + '</text>';
+  });
+
+  // x ticks
+  var xStep = (hi-lo) <= 1200000 ? 200000 : ((hi-lo) <= 2600000 ? 400000 : 600000);
+  for(var s2 = Math.ceil(lo/xStep)*xStep; s2 <= hi; s2 += xStep){
+    g += '<text x="'+X(s2)+'" y="'+(P.t+ih+19)+'" text-anchor="middle" font-size="10.5" fill="var(--ink3)" font-family="IBM Plex Mono, monospace">'+man(s2)+'</text>';
+  }
+
+  // area + line
+  var line = pts.map(function(d,i){ return (i?"L":"M")+X(d.s).toFixed(1)+","+Y(d.p).toFixed(1); }).join(" ");
+  var area = "M"+X(pts[0].s).toFixed(1)+","+zeroY.toFixed(1)+" L"+line.substring(1)
+           + " L"+X(pts[N].s).toFixed(1)+","+zeroY.toFixed(1)+" Z";
+
+  var defs = '<defs>'
+    + '<clipPath id="clipTop"><rect x="'+P.l+'" y="'+P.t+'" width="'+iw+'" height="'+Math.max(zeroY-P.t,0)+'"/></clipPath>'
+    + '<clipPath id="clipBot"><rect x="'+P.l+'" y="'+zeroY+'" width="'+iw+'" height="'+Math.max(P.t+ih-zeroY,0)+'"/></clipPath>'
+    + '</defs>';
+
+  var body = defs + g
+    + '<path d="'+area+'" fill="var(--good)" opacity="0.16" clip-path="url(#clipTop)"/>'
+    + '<path d="'+area+'" fill="var(--bad)" opacity="0.16" clip-path="url(#clipBot)"/>'
+    + '<line x1="'+P.l+'" y1="'+zeroY+'" x2="'+(P.l+iw)+'" y2="'+zeroY+'" stroke="var(--line2)" stroke-width="1.5"/>'
+    + '<path d="'+line+'" fill="none" stroke="var(--ink)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>';
+
+  if(be != null && be >= lo && be <= hi){
+    body += '<line x1="'+X(be)+'" y1="'+P.t+'" x2="'+X(be)+'" y2="'+(P.t+ih)+'" stroke="var(--accent)" stroke-width="1.5" stroke-dasharray="4 4"/>'
+          + '<text x="'+(X(be)+6)+'" y="'+(P.t+12)+'" font-size="11" fill="var(--accent)" font-weight="600">分岐点 '+man(be)+'</text>';
+  }
+  if(cur >= lo && cur <= hi){
+    var cy = Y(R.profit);
+    body += '<circle cx="'+X(cur)+'" cy="'+cy+'" r="5.5" fill="var(--surface)" stroke="var(--ink)" stroke-width="2.5"/>';
+  }
+  body += '<line id="cross" x1="0" y1="'+P.t+'" x2="0" y2="'+(P.t+ih)+'" stroke="var(--ink3)" stroke-width="1" stroke-dasharray="3 3" opacity="0"/>'
+        + '<circle id="crossDot" r="4.5" fill="var(--ink)" opacity="0"/>';
+
+  svg.setAttribute("viewBox", "0 0 "+W+" "+H);
+  svg.setAttribute("width", W);
+  svg.setAttribute("height", H);
+  svg.innerHTML = body;
+
+  curveData = {lo:lo, hi:hi, X:X, Y:Y, P:P, iw:iw, W:W};
+
+  document.getElementById("curveRead").textContent =
+    "表示範囲 " + man(lo) + "円 〜 " + man(hi) + "円";
+}
+
+function bindCurve(){
+  var svg = document.getElementById("curve");
+  function move(ev){
+    if(!curveData) return;
+    var rect = svg.getBoundingClientRect();
+    var cx = (ev.touches ? ev.touches[0].clientX : ev.clientX) - rect.left;
+    var scale = curveData.W / rect.width;
+    var px = cx * scale;
+    if(px < curveData.P.l || px > curveData.P.l + curveData.iw){ hide(); return; }
+    var s = curveData.lo + (px - curveData.P.l)/curveData.iw * (curveData.hi - curveData.lo);
+    s = Math.round(s/10000)*10000;
+    var p = profitAt(s);
+    var cross = svg.querySelector("#cross"), dot = svg.querySelector("#crossDot");
+    if(cross){ cross.setAttribute("x1", curveData.X(s)); cross.setAttribute("x2", curveData.X(s)); cross.setAttribute("opacity","0.8"); }
+    if(dot){ dot.setAttribute("cx", curveData.X(s)); dot.setAttribute("cy", curveData.Y(p)); dot.setAttribute("opacity","1"); }
+    tt.innerHTML = '<div style="color:var(--ink3);font-size:11px">総売上 '+yen(s)+'</div>'
+                 + '<b class="num" style="color:'+(p>=0?"var(--good)":"var(--bad)")+'">'+yen(p)+'</b>';
+    tt.style.opacity = "1";
+    var left = curveData.X(s)/scale + 14;
+    if(left > rect.width - 150) left = curveData.X(s)/scale - 150;
+    tt.style.left = Math.max(0, left) + "px";
+    tt.style.top = Math.max(0, curveData.Y(p)/scale - 46) + "px";
+  }
+  function hide(){
+    tt.style.opacity = "0";
+    var cross = svg.querySelector("#cross"), dot = svg.querySelector("#crossDot");
+    if(cross) cross.setAttribute("opacity","0");
+    if(dot) dot.setAttribute("opacity","0");
+  }
+  svg.addEventListener("mousemove", move);
+  svg.addEventListener("mouseleave", hide);
+  svg.addEventListener("touchmove", function(e){ move(e); }, {passive:true});
+  svg.addEventListener("touchend", hide);
+}
+
+/* ── 描画: 料率テーブル ───────────────────────────────── */
+function renderTiers(R){
+  var ts = sortedTiers();
+  function tierIndex(sales){
+    var idx = 0;
+    for(var i=0;i<ts.length;i++){ if(sales >= ts[i].t) idx = i; }
+    return idx;
+  }
+  var act = [tierIndex(R.pa.sales), tierIndex(R.pb.sales)];
+  var html = "", inverted = -1;
+  ts.forEach(function(row, i){
+    var warn = i > 0 && row.r < ts[i-1].r;
+    if(warn && inverted < 0) inverted = i;
+    var isActive = act.indexOf(i) >= 0;
+    html += '<tr class="'+(warn?"warn ":"")+(isActive?"active":"")+'">'
+          + '<td><span class="mark">'+(warn?"!":"")+'</span>'
+          + '<input type="number" data-i="'+i+'" data-f="t" step="50000" min="0" value="'+row.t+'" '
+          + 'style="width:calc(100% - 18px)" aria-label="売上基準'+(i+1)+'"></td>'
+          + '<td><input type="number" data-i="'+i+'" data-f="r" step="1" min="0" max="100" value="'+row.r+'" aria-label="料率'+(i+1)+'"></td>'
+          + '</tr>';
+  });
+  document.getElementById("tierBody").innerHTML = html;
+
+  var note = "";
+  if(inverted >= 0){
+    var bad = ts[inverted], prev = ts[inverted-1];
+    note = '<div class="note">元の表では <b>'+bad.t.toLocaleString("ja-JP")+'円 が '+bad.r+'%</b> で、'
+         + 'ひとつ前の段（'+prev.t.toLocaleString("ja-JP")+'円・'+prev.r+'%）より低くなっています。'
+         + 'このままだと売上を上げたのに支給額が下がる逆転が起きます（'
+         + yen(prev.t*prev.r/100)+' → '+yen(bad.t*bad.r/100)+'）。';
+    if(bad.t === 1400000 && bad.r === 34){
+      note += '<br><b>38%の打ち間違い</b>の可能性が高いです。'
+            + '<button type="button" class="btn btn-accent" id="fixTier">38%に直す</button>';
+    }
+    note += '</div>';
+  }
+  document.getElementById("tierNote").innerHTML = note;
+
+  var fix = document.getElementById("fixTier");
+  if(fix) fix.addEventListener("click", function(){
+    S.tiers.forEach(function(x){ if(x.t === 1400000) x.r = 38; });
+    save(); render();
+  });
+
+  Array.prototype.forEach.call(document.querySelectorAll(".tiers input"), function(el){
+    el.addEventListener("change", function(){
+      var ts2 = sortedTiers();
+      var i = +el.dataset.i, f = el.dataset.f, v = parseFloat(el.value);
+      if(!isFinite(v) || v < 0) return render();
+      ts2[i][f] = v;
+      S.tiers = ts2;
+      save(); render();
+    });
+  });
+}
+
+/* ── 全体描画 ─────────────────────────────────────────── */
+function render(){
+  var R = calc(S.salesA, S.salesB);
+  var be = breakeven();
+
+  document.getElementById("totalSales").textContent = yen(R.total);
+
+  var pEl = document.getElementById("profit");
+  pEl.textContent = yen(R.profit);
+  pEl.className = "k-val num " + (R.profit >= 0 ? "pos" : "neg");
+  document.getElementById("pnlChip").innerHTML =
+    '<span class="chip '+(R.profit>=0?"pos":"neg")+'">'+(R.profit>=0?"黒字":"赤字")+'</span>';
+  document.getElementById("profitSub").textContent =
+    "総売上 "+yen(R.total)+" − 費用 "+yen(R.totalCost);
+
+  document.getElementById("margin").textContent = R.total>0 ? pct(R.margin) : "—";
+  document.getElementById("marginSub").textContent =
+    "人件費率 " + (R.total>0 ? pct((R.pa.pay+R.pb.pay)/R.total*100) : "—");
+
+  if(be == null){
+    document.getElementById("be").textContent = "—";
+    document.getElementById("beSub").textContent = "この条件では黒字になりません";
+  }else{
+    document.getElementById("be").textContent = yen(be);
+    var diff = R.total - be;
+    document.getElementById("beSub").textContent =
+      (diff >= 0 ? "いまは "+yen(diff)+" 上回っています" : "あと "+yen(-diff)+" 必要です")
+      + "（1人 "+man(be/2)+"円）";
+  }
+
+  var dv = document.getElementById("dockProfit");
+  dv.textContent = yen(R.profit);
+  dv.className = "d-val num " + (R.profit >= 0 ? "pos" : "neg");
+  document.getElementById("dockMargin").textContent = R.total>0 ? pct(R.margin) : "";
+
+  renderWF(R);
+  renderStaff(R);
+  renderTiers(R);
+  renderCurve(R, be);
+}
+
+/* ── 入力バインド ─────────────────────────────────────── */
+var NUMS = [
+  ["salesA","salesA_r"], ["salesB","salesB_r"],
+  ["rent","rent_r"], ["ad","ad_r"], ["misc","misc_r"],
+  ["royalty","royalty_r"], ["fee","fee_r"], ["card","card_r"],
+  ["guar",null], ["guarLine",null]
+];
+function syncInputs(){
+  NUMS.forEach(function(pair){
+    var n = document.getElementById(pair[0]);
+    if(n) n.value = S[pair[0]];
+    if(pair[1]){
+      var r = document.getElementById(pair[1]);
+      if(r) r.value = Math.min(Math.max(S[pair[0]], +r.min), +r.max);
+    }
+  });
+  Array.prototype.forEach.call(document.querySelectorAll("#mode button"), function(b){
+    b.setAttribute("aria-pressed", b.dataset.mode === S.mode ? "true" : "false");
+  });
+}
+NUMS.forEach(function(pair){
+  var key = pair[0];
+  var n = document.getElementById(key);
+  var r = pair[1] ? document.getElementById(pair[1]) : null;
+  if(n) n.addEventListener("input", function(){
+    var v = parseFloat(n.value);
+    if(!isFinite(v) || v < 0) return;
+    S[key] = v;
+    if(r) r.value = Math.min(Math.max(v, +r.min), +r.max);
+    save(); render();
+  });
+  if(r) r.addEventListener("input", function(){
+    S[key] = parseFloat(r.value);
+    if(n) n.value = S[key];
+    save(); render();
+  });
+});
+Array.prototype.forEach.call(document.querySelectorAll("#mode button"), function(b){
+  b.addEventListener("click", function(){
+    S.mode = b.dataset.mode;
+    syncInputs(); save(); render();
+  });
+});
+document.getElementById("reset").addEventListener("click", function(){
+  S = JSON.parse(JSON.stringify(DEFAULTS));
+  save(); syncInputs(); render();
+});
+document.getElementById("theme").addEventListener("click", function(){
+  var root = document.documentElement;
+  var isDark = root.getAttribute("data-theme") === "dark" ||
+    (!root.getAttribute("data-theme") && window.matchMedia("(prefers-color-scheme: dark)").matches);
+  root.setAttribute("data-theme", isDark ? "light" : "dark");
+  render();
+});
+
+var rt;
+window.addEventListener("resize", function(){
+  clearTimeout(rt);
+  rt = setTimeout(function(){ render(); }, 120);
+});
+
+/* グラフの器の幅が決まった時点で描き直す（初回表示・タブ切替・埋め込み時の幅0対策） */
+var lastW = 0;
+if(window.ResizeObserver){
+  new ResizeObserver(function(entries){
+    var w = Math.round(entries[0].contentRect.width);
+    if(w > 0 && w !== lastW){ lastW = w; render(); }
+  }).observe(document.querySelector(".chart-wrap"));
+}
+if(document.fonts && document.fonts.ready){ document.fonts.ready.then(function(){ render(); }); }
+
+syncInputs();
+render();
+bindCurve();
+})();
+</script>
+</body>
+</html>
