@@ -18,6 +18,7 @@
   --accent:#D9481F; --accent-soft:rgba(217,72,31,.10);
   --cost:#4A73B8; --cost-soft:rgba(74,115,184,.14);
   --good:#12876A; --good-soft:rgba(18,135,106,.14);
+  --warn:#A96A11; --warn-soft:rgba(169,106,17,.14);
   --bad:#C22F49; --bad-soft:rgba(194,47,73,.14);
   --neutral-bar:#5C6B7F;
   --shadow:0 1px 2px rgba(16,21,30,.05), 0 8px 24px -16px rgba(16,21,30,.28);
@@ -32,6 +33,7 @@
     --accent:#FF7A57; --accent-soft:rgba(255,122,87,.14);
     --cost:#6E93D6; --cost-soft:rgba(110,147,214,.18);
     --good:#35C79A; --good-soft:rgba(53,199,154,.16);
+    --warn:#E3B341; --warn-soft:rgba(227,179,65,.16);
     --bad:#FB7185; --bad-soft:rgba(251,113,133,.16);
     --neutral-bar:#7C8DA3;
     --shadow:0 1px 2px rgba(0,0,0,.4), 0 12px 28px -18px rgba(0,0,0,.9);
@@ -45,49 +47,44 @@
   --accent:#FF7A57; --accent-soft:rgba(255,122,87,.14);
   --cost:#6E93D6; --cost-soft:rgba(110,147,214,.18);
   --good:#35C79A; --good-soft:rgba(53,199,154,.16);
+  --warn:#E3B341; --warn-soft:rgba(227,179,65,.16);
   --bad:#FB7185; --bad-soft:rgba(251,113,133,.16);
   --neutral-bar:#7C8DA3;
   --shadow:0 1px 2px rgba(0,0,0,.4), 0 12px 28px -18px rgba(0,0,0,.9);
 }
 
 *{box-sizing:border-box}
+[hidden]{display:none !important}
 body{
   margin:0; background:var(--bg); color:var(--ink);
   font-family:"Noto Sans JP","Outfit",system-ui,sans-serif;
   font-size:15px; line-height:1.7; -webkit-font-smoothing:antialiased;
 }
 .num{font-family:"IBM Plex Mono","Outfit",ui-monospace,monospace; font-variant-numeric:tabular-nums; letter-spacing:-.01em}
-
-.page{max-width:1220px; margin:0 auto; padding:36px 20px 72px}
+.page{max-width:1280px; margin:0 auto; padding:36px 20px 72px}
 
 /* ── masthead ─────────────────────────────────────────── */
 .masthead{display:flex; flex-direction:column; gap:8px; padding-bottom:22px; border-bottom:1px solid var(--line2)}
-.eyebrow{
-  margin:0; font-family:"Outfit","Noto Sans JP",sans-serif; font-weight:600;
-  font-size:11px; letter-spacing:.18em; text-transform:uppercase; color:var(--accent);
-}
-.masthead h1{
-  margin:0; font-family:"Outfit","Noto Sans JP",sans-serif; font-weight:700;
-  font-size:clamp(26px,4.2vw,38px); line-height:1.2; letter-spacing:-.01em; text-wrap:balance;
-}
-.lede{margin:0; max-width:62ch; color:var(--ink2); font-size:14px}
+.eyebrow{margin:0; font-family:"Outfit","Noto Sans JP",sans-serif; font-weight:600;
+  font-size:11px; letter-spacing:.18em; text-transform:uppercase; color:var(--accent)}
+.masthead h1{margin:0; font-family:"Outfit","Noto Sans JP",sans-serif; font-weight:700;
+  font-size:clamp(26px,4.2vw,38px); line-height:1.2; letter-spacing:-.01em; text-wrap:balance}
+.lede{margin:0; max-width:64ch; color:var(--ink2); font-size:14px}
 .lede strong{white-space:nowrap; color:var(--ink); font-weight:700}
 
 /* ── layout ───────────────────────────────────────────── */
 .layout{display:grid; grid-template-columns:minmax(0,340px) minmax(0,1fr); gap:26px; margin-top:26px; align-items:start}
 @media (max-width:940px){ .layout{grid-template-columns:1fr} }
-
 .rail{position:sticky; top:20px; display:flex; flex-direction:column; gap:14px}
 @media (max-width:940px){ .rail{position:static} }
 .results{display:flex; flex-direction:column; gap:18px; min-width:0}
+#monthView,#yearView{display:flex; flex-direction:column; gap:18px}
 
 .card{background:var(--surface); border:1px solid var(--line); border-radius:var(--r); box-shadow:var(--shadow)}
 .card-hd{display:flex; align-items:baseline; justify-content:space-between; gap:10px; padding:14px 16px 0}
-.card-hd h2{
-  margin:0; font-family:"Outfit","Noto Sans JP",sans-serif; font-weight:600;
-  font-size:12px; letter-spacing:.13em; text-transform:uppercase; color:var(--ink3);
-}
-.card-hd .hint{font-size:11.5px; color:var(--ink3)}
+.card-hd h2{margin:0; font-family:"Outfit","Noto Sans JP",sans-serif; font-weight:600;
+  font-size:12px; letter-spacing:.13em; text-transform:uppercase; color:var(--ink3)}
+.card-hd .hint{font-size:11.5px; color:var(--ink3); text-align:right}
 .card-bd{padding:14px 16px 16px}
 
 /* ── fields ───────────────────────────────────────────── */
@@ -95,193 +92,188 @@ body{
 .field:first-child{border-top:0; padding-top:2px}
 .field-top{display:flex; align-items:center; justify-content:space-between; gap:10px}
 .field label{font-size:13px; color:var(--ink2); font-weight:500; line-height:1.5}
-.field .unit{white-space:nowrap}
-.field .unit{font-size:11px; color:var(--ink3); margin-left:4px; font-weight:400}
-.field input[type="number"]{
-  width:118px; padding:5px 8px; text-align:right; font-size:14px;
+.field .unit{font-size:11px; color:var(--ink3); margin-left:4px; font-weight:400; white-space:nowrap}
+.field input[type="number"]{width:118px; padding:5px 8px; text-align:right; font-size:14px;
   font-family:"IBM Plex Mono",ui-monospace,monospace; font-variant-numeric:tabular-nums;
-  color:var(--ink); background:var(--inset); border:1px solid var(--line); border-radius:6px;
-}
-.field input[type="number"]:focus-visible,
-.seg button:focus-visible, .btn:focus-visible, input[type="range"]:focus-visible{
-  outline:2px solid var(--accent); outline-offset:2px;
-}
+  color:var(--ink); background:var(--inset); border:1px solid var(--line); border-radius:6px}
+.field input[type="number"]:focus-visible, .seg button:focus-visible, .btn:focus-visible,
+input[type="range"]:focus-visible, select:focus-visible, .m-in:focus-visible{
+  outline:2px solid var(--accent); outline-offset:2px}
 input[type="range"]{width:100%; accent-color:var(--accent); height:18px; margin:0; cursor:pointer}
 
 .stepper{display:flex; align-items:stretch; border:1px solid var(--line); border-radius:6px; overflow:hidden; background:var(--inset)}
-.stepper button{
-  width:30px; font:inherit; font-size:16px; line-height:1; cursor:pointer; color:var(--ink2);
-  background:var(--surface2); border:0; border-right:1px solid var(--line);
-}
+.stepper button{width:30px; font:inherit; font-size:16px; line-height:1; cursor:pointer; color:var(--ink2);
+  background:var(--surface2); border:0; border-right:1px solid var(--line)}
 .stepper button:last-of-type{border-right:0; border-left:1px solid var(--line)}
 .stepper button:hover:not(:disabled){color:var(--accent)}
 .stepper button:disabled{opacity:.35; cursor:not-allowed}
 .stepper input[type="number"]{width:56px; border:0; border-radius:0; background:transparent; text-align:center}
 .stepper input::-webkit-outer-spin-button,.stepper input::-webkit-inner-spin-button{-webkit-appearance:none; margin:0}
 .stepper input[type=number]{-moz-appearance:textfield}
-.sum{
-  display:flex; align-items:baseline; justify-content:space-between;
-  margin-top:10px; padding:9px 11px; background:var(--inset); border-radius:7px;
-}
+
+.sum{display:flex; align-items:baseline; justify-content:space-between;
+  margin-top:10px; padding:9px 11px; background:var(--inset); border-radius:7px}
 .sum span{font-size:12px; color:var(--ink2)}
 .sum strong{font-size:17px; font-weight:600}
 
-.seg{display:flex; gap:0; border:1px solid var(--line2); border-radius:7px; overflow:hidden}
-.seg button{
-  flex:1; padding:8px 6px; font:inherit; font-size:11.5px; line-height:1.45; cursor:pointer;
-  background:var(--surface2); color:var(--ink2); border:0; border-left:1px solid var(--line);
-}
+.seg{display:flex; border:1px solid var(--line2); border-radius:7px; overflow:hidden}
+.seg button{flex:1; padding:8px 6px; font:inherit; font-size:11.5px; line-height:1.45; cursor:pointer;
+  background:var(--surface2); color:var(--ink2); border:0; border-left:1px solid var(--line)}
 .seg button:first-child{border-left:0}
 .seg button[aria-pressed="true"]{background:var(--accent); color:#fff; font-weight:700}
+.viewswitch{max-width:320px}
+.viewswitch button{padding:9px 8px; font-size:13px; font-weight:500}
 
-.btn{
-  padding:7px 12px; font:inherit; font-size:12px; cursor:pointer; color:var(--ink2);
-  background:var(--surface2); border:1px solid var(--line2); border-radius:6px;
-}
-.btn:hover{color:var(--ink); border-color:var(--ink3)}
+.btn{padding:7px 12px; font:inherit; font-size:12px; cursor:pointer; color:var(--ink2);
+  background:var(--surface2); border:1px solid var(--line2); border-radius:6px}
+.btn:hover:not(:disabled){color:var(--ink); border-color:var(--ink3)}
+.btn:disabled{opacity:.4; cursor:not-allowed}
 .btn-accent{background:var(--accent-soft); color:var(--accent); border-color:var(--accent); font-weight:600}
+select{font:inherit; font-size:14px; padding:6px 10px; color:var(--ink); background:var(--inset);
+  border:1px solid var(--line2); border-radius:6px; cursor:pointer}
 
 /* ── tier table ───────────────────────────────────────── */
 .tiers{width:100%; border-collapse:collapse; font-size:12.5px}
-.tiers th{
-  text-align:right; padding:0 6px 6px; font-weight:600; font-size:10.5px;
-  letter-spacing:.08em; color:var(--ink3); border-bottom:1px solid var(--line);
-}
+.tiers th{text-align:right; padding:0 6px 6px; font-weight:600; font-size:10.5px;
+  letter-spacing:.08em; color:var(--ink3); border-bottom:1px solid var(--line)}
 .tiers th:first-child{text-align:left}
 .tiers td{padding:3px 6px; border-bottom:1px solid var(--line)}
-.tiers input{
-  width:100%; padding:4px 6px; text-align:right; font-size:12.5px;
+.tiers input{width:100%; padding:4px 6px; text-align:right; font-size:12.5px;
   font-family:"IBM Plex Mono",ui-monospace,monospace; font-variant-numeric:tabular-nums;
-  color:var(--ink); background:transparent; border:1px solid transparent; border-radius:5px;
-}
+  color:var(--ink); background:transparent; border:1px solid transparent; border-radius:5px}
 .tiers input:hover{border-color:var(--line2)}
 .tiers input:focus{background:var(--inset); border-color:var(--accent); outline:none}
 .tiers tr.warn td{background:var(--bad-soft)}
 .tiers tr.active td{background:var(--accent-soft)}
 .tiers .mark{display:inline-block; width:14px; font-size:11px; color:var(--bad)}
-
-.note{
-  margin:11px 0 0; padding:10px 12px; border-radius:7px; font-size:12px; line-height:1.65;
-  background:var(--bad-soft); color:var(--ink2); border:1px solid transparent;
-}
+.note{margin:11px 0 0; padding:10px 12px; border-radius:7px; font-size:12px; line-height:1.65;
+  background:var(--bad-soft); color:var(--ink2)}
 .note b{color:var(--ink)}
 .note .btn{margin-top:7px}
 
 /* ── KPI ──────────────────────────────────────────────── */
 .kpis{display:grid; grid-template-columns:1.35fr 1fr 1fr; gap:14px}
 @media (max-width:720px){ .kpis{grid-template-columns:1fr 1fr} .kpis .kpi:first-child{grid-column:1/-1} }
-.kpi{background:var(--surface); border:1px solid var(--line); border-radius:var(--r); padding:15px 16px 16px; box-shadow:var(--shadow); min-width:0}
-.kpi .k-label{display:flex; align-items:center; gap:7px; font-size:11px; letter-spacing:.1em; text-transform:uppercase; color:var(--ink3); font-family:"Outfit","Noto Sans JP",sans-serif; font-weight:600}
+.kpi{background:var(--surface); border:1px solid var(--line); border-radius:var(--r); padding:15px 16px 16px;
+  box-shadow:var(--shadow); min-width:0}
+.kpi .k-label{display:flex; align-items:center; gap:7px; flex-wrap:wrap; font-size:11px; letter-spacing:.1em;
+  text-transform:uppercase; color:var(--ink3); font-family:"Outfit","Noto Sans JP",sans-serif; font-weight:600}
 .kpi .k-val{margin-top:6px; font-size:clamp(20px,2.5vw,26px); font-weight:600; line-height:1.15; white-space:nowrap}
 .kpi.hero .k-val{font-size:clamp(26px,3.8vw,36px)}
 .kpi .k-sub{margin-top:3px; font-size:12px; color:var(--ink3)}
-.kpi.hero .k-val.pos{color:var(--good)}
-.kpi.hero .k-val.neg{color:var(--bad)}
-.chip{
-  display:inline-flex; align-items:center; gap:4px; padding:2px 8px; border-radius:999px;
-  font-size:10.5px; font-weight:700; letter-spacing:.06em; line-height:1.7; text-transform:none;
-}
+.kpi .k-val.pos{color:var(--good)} .kpi .k-val.neg{color:var(--bad)}
+.chip{display:inline-flex; align-items:center; gap:4px; padding:2px 8px; border-radius:999px;
+  font-size:10.5px; font-weight:700; letter-spacing:.06em; line-height:1.7; text-transform:none}
 .chip.pos{background:var(--good-soft); color:var(--good)}
 .chip.neg{background:var(--bad-soft); color:var(--bad)}
 .chip.tag{background:var(--inset); color:var(--ink3); font-weight:500}
 .chip.guar{background:var(--accent-soft); color:var(--accent)}
 
-/* ── waterfall ledger ─────────────────────────────────── */
+/* ── waterfall ────────────────────────────────────────── */
 .wf{display:flex; flex-direction:column}
-.wf-row{
-  display:grid; grid-template-columns:104px minmax(0,1fr) 108px 54px;
-  align-items:center; gap:10px; padding:7px 0; border-bottom:1px solid var(--line);
-}
+.wf-row{display:grid; grid-template-columns:112px minmax(0,1fr) 112px 54px; align-items:center; gap:10px;
+  padding:7px 0; border-bottom:1px solid var(--line)}
 .wf-row:last-child{border-bottom:0}
 .wf-row.total{border-top:1.5px solid var(--line2); border-bottom:0; margin-top:5px; padding-top:11px}
 .wf-row .w-label{font-size:12.5px; color:var(--ink2)}
 .wf-row.total .w-label, .wf-row.gross .w-label{font-weight:700; color:var(--ink)}
 .track{position:relative; height:20px; background:var(--surface2); border-radius:4px; overflow:hidden}
 .bar{position:absolute; top:3px; height:14px; border-radius:3px}
-.bar.gross{background:var(--neutral-bar)}
-.bar.cost{background:var(--cost)}
-.bar.pos{background:var(--good)}
-.bar.neg{background:var(--bad)}
+.bar.gross{background:var(--neutral-bar)} .bar.cost{background:var(--cost)}
+.bar.pos{background:var(--good)} .bar.neg{background:var(--bad)}
 .zeroline{position:absolute; top:0; bottom:0; width:1px; background:var(--line2)}
 .w-amt{text-align:right; font-size:13.5px; font-weight:500; white-space:nowrap}
 .wf-row.total .w-amt{font-size:16px; font-weight:600}
-.wf-row.total.pos .w-amt{color:var(--good)}
-.wf-row.total.neg .w-amt{color:var(--bad)}
+.wf-row.total.pos .w-amt{color:var(--good)} .wf-row.total.neg .w-amt{color:var(--bad)}
 .w-pct{text-align:right; font-size:11.5px; color:var(--ink3)}
-@media (max-width:620px){
-  .wf-row{grid-template-columns:88px minmax(0,1fr) 92px; }
-  .w-pct{display:none}
-}
+@media (max-width:620px){ .wf-row{grid-template-columns:92px minmax(0,1fr) 96px} .w-pct{display:none} }
 
 /* ── staff ────────────────────────────────────────────── */
 .staff{display:grid; grid-template-columns:repeat(auto-fit,minmax(212px,1fr)); gap:12px}
 .staff-card{background:var(--surface2); border:1px solid var(--line); border-radius:8px; padding:12px 13px}
-.staff-card h3{margin:0 0 8px; font-size:12px; font-weight:700; color:var(--ink2); display:flex; align-items:center; justify-content:space-between; gap:8px}
+.staff-card h3{margin:0 0 8px; font-size:12px; font-weight:700; color:var(--ink2);
+  display:flex; align-items:center; justify-content:space-between; gap:8px}
 .kv{display:flex; align-items:baseline; justify-content:space-between; gap:8px; padding:3px 0; font-size:12.5px; color:var(--ink2)}
 .kv b{font-weight:600; color:var(--ink); font-size:13.5px}
 .kv.big b{font-size:18px}
 .formula{margin-top:8px; padding-top:8px; border-top:1px dashed var(--line); font-size:11.5px; color:var(--ink3); line-height:1.6}
 
-/* ── chart ────────────────────────────────────────────── */
-.chart-wrap{position:relative}
-#curve{display:block; width:100%; overflow:visible}
-.tt{
-  position:absolute; pointer-events:none; opacity:0; transition:opacity .1s;
-  background:var(--surface); border:1px solid var(--line2); border-radius:7px;
-  padding:7px 10px; font-size:12px; box-shadow:var(--shadow); white-space:nowrap; z-index:3;
+/* ── metrics ──────────────────────────────────────────── */
+.metrics{display:flex; flex-direction:column}
+.metric{display:grid; grid-template-columns:minmax(0,1fr) 120px minmax(0,190px); align-items:baseline; gap:12px;
+  padding:9px 0; border-bottom:1px solid var(--line)}
+.metric:last-child{border-bottom:0}
+.metric .m-name{font-size:13px; color:var(--ink); font-weight:500}
+.metric .m-name em{display:block; font-style:normal; font-size:11px; color:var(--ink3); font-weight:400; line-height:1.5}
+.metric .m-val{text-align:right; font-size:15px; font-weight:600; white-space:nowrap}
+.metric .m-bench{font-size:11.5px; color:var(--ink3); display:flex; align-items:center; gap:6px}
+.dot{width:8px; height:8px; border-radius:50%; flex:0 0 8px}
+.dot.ok{background:var(--good)} .dot.mid{background:var(--warn)} .dot.ng{background:var(--bad)}
+.m-bench .lab{font-weight:700}
+.m-bench.ok .lab{color:var(--good)} .m-bench.mid .lab{color:var(--warn)} .m-bench.ng .lab{color:var(--bad)}
+@media (max-width:640px){
+  .metric{grid-template-columns:minmax(0,1fr) auto; row-gap:2px}
+  .metric .m-bench{grid-column:1/-1; margin-top:2px}
 }
-.tt b{font-size:13.5px}
+
+/* ── year bar ─────────────────────────────────────────── */
+.yearbar{display:flex; align-items:center; gap:10px; flex-wrap:wrap;
+  background:var(--surface); border:1px solid var(--line); border-radius:var(--r); padding:12px 16px; box-shadow:var(--shadow)}
+.yearbar .yb-label{font-size:11px; letter-spacing:.1em; text-transform:uppercase; color:var(--ink3);
+  font-family:"Outfit","Noto Sans JP",sans-serif; font-weight:600}
+.yearbar .spacer{flex:1 1 auto}
+
+/* ── months table ─────────────────────────────────────── */
+.table-wrap{overflow-x:auto; margin:0 -2px}
+.months{width:100%; border-collapse:separate; border-spacing:0; font-size:12.5px; min-width:900px}
+.months th{padding:0 8px 7px; font-weight:600; font-size:10.5px; letter-spacing:.07em;
+  color:var(--ink3); border-bottom:1px solid var(--line2); text-align:right; white-space:nowrap}
+.months th:first-child{text-align:left}
+.months td{padding:2px 8px; border-bottom:1px solid var(--line); text-align:right; white-space:nowrap}
+.months th:first-child, .months td:first-child{position:sticky; left:0; z-index:1;
+  background:var(--surface); text-align:left; font-size:12.5px; color:var(--ink2);
+  box-shadow:1px 0 0 var(--line)}
+.months .m-in{width:100%; min-width:82px; max-width:112px; padding:4px 7px; text-align:right; font-size:12.5px;
+  font-family:"IBM Plex Mono",ui-monospace,monospace; font-variant-numeric:tabular-nums;
+  color:var(--ink); background:transparent; border:1px solid transparent; border-radius:5px}
+.months .m-in:hover{border-color:var(--line2)}
+.months .m-in:focus{background:var(--inset); border-color:var(--accent); outline:none}
+.months tr.edited td:first-child::before{content:"\25CF"; color:var(--accent); font-size:8px; vertical-align:2px; margin-right:5px}
+.months tr:not(.edited) td:first-child::before{content:""; display:inline-block; width:13px}
+.months tr.loss .m-profit{color:var(--bad)}
+.months.no-prev th:nth-child(3), .months.no-prev td:nth-child(3){display:none}
+.months .m-yoy.up{color:var(--good)} .months .m-yoy.down{color:var(--bad)}
+.months tfoot td{border-bottom:0; border-top:1.5px solid var(--line2); padding-top:9px; font-weight:600; font-size:13px}
+.months tfoot td:first-child{font-weight:700; color:var(--ink)}
+.yr-actions{display:flex; align-items:center; justify-content:space-between; gap:10px; margin-top:12px; flex-wrap:wrap}
+.yr-actions p{margin:0; font-size:11.5px; color:var(--ink3)}
+
+/* ── charts ───────────────────────────────────────────── */
+.chart-wrap{position:relative}
+#curve,#yearChart{display:block; width:100%; overflow:visible}
+.tt{position:absolute; pointer-events:none; opacity:0; transition:opacity .1s;
+  background:var(--surface); border:1px solid var(--line2); border-radius:7px;
+  padding:7px 10px; font-size:12px; box-shadow:var(--shadow); white-space:nowrap; z-index:3}
 .legend{display:flex; flex-wrap:wrap; gap:14px; margin-top:10px; font-size:11.5px; color:var(--ink3)}
 .legend i{display:inline-block; width:11px; height:11px; border-radius:3px; margin-right:5px; vertical-align:-1px}
+.legend i.dash{width:16px; height:0; border-top:2px dashed var(--ink3); border-radius:0; vertical-align:3px}
 
 /* ── footer ───────────────────────────────────────────── */
 .assump{margin-top:26px; padding-top:18px; border-top:1px solid var(--line2); font-size:12.5px; color:var(--ink3); line-height:1.85}
-.assump h2{margin:0 0 8px; font-size:11px; letter-spacing:.13em; text-transform:uppercase; color:var(--ink3); font-family:"Outfit","Noto Sans JP",sans-serif; font-weight:600}
+.assump h2{margin:0 0 8px; font-size:11px; letter-spacing:.13em; text-transform:uppercase; color:var(--ink3);
+  font-family:"Outfit","Noto Sans JP",sans-serif; font-weight:600}
 .assump ul{margin:0; padding-left:1.2em}
 .assump li{margin:2px 0}
+.assump b{color:var(--ink2)}
 .rail-actions{display:flex; gap:8px}
 .rail-actions .btn{flex:1}
 
-[hidden]{display:none !important}
-
-/* ── 期間切替 ─────────────────────────────────────────── */
-.viewswitch{max-width:320px}
-.viewswitch button{padding:9px 8px; font-size:13px; font-weight:500}
-
-/* ── 月別テーブル ─────────────────────────────────────── */
-.table-wrap{overflow-x:auto; margin:0 -2px}
-.months{width:100%; border-collapse:collapse; font-size:13px; min-width:540px}
-.months th{
-  padding:0 8px 7px; font-weight:600; font-size:10.5px; letter-spacing:.09em;
-  color:var(--ink3); border-bottom:1px solid var(--line2); text-align:right; white-space:nowrap;
-}
-.months th:first-child{text-align:left}
-.months td{padding:2px 8px; border-bottom:1px solid var(--line); text-align:right; white-space:nowrap}
-.months td:first-child{text-align:left; font-size:12.5px; color:var(--ink2)}
-.months .m-in{
-  width:100%; max-width:118px; padding:4px 7px; text-align:right; font-size:12.5px;
-  font-family:"IBM Plex Mono",ui-monospace,monospace; font-variant-numeric:tabular-nums;
-  color:var(--ink); background:transparent; border:1px solid transparent; border-radius:5px;
-}
-.months .m-in:hover{border-color:var(--line2)}
-.months .m-in:focus{background:var(--inset); border-color:var(--accent); outline:none}
-.months tr.edited td:first-child::before{content:"●"; color:var(--accent); font-size:8px; vertical-align:2px; margin-right:5px}
-.months tr:not(.edited) td:first-child::before{content:""; display:inline-block; width:13px}
-.months tr.loss .m-profit{color:var(--bad)}
-.months tfoot td{border-bottom:0; border-top:1.5px solid var(--line2); padding-top:9px; font-weight:600; font-size:13.5px}
-.months tfoot td:first-child{font-weight:700}
-.yr-actions{display:flex; align-items:center; justify-content:space-between; gap:10px; margin-top:12px; flex-wrap:wrap}
-.yr-actions p{margin:0; font-size:11.5px; color:var(--ink3)}
-#yearChart{display:block; width:100%; overflow:visible}
-
-/* ── モバイル固定サマリー ─────────────────────────────── */
+/* ── mobile dock ──────────────────────────────────────── */
 .dock{display:none}
 @media (max-width:940px){
-  .dock{
-    display:flex; align-items:center; gap:10px; position:fixed; left:0; right:0; bottom:0; z-index:20;
+  .dock{display:flex; align-items:center; gap:10px; position:fixed; left:0; right:0; bottom:0; z-index:20;
     padding:10px 16px calc(10px + env(safe-area-inset-bottom)); background:var(--surface);
-    border-top:1px solid var(--line2); box-shadow:0 -6px 20px -12px rgba(0,0,0,.4);
-  }
+    border-top:1px solid var(--line2); box-shadow:0 -6px 20px -12px rgba(0,0,0,.4)}
   .dock .d-label{font-size:11px; letter-spacing:.08em; color:var(--ink3); font-weight:600}
   .dock .d-val{margin-left:auto; font-size:20px; font-weight:600}
   .dock .d-val.pos{color:var(--good)} .dock .d-val.neg{color:var(--bad)}
@@ -295,9 +287,9 @@ input[type="range"]{width:100%; accent-color:var(--accent); height:18px; margin:
 <body>
 <div class="page">
   <header class="masthead">
-    <p class="eyebrow">NAORU整体 &middot; 月次損益シミュレーション</p>
+    <p class="eyebrow">NAORU整体 &middot; 損益シミュレーション &amp; 実績記録</p>
     <h1>整体院の損益シミュレーター</h1>
-    <p class="lede">スタッフの人数と一人ずつの個人売上、月ごとに変わる家賃・広告費・雑費を入れると、歩合の人件費・ロイヤリティ15%・Square決済手数料を差し引いた<strong>税引前利益</strong>と<strong>損益分岐点</strong>が出ます。</p>
+    <p class="lede">スタッフの人数と個人売上、家賃・広告費・雑費を入れると、歩合の人件費・ロイヤリティ・決済手数料を差し引いた<strong>税引前利益</strong>が出ます。年を切り替えて<strong>1月から12月まで記録</strong>でき、前年との比較や<strong>損益分岐点・労働分配率</strong>などの経営指標も出します。</p>
   </header>
 
   <div class="layout">
@@ -305,23 +297,23 @@ input[type="range"]{width:100%; accent-color:var(--accent); height:18px; margin:
     <form class="rail" id="rail" onsubmit="return false">
 
       <section class="card">
-        <div class="card-hd"><h2>売上</h2><span class="hint">一人ずつの個人売上</span></div>
+        <div class="card-hd"><h2>売上</h2><span class="hint">基準となる1ヶ月・税抜</span></div>
         <div class="card-bd">
           <div class="field">
             <div class="field-top"><label for="headcount">スタッフの人数<span class="unit">人</span></label>
               <div class="stepper">
-                <button type="button" id="hcMinus" data-step="-1" aria-label="人数を1人減らす">−</button>
+                <button type="button" id="hcMinus" aria-label="人数を1人減らす">&minus;</button>
                 <input type="number" id="headcount" inputmode="numeric" step="1" min="1" max="10">
-                <button type="button" id="hcPlus" data-step="1" aria-label="人数を1人増やす">＋</button>
+                <button type="button" id="hcPlus" aria-label="人数を1人増やす">&plus;</button>
               </div></div>
           </div>
           <div id="staffInputs"></div>
-          <div class="sum"><span>店舗の総売上</span><strong class="num" id="totalSales">—</strong></div>
+          <div class="sum"><span>店舗の総売上（税抜）</span><strong class="num" id="totalSales">&mdash;</strong></div>
         </div>
       </section>
 
       <section class="card">
-        <div class="card-hd"><h2>毎月入れ替える費用</h2><span class="hint">変動費</span></div>
+        <div class="card-hd"><h2>毎月入れ替える費用</h2><span class="hint">固定費</span></div>
         <div class="card-bd">
           <div class="field">
             <div class="field-top"><label for="rent">家賃<span class="unit">円</span></label>
@@ -342,7 +334,7 @@ input[type="range"]{width:100%; accent-color:var(--accent); height:18px; margin:
       </section>
 
       <section class="card">
-        <div class="card-hd"><h2>率で引かれるもの</h2><span class="hint">売上に連動</span></div>
+        <div class="card-hd"><h2>率で決まるもの</h2><span class="hint">売上・人件費に連動</span></div>
         <div class="card-bd">
           <div class="field">
             <div class="field-top"><label for="royalty">ロイヤリティ<span class="unit">%</span></label>
@@ -359,31 +351,49 @@ input[type="range"]{width:100%; accent-color:var(--accent); height:18px; margin:
               <input type="number" id="card" inputmode="numeric" step="5" min="0" max="100"></div>
             <input type="range" id="card_r" min="0" max="100" step="5" aria-label="カード決済比率スライダー">
           </div>
+          <div class="field">
+            <div class="field-top"><label for="shaho">社会保険 会社負担<span class="unit">% 対人件費</span></label>
+              <input type="number" id="shaho" inputmode="decimal" step="0.5" min="0" max="30"></div>
+            <input type="range" id="shaho_r" min="0" max="20" step="0.5" aria-label="社会保険 会社負担率スライダー">
+          </div>
+          <div class="field">
+            <div class="field-top"><label for="consumption">消費税率<span class="unit">%</span></label>
+              <input type="number" id="consumption" inputmode="decimal" step="1" min="0" max="20"></div>
+          </div>
+          <div class="field">
+            <div class="field-top"><label for="tax">法人税など 実効税率<span class="unit">% 概算</span></label>
+              <input type="number" id="tax" inputmode="decimal" step="1" min="0" max="60"></div>
+            <input type="range" id="tax_r" min="0" max="50" step="1" aria-label="実効税率スライダー">
+          </div>
         </div>
       </section>
 
       <section class="card">
-        <div class="card-hd"><h2>人件費のルール</h2></div>
+        <div class="card-hd"><h2>業務委託費のルール</h2><span class="hint">歩合と最低保証</span></div>
         <div class="card-bd">
-          <div class="seg" id="mode" role="group" aria-label="支給方式">
+          <div class="seg" id="basis" role="group" aria-label="計上する金額">
+            <button type="button" data-basis="net" aria-pressed="true">税抜で計上</button>
+            <button type="button" data-basis="gross" aria-pressed="false">税込で計上</button>
+          </div>
+          <div class="seg" id="mode" role="group" aria-label="支給方式" style="margin-top:8px">
             <button type="button" data-mode="floor" aria-pressed="true">保証ライン未満は<br>保証額を支給</button>
             <button type="button" data-mode="higher" aria-pressed="false">つねに歩合と<br>保証額の高い方</button>
           </div>
-
           <div class="field" style="margin-top:10px">
-            <div class="field-top"><label for="guar">最低保証額（1人あたり）<span class="unit">円</span></label>
+            <div class="field-top"><label for="guar">最低保証額（1人あたり）<span class="unit">円 税込</span></label>
               <input type="number" id="guar" inputmode="numeric" step="10000" min="0"></div>
           </div>
           <div class="field">
             <div class="field-top"><label for="guarLine">保証額を出す売上ライン<span class="unit">円 未満</span></label>
               <input type="number" id="guarLine" inputmode="numeric" step="50000" min="0"></div>
           </div>
-
           <table class="tiers" style="margin-top:12px">
-            <thead><tr><th>個人売上（以上）</th><th>料率</th></tr></thead>
+            <thead><tr><th>個人売上（税抜・以上）</th><th>料率</th></tr></thead>
             <tbody id="tierBody"></tbody>
           </table>
           <div id="tierNote"></div>
+          <p style="margin:9px 0 0;font-size:11.5px;color:var(--ink3);line-height:1.6">
+            料率をかけて出るのは<b>税込の支払額</b>です。税抜はそれを消費税で割り戻した額になります。</p>
         </div>
       </section>
 
@@ -396,112 +406,142 @@ input[type="range"]{width:100%; accent-color:var(--accent); height:18px; margin:
     <!-- ══ 結果 ══ -->
     <div class="results">
       <div class="seg viewswitch" id="view" role="group" aria-label="表示する期間">
-        <button type="button" data-view="month" aria-pressed="true">月次</button>
-        <button type="button" data-view="year" aria-pressed="false">年間（12ヶ月）</button>
+        <button type="button" data-view="month" aria-pressed="true">月次シミュレーション</button>
+        <button type="button" data-view="year" aria-pressed="false">年間の記録</button>
       </div>
 
+      <!-- ─ 月次 ─ -->
       <div id="monthView">
-      <div class="kpis">
-        <div class="kpi hero">
-          <div class="k-label">税引前利益 <span id="pnlChip"></span></div>
-          <div class="k-val num" id="profit">—</div>
-          <div class="k-sub" id="profitSub">—</div>
+        <div class="kpis">
+          <div class="kpi hero">
+            <div class="k-label">税引前利益 <span id="pnlChip"></span></div>
+            <div class="k-val num" id="profit">&mdash;</div>
+            <div class="k-sub" id="profitSub">&mdash;</div>
+          </div>
+          <div class="kpi">
+            <div class="k-label">利益率</div>
+            <div class="k-val num" id="margin">&mdash;</div>
+            <div class="k-sub" id="marginSub">&mdash;</div>
+          </div>
+          <div class="kpi">
+            <div class="k-label">損益分岐点</div>
+            <div class="k-val num" id="be">&mdash;</div>
+            <div class="k-sub" id="beSub">&mdash;</div>
+          </div>
         </div>
-        <div class="kpi">
-          <div class="k-label">利益率</div>
-          <div class="k-val num" id="margin">—</div>
-          <div class="k-sub" id="marginSub">売上に対する割合</div>
-        </div>
-        <div class="kpi">
-          <div class="k-label">損益分岐点</div>
-          <div class="k-val num" id="be">—</div>
-          <div class="k-sub" id="beSub">—</div>
-        </div>
+
+        <section class="card">
+          <div class="card-hd"><h2>売上から利益までの流れ</h2><span class="hint">上から順に引いた残り</span></div>
+          <div class="card-bd"><div class="wf" id="wf"></div></div>
+        </section>
+
+        <section class="card">
+          <div class="card-hd"><h2>経営指標</h2><span class="hint">目安つき</span></div>
+          <div class="card-bd"><div class="metrics" id="mMetrics"></div></div>
+        </section>
+
+        <section class="card">
+          <div class="card-hd"><h2>業務委託費の内訳</h2><span class="hint" id="staffHint">&mdash;</span></div>
+          <div class="card-bd"><div class="staff" id="staff"></div></div>
+        </section>
+
+        <section class="card">
+          <div class="card-hd"><h2>売上をいくらにすると利益がどう動くか</h2><span class="hint">売上比は現在のまま</span></div>
+          <div class="card-bd">
+            <div class="chart-wrap">
+              <svg id="curve" role="img" aria-label="総売上に対する税引前利益の推移"></svg>
+              <div class="tt" id="tt"></div>
+            </div>
+            <div class="legend">
+              <span><i style="background:var(--good)"></i>黒字の範囲</span>
+              <span><i style="background:var(--bad)"></i>赤字の範囲</span>
+              <span><i style="background:var(--ink3)"></i>いまの売上</span>
+              <span id="curveRead"></span>
+            </div>
+          </div>
+        </section>
       </div>
 
-      <section class="card">
-        <div class="card-hd"><h2>売上から利益までの流れ</h2><span class="hint">上から順に引いた残り</span></div>
-        <div class="card-bd"><div class="wf" id="wf"></div></div>
-      </section>
-
-      <section class="card">
-        <div class="card-hd"><h2>人件費の内訳</h2><span class="hint" id="staffHint">—</span></div>
-        <div class="card-bd"><div class="staff" id="staff"></div></div>
-      </section>
-
-      <section class="card">
-        <div class="card-hd"><h2>売上をいくらにすると利益がどう動くか</h2><span class="hint">売上比は現在のまま</span></div>
-        <div class="card-bd">
-          <div class="chart-wrap">
-            <svg id="curve" role="img" aria-label="総売上に対する税引前利益の推移"></svg>
-            <div class="tt" id="tt"></div>
-          </div>
-          <div class="legend">
-            <span><i style="background:var(--good)"></i>黒字の範囲</span>
-            <span><i style="background:var(--bad)"></i>赤字の範囲</span>
-            <span><i style="background:var(--ink3)"></i>いまの売上</span>
-            <span id="curveRead"></span>
-          </div>
-        </div>
-      </section>
-
-      </div><!-- /monthView -->
-
+      <!-- ─ 年間 ─ -->
       <div id="yearView" hidden>
+        <div class="yearbar">
+          <span class="yb-label">対象の年</span>
+          <select id="yearSel" aria-label="表示する年"></select>
+          <span class="spacer"></span>
+          <button type="button" class="btn" id="addYear">翌年を追加</button>
+          <button type="button" class="btn" id="copyYear">前年をコピーして追加</button>
+          <button type="button" class="btn" id="delYear">この年を削除</button>
+        </div>
+
         <div class="kpis">
           <div class="kpi hero">
             <div class="k-label">年間の税引前利益 <span id="yPnlChip"></span></div>
-            <div class="k-val num" id="yProfit">—</div>
-            <div class="k-sub" id="yProfitSub">—</div>
+            <div class="k-val num" id="yProfit">&mdash;</div>
+            <div class="k-sub" id="yProfitSub">&mdash;</div>
           </div>
           <div class="kpi">
-            <div class="k-label">年間売上</div>
-            <div class="k-val num" id="ySales">—</div>
-            <div class="k-sub" id="ySalesSub">—</div>
+            <div class="k-label">年間売上 <span id="ySalesChip"></span></div>
+            <div class="k-val num" id="ySales">&mdash;</div>
+            <div class="k-sub" id="ySalesSub">&mdash;</div>
           </div>
           <div class="kpi">
             <div class="k-label">黒字の月</div>
-            <div class="k-val num" id="yPos">—</div>
-            <div class="k-sub" id="yPosSub">—</div>
+            <div class="k-val num" id="yPos">&mdash;</div>
+            <div class="k-sub" id="yPosSub">&mdash;</div>
           </div>
         </div>
 
-        <section class="card" style="margin-top:18px">
+        <section class="card">
           <div class="card-hd"><h2>1年分の売上から利益までの流れ</h2><span class="hint">12ヶ月の合計</span></div>
           <div class="card-bd"><div class="wf" id="ywf"></div></div>
         </section>
 
-        <section class="card" style="margin-top:18px">
-          <div class="card-hd"><h2>月ごとの利益</h2><span class="hint">売上と広告費は月ごとに変えられます</span></div>
+        <section class="card">
+          <div class="card-hd"><h2>経営指標</h2><span class="hint">年間の合計にもとづく目安</span></div>
+          <div class="card-bd"><div class="metrics" id="yMetrics"></div></div>
+        </section>
+
+        <section class="card">
+          <div class="card-hd"><h2>月ごとの記録</h2><span class="hint">売上・家賃・広告費・雑費は月ごとに入力できます</span></div>
           <div class="card-bd">
             <svg id="yearChart" role="img" aria-label="月ごとの税引前利益"></svg>
+            <div class="legend" id="yearLegend"></div>
             <div class="table-wrap" style="margin-top:14px">
               <table class="months">
-                <thead><tr><th>月</th><th>総売上</th><th>広告費</th><th>人件費</th><th>税引前利益</th></tr></thead>
+                <thead><tr>
+                  <th>月</th><th>総売上</th><th id="thYoy">前年比</th><th>家賃</th><th>広告費</th><th>雑費</th>
+                  <th>業務委託費</th><th>費用計</th><th>税引前利益</th><th>利益率</th>
+                </tr></thead>
                 <tbody id="monthBody"></tbody>
                 <tfoot><tr>
-                  <td>合計</td><td class="num" id="ftSales">—</td><td class="num" id="ftAd">—</td>
-                  <td class="num" id="ftLabor">—</td><td class="num" id="ftProfit">—</td>
+                  <td>合計</td><td class="num" id="ftSales">&mdash;</td><td class="num" id="ftYoy">&mdash;</td>
+                  <td class="num" id="ftRent">&mdash;</td><td class="num" id="ftAd">&mdash;</td><td class="num" id="ftMisc">&mdash;</td>
+                  <td class="num" id="ftLabor">&mdash;</td><td class="num" id="ftCost">&mdash;</td>
+                  <td class="num" id="ftProfit">&mdash;</td><td class="num" id="ftMargin">&mdash;</td>
                 </tr></tfoot>
               </table>
             </div>
             <div class="yr-actions">
-              <p>数字を書き換えた月には印（●）が付きます。空欄にすると月次の値に戻ります。</p>
-              <button type="button" class="btn" id="resetMonths">全部の月を月次の値に戻す</button>
+              <p>数字を書き換えた月には印（&#9679;）が付きます。欄を空にすると左パネルの値に戻ります。</p>
+              <button type="button" class="btn" id="resetMonths">この年を左パネルの値に戻す</button>
             </div>
           </div>
         </section>
-      </div><!-- /yearView -->
+      </div>
 
       <div class="assump">
         <h2>この計算の前提</h2>
         <ul>
-          <li>人件費は<b>個人売上 × 料率</b>で1人ずつ計算し、最低保証と比べて決めます。表の料率は左のパネルで直接書き換えられます。</li>
-          <li>ロイヤリティと決済手数料は<b>店舗の総売上</b>に対してかけています。決済手数料はカード・電子決済の比率をかけた分だけ発生します。</li>
-          <li>出るのは<b>税引前利益</b>です。法人税・所得税、消費税の納付、社会保険の会社負担分、減価償却は含みません。</li>
-          <li>損益分岐点は、<b>いまのスタッフ間の売上比のまま</b>総売上を動かしたときに、利益が0円以上になる最小の売上です。人数を増やすと最低保証の分だけ分岐点も上がります。</li>
-          <li>年間は<b>12ヶ月分の積み上げ</b>です。何も書き換えなければ月次の12倍になり、月ごとに総売上と広告費を入れれば繁閑を反映できます。家賃・雑費・料率・人数は全月共通です。</li>
-          <li>月ごとの人件費は、その月の総売上を<b>いまのスタッフ間の売上比</b>で割り振ってから、一人ずつ料率と最低保証を当てて計算しています。</li>
+          <li>業務委託費は<b>個人売上（税抜）&times; 料率＝税込の支払額</b>で1人ずつ計算し、最低保証（税込）と比べて高いほうを採用します。料率表は左パネルで直接書き換えられます。</li>
+          <li>売上はすべて<b>税抜</b>で入力してください。ロイヤリティは税抜売上に、決済手数料は実際に決済される<b>税込金額</b>にカード・電子決済の比率をかけた分にかかります。</li>
+          <li>年間は<b>12ヶ月の積み上げ</b>です。何も入力しなければ左パネルの値が全月に入り、月ごとに売上・家賃・広告費・雑費を入れれば実績の記録になります。人数・料率・各種率は全年・全月で共通です。</li>
+          <li>月ごとの業務委託費は、その月の総売上を<b>いまのスタッフ間の売上比</b>で割り振ってから、一人ずつ料率と最低保証を当てて計算しています。</li>
+          <li><b>固定費</b>は家賃・広告費・雑費と、最低保証が適用された人の委託費。<b>変動費</b>はロイヤリティ・決済手数料と、歩合で決まった人の委託費として区分しています。限界利益＝売上&minus;変動費です。</li>
+          <li>損益分岐点は、いまの売上構成のまま売上を動かしたときに利益が0円以上になる最小の売上です。人数を増やすと最低保証の分だけ分岐点も上がります。</li>
+          <li>損益に載せる委託費は「<b>税抜で計上</b>」が既定です（消費税の仕入税額控除を取る前提）。税込経理なら「税込で計上」に切り替えてください。家賃・広告費・雑費は入力した額をそのまま計上します。</li>
+          <li>社会保険の会社負担は既定0%です。業務委託なら不要で、雇用に切り替えるときだけ率を入れてください。</li>
+          <li>税引後利益は<b>実効税率をかけただけの概算</b>です。欠損金の繰越や税額控除、均等割は反映していません。正式な税額は税理士に確認してください。</li>
+          <li>営業外の収支（受取利息・支払利息など）がなければ、ここでいう税引前利益は営業利益と同額です。減価償却費・借入返済は含みません。</li>
           <li>入力した値はこのブラウザに保存され、次に開いたときも残ります。</li>
         </ul>
       </div>
@@ -511,7 +551,7 @@ input[type="range"]{width:100%; accent-color:var(--accent); height:18px; margin:
 
 <div class="dock" id="dock">
   <span class="d-label" id="dockLabel">税引前利益</span>
-  <span class="d-val num" id="dockProfit">—</span>
+  <span class="d-val num" id="dockProfit">&mdash;</span>
   <span class="d-sub num" id="dockMargin"></span>
 </div>
 
@@ -519,448 +559,448 @@ input[type="range"]{width:100%; accent-color:var(--accent); height:18px; margin:
 (function(){
 "use strict";
 
-/* ── 既定値 ────────────────────────────────────────────── */
-var DEFAULT_TIERS = [
-  {t:0,       r:30},
-  {t:1000000, r:32},
-  {t:1100000, r:34},
-  {t:1200000, r:36},
-  {t:1300000, r:37},
-  {t:1400000, r:34},
-  {t:1500000, r:39},
-  {t:1600000, r:40}
-];
+/* ══ 既定値と状態 ══════════════════════════════════════ */
 var MAX_STAFF = 10;
+var THIS_YEAR = new Date().getFullYear();
+var MONTHS = ["1月","2月","3月","4月","5月","6月","7月","8月","9月","10月","11月","12月"];
+var CIRCLED = ["①","②","③","④","⑤","⑥","⑦","⑧","⑨","⑩"];
+var DEFAULT_TIERS = [
+  {t:800000,r:33},{t:900000,r:34},{t:1000000,r:35},{t:1100000,r:36},{t:1200000,r:37},
+  {t:1300000,r:38},{t:1400000,r:39},{t:1500000,r:40},{t:1600000,r:41},{t:1700000,r:42},
+  {t:1800000,r:43},{t:1900000,r:44},{t:2000000,r:45}
+];
+function emptyMonths(){
+  var a = [];
+  for(var i = 0; i < 12; i++) a.push({s:null, r:null, a:null, m:null});
+  return a;
+}
 var DEFAULTS = {
   staff:[1000000, 900000],
   rent:200000, ad:150000, misc:40000,
-  royalty:15, fee:2.75, card:100,
-  guar:250000, guarLine:1000000,
-  mode:"floor",
-  view:"month",
-  months:[],
-  tiers: DEFAULT_TIERS.map(function(x){return {t:x.t, r:x.r};})
+  royalty:15, fee:2.75, card:100, shaho:0, tax:33, consumption:10, payBasis:"net",
+  guar:260000, guarLine:800000, mode:"floor",
+  tiers: DEFAULT_TIERS.map(function(x){ return {t:x.t, r:x.r}; }),
+  view:"month", year:THIS_YEAR, years:{}
 };
-var KEY = "naoru-pl-sim-v2";
+var KEY = "naoru-pl-sim-v4", OLD_KEYS = ["naoru-pl-sim-v3", "naoru-pl-sim-v2"];
 var S = load();
 
+function num(v, fb){ return (v !== null && v !== undefined && isFinite(v)) ? +v : fb; }
 function load(){
   var base = JSON.parse(JSON.stringify(DEFAULTS));
+  var raw = null, old = null;
   try{
-    var raw = localStorage.getItem(KEY);
-    if(raw){
-      var o = JSON.parse(raw);
-      for(var k in base){ if(o[k] !== undefined && o[k] !== null) base[k] = o[k]; }
-      if(!Array.isArray(base.tiers) || !base.tiers.length) base.tiers = DEFAULTS.tiers;
-      if(o.staff === undefined && (o.salesA !== undefined || o.salesB !== undefined)){
-        base.staff = [+o.salesA || 0, +o.salesB || 0];   /* 旧バージョンからの引き継ぎ */
-      }
-    }
+    raw = localStorage.getItem(KEY);
+    for(var j = 0; j < OLD_KEYS.length && !old; j++) old = localStorage.getItem(OLD_KEYS[j]);
   }catch(e){}
-  if(!Array.isArray(base.months)) base.months = [];
-  var mm = [];
-  for(var k = 0; k < 12; k++){
-    var o = base.months[k] || {};
-    mm.push({ s: isFinite(o.s) && o.s !== null ? +o.s : null,
-              a: isFinite(o.a) && o.a !== null ? +o.a : null });
+  var o = null, fresh = !raw;
+  try{ o = raw ? JSON.parse(raw) : (old ? JSON.parse(old) : null); }catch(e){}
+  if(o){
+    /* 旧バージョンから来たときは、料率表と保証額だけ新しい表を使う */
+    var skip = fresh ? {tiers:1, guar:1, guarLine:1} : {};
+    for(var k in base){ if(!skip[k] && o[k] !== undefined && o[k] !== null) base[k] = o[k]; }
+    /* v2 からの引き継ぎ: months 配列を今年の記録として取り込む */
+    if(!raw && Array.isArray(o.months)){
+      var mm = emptyMonths();
+      for(var i = 0; i < 12 && i < o.months.length; i++){
+        mm[i].s = num(o.months[i] && o.months[i].s, null);
+        mm[i].a = num(o.months[i] && o.months[i].a, null);
+      }
+      base.years = {}; base.years[THIS_YEAR] = mm;
+    }
+    if(o.staff === undefined && (o.salesA !== undefined || o.salesB !== undefined)){
+      base.staff = [num(o.salesA, 0), num(o.salesB, 0)];
+    }
   }
-  base.months = mm;
-  if(base.view !== "year") base.view = "month";
   if(!Array.isArray(base.staff) || !base.staff.length) base.staff = DEFAULTS.staff.slice();
-  base.staff = base.staff.slice(0, MAX_STAFF).map(function(v){ return isFinite(v) && v > 0 ? +v : 0; });
+  base.staff = base.staff.slice(0, MAX_STAFF).map(function(v){ return num(v, 0) > 0 ? +v : 0; });
+  if(!Array.isArray(base.tiers) || !base.tiers.length) base.tiers = DEFAULTS.tiers;
+  if(!base.years || typeof base.years !== "object" || Array.isArray(base.years)) base.years = {};
+  var keys = Object.keys(base.years);
+  keys.forEach(function(y){
+    var src = Array.isArray(base.years[y]) ? base.years[y] : [];
+    var dst = emptyMonths();
+    for(var i = 0; i < 12; i++){
+      var e = src[i] || {};
+      dst[i] = {s:num(e.s, null), r:num(e.r, null), a:num(e.a, null), m:num(e.m, null)};
+    }
+    base.years[y] = dst;
+  });
+  base.year = num(base.year, THIS_YEAR);
+  if(!base.years[base.year]) base.years[base.year] = emptyMonths();
+  if(base.view !== "year") base.view = "month";
+  if(base.payBasis !== "gross") base.payBasis = "net";
+  ["rent","ad","misc","royalty","fee","card","shaho","tax","consumption","guar","guarLine"].forEach(function(k){
+    base[k] = num(base[k], DEFAULTS[k]);
+  });
   return base;
 }
 function save(){ try{ localStorage.setItem(KEY, JSON.stringify(S)); }catch(e){} }
 
-/* ── 整形 ─────────────────────────────────────────────── */
-function yen(v){ var s = Math.round(Math.abs(v)).toLocaleString("ja-JP"); return (v<0?"▲¥":"¥")+s; }
-function man(v){ return Math.round(v/10000).toLocaleString("ja-JP")+"万"; }
-function pct(v){ var a=(Math.round(Math.abs(v)*10)/10).toFixed(1)+"%"; return (v<0?"▲":"")+a; }
+/* ══ 整形 ══════════════════════════════════════════════ */
+function yen(v){ return (v < 0 ? "▲¥" : "¥") + Math.round(Math.abs(v)).toLocaleString("ja-JP"); }
+function man(v){ return Math.round(v/10000).toLocaleString("ja-JP") + "万"; }
+function pct(v){ var a = (Math.round(Math.abs(v)*10)/10).toFixed(1) + "%"; return (v < 0 ? "▲" : "") + a; }
+function signPct(v){ var a = (Math.round(Math.abs(v)*10)/10).toFixed(1) + "%"; return (v < 0 ? "▲" : "+") + a; }
+function sum(a){ return a.reduce(function(x, v){ return x + v; }, 0); }
 
-/* ── 計算 ─────────────────────────────────────────────── */
+/* ══ 人件費と損益 ══════════════════════════════════════ */
 function sortedTiers(){
   return S.tiers.slice().filter(function(x){ return isFinite(x.t) && isFinite(x.r); })
-          .sort(function(a,b){ return a.t-b.t; });
+          .sort(function(a, b){ return a.t - b.t; });
 }
-function rateFor(sales){
+function rateFor(s){
   var ts = sortedTiers(), r = ts.length ? ts[0].r : 0;
-  for(var i=0;i<ts.length;i++){ if(sales >= ts[i].t) r = ts[i].r; }
+  for(var i = 0; i < ts.length; i++){ if(s >= ts[i].t) r = ts[i].r; }
   return r;
 }
-function payFor(sales){
-  var rate = rateFor(sales);
-  var comm = sales * rate / 100;
-  if(S.mode === "floor" && sales < S.guarLine){
-    return {pay:S.guar, rate:rate, comm:comm, basis:"保証", sales:sales};
-  }
-  if(comm < S.guar) return {pay:S.guar, rate:rate, comm:comm, basis:"保証", sales:sales};
-  return {pay:comm, rate:rate, comm:comm, basis:"歩合", sales:sales};
+function taxMul(){ return 1 + S.consumption/100; }
+function payFor(s){
+  var rate = rateFor(s);
+  var commGross = s * rate / 100;          /* 表の「業務委託費（税込）」＝ 税抜売上 × 料率 */
+  var gross, basis;
+  if(S.mode === "floor" && s < S.guarLine){ gross = S.guar; basis = "保証"; }
+  else if(commGross < S.guar){ gross = S.guar; basis = "保証"; }
+  else { gross = commGross; basis = "歩合"; }
+  var net = gross / taxMul();
+  return {gross:gross, net:net, pay: S.payBasis === "gross" ? gross : net,
+          commGross:commGross, commNet: commGross / taxMul(),
+          rate:rate, basis:basis, sales:s};
 }
 function calc(list, opts){
-  var ad = (opts && opts.ad !== undefined && opts.ad !== null) ? opts.ad : S.ad;
-  var total = list.reduce(function(x, v){ return x + v; }, 0);
-  var pays = list.map(payFor);
-  var labor = pays.reduce(function(x, d){ return x + d.pay; }, 0);
-  var royalty = total * S.royalty / 100;
-  var fee = total * (S.card/100) * (S.fee/100);
-  var costs = [
-    {key:"人件費",     v:labor},
-    {key:"ロイヤリティ", v:royalty},
-    {key:"決済手数料",  v:fee},
-    {key:"家賃",       v:S.rent},
-    {key:"広告費",     v:ad},
-    {key:"雑費",       v:S.misc}
-  ];
-  var totalCost = costs.reduce(function(s,c){ return s+c.v; }, 0);
-  return {total:total, pays:pays, labor:labor, costs:costs, totalCost:totalCost,
-          profit: total - totalCost, margin: total>0 ? (total-totalCost)/total*100 : 0};
+  opts = opts || {};
+  var rent = num(opts.rent, S.rent), ad = num(opts.ad, S.ad), misc = num(opts.misc, S.misc);
+  var total = sum(list), pays = list.map(payFor);
+  var labor = 0, laborFixed = 0, laborVar = 0;
+  pays.forEach(function(d){
+    labor += d.pay;
+    if(d.basis === "保証") laborFixed += d.pay; else laborVar += d.pay;
+  });
+  var sh = S.shaho/100;
+  var shaho = labor*sh, shahoFixed = laborFixed*sh, shahoVar = laborVar*sh;
+  var royalty = total * S.royalty/100;
+  var fee = total * taxMul() * (S.card/100) * (S.fee/100);   /* 手数料は税込の決済額にかかる */
+  var costs = [{key:"業務委託費", v:labor}];
+  if(shaho > 0) costs.push({key:"社会保険", v:shaho});
+  costs.push({key:"ロイヤリティ", v:royalty},
+             {key:"決済手数料", v:fee},
+             {key:"家賃", v:rent},
+             {key:"広告費", v:ad},
+             {key:"雑費", v:misc});
+  var totalCost = sum(costs.map(function(c){ return c.v; }));
+  var variable = laborVar + shahoVar + royalty + fee;
+  var fixed = laborFixed + shahoFixed + rent + ad + misc;
+  var profit = total - totalCost;
+  return {total:total, pays:pays, labor:labor, laborFixed:laborFixed, laborVar:laborVar,
+          shaho:shaho, royalty:royalty, fee:fee, rent:rent, ad:ad, misc:misc,
+          costs:costs, totalCost:totalCost, profit:profit,
+          margin: total > 0 ? profit/total*100 : 0,
+          variable:variable, fixed:fixed,
+          contribution: total - variable,
+          contRate: total > 0 ? (total - variable)/total*100 : 0};
 }
-/* いまのスタッフ間の売上比を保ったまま、総売上だけを動かす */
+function staffTotal(){ return sum(S.staff); }
 function spread(total){
-  var cur = S.staff, sum = cur.reduce(function(x, v){ return x + v; }, 0);
-  if(sum > 0) return cur.map(function(v){ return total * v / sum; });
+  var cur = S.staff, t = staffTotal();
+  if(t > 0) return cur.map(function(v){ return total * v / t; });
   return cur.map(function(){ return total / cur.length; });
 }
-function profitAt(total){ return calc(spread(total)).profit; }
 function breakeven(){
   var step = 10000, cap = 4000000 * Math.max(S.staff.length, 2);
-  for(var v = 0; v <= cap; v += step){ if(profitAt(v) >= 0) return v; }
+  for(var v = 0; v <= cap; v += step){ if(calc(spread(v)).profit >= 0) return v; }
   return null;
 }
 
-/* ── 描画: ウォーターフォール ──────────────────────────── */
-function renderWF(R, hostId){
-  var lo = Math.min(0, R.profit);
-  var hi = Math.max(R.total, R.totalCost, 1);
-  var span = hi - lo;
-  var x = function(v){ return (v - lo) / span * 100; };
-  var zero = x(0);
-  var showZero = lo < 0;
-
-  var html = "";
-  function row(cls, label, barHTML, amt, pctText){
-    html += '<div class="wf-row '+cls+'">'
-          +   '<div class="w-label">'+label+'</div>'
-          +   '<div class="track">'+ (showZero ? '<div class="zeroline" style="left:'+zero+'%"></div>' : '') + barHTML +'</div>'
-          +   '<div class="w-amt num">'+amt+'</div>'
-          +   '<div class="w-pct num">'+pctText+'</div>'
-          + '</div>';
-  }
-  function bar(cls, from, to){
-    var l = Math.min(x(from), x(to)), w = Math.abs(x(to) - x(from));
-    return '<div class="bar '+cls+'" style="left:'+l+'%;width:'+Math.max(w,0.4)+'%"></div>';
-  }
-
-  row("gross", "売上", bar("gross", 0, R.total), yen(R.total), "100%");
-
-  var run = R.total;
-  R.costs.forEach(function(c){
-    var to = run - c.v;
-    row("", c.key, bar("cost", run, to), "−"+yen(c.v),
-        R.total>0 ? pct(c.v/R.total*100) : "—");
-    run = to;
-  });
-
-  var sign = R.profit >= 0 ? "pos" : "neg";
-  row("total "+sign, "税引前利益", bar(sign, 0, R.profit), yen(R.profit),
-      R.total>0 ? pct(R.margin) : "—");
-
-  document.getElementById(hostId || "wf").innerHTML = html;
+/* ══ 年の記録 ══════════════════════════════════════════ */
+function yearKeys(){
+  return Object.keys(S.years).map(Number).filter(isFinite).sort(function(a, b){ return a - b; });
 }
+function ensureYear(y){ if(!S.years[y]) S.years[y] = emptyMonths(); }
+function mOv(y, i){ var a = S.years[y]; return (a && a[i]) || {s:null, r:null, a:null, m:null}; }
+function mSales(y, i){ var o = mOv(y, i); return o.s === null ? staffTotal() : o.s; }
+function mRent(y, i){ var o = mOv(y, i); return o.r === null ? S.rent : o.r; }
+function mAd(y, i){ var o = mOv(y, i); return o.a === null ? S.ad : o.a; }
+function mMisc(y, i){ var o = mOv(y, i); return o.m === null ? S.misc : o.m; }
+function mEdited(y, i){ var o = mOv(y, i); return o.s !== null || o.r !== null || o.a !== null || o.m !== null; }
 
-/* ── 描画: スタッフ ───────────────────────────────────── */
-var CIRCLED = ["①","②","③","④","⑤","⑥","⑦","⑧","⑨","⑩"];
-function staffName(i){ return "スタッフ" + (CIRCLED[i] || (i + 1)); }
-
-function renderStaff(R){
-  var html = "";
-  R.pays.forEach(function(d, i){
-    var name = staffName(i);
-    var chip = d.basis === "保証"
-      ? '<span class="chip guar">最低保証を適用</span>'
-      : '<span class="chip tag">歩合</span>';
-    var f = d.basis === "保証"
-      ? (S.mode==="floor" && d.sales < S.guarLine
-          ? "個人売上が保証ライン "+man(S.guarLine)+"円 に届かないため、保証額 "+yen(S.guar)+" を支給。（歩合なら "+yen(d.comm)+"）"
-          : "歩合 "+yen(d.comm)+" が保証額 "+yen(S.guar)+" を下回るため保証額を支給。")
-      : yen(d.sales)+" × "+d.rate+"% = "+yen(d.comm);
-    html += '<div class="staff-card">'
-          +   '<h3><span>'+name+'</span>'+chip+'</h3>'
-          +   '<div class="kv"><span>個人売上</span><b class="num">'+yen(d.sales)+'</b></div>'
-          +   '<div class="kv"><span>適用料率</span><b class="num">'+d.rate+'%</b></div>'
-          +   '<div class="kv big"><span>支給額</span><b class="num">'+yen(d.pay)+'</b></div>'
-          +   '<div class="formula">'+f+'</div>'
-          + '</div>';
-  });
-  document.getElementById("staff").innerHTML = html;
-}
-
-/* ── 年間（12ヶ月の積み上げ） ─────────────────────────── */
-var MONTHS = ["1月","2月","3月","4月","5月","6月","7月","8月","9月","10月","11月","12月"];
-function staffTotal(){ return S.staff.reduce(function(x, v){ return x + v; }, 0); }
-function ov(i){ return S.months[i] || {s:null, a:null}; }
-function monthSales(i){ var o = ov(i); return o.s === null ? staffTotal() : o.s; }
-function monthAd(i){ var o = ov(i); return o.a === null ? S.ad : o.a; }
-function isEdited(i){ var o = ov(i); return o.s !== null || o.a !== null; }
-
-function calcYear(){
-  var rows = [], sums = {}, order = [], total = 0;
+function calcYear(y){
+  if(!S.years[y]) return null;
+  var rows = [], order = [], sums = {}, agg = {
+    total:0, labor:0, laborFixed:0, laborVar:0, shaho:0, royalty:0, fee:0,
+    rent:0, ad:0, misc:0, variable:0, fixed:0
+  };
   for(var i = 0; i < 12; i++){
-    var sales = monthSales(i), ad = monthAd(i);
-    var R = calc(spread(sales), {ad: ad});
-    rows.push({i:i, sales:sales, ad:ad, R:R, edited:isEdited(i)});
-    total += R.total;
+    var sales = mSales(y, i), rent = mRent(y, i), ad = mAd(y, i), misc = mMisc(y, i);
+    var R = calc(spread(sales), {rent:rent, ad:ad, misc:misc});
+    rows.push({i:i, sales:sales, rent:rent, ad:ad, misc:misc, R:R, edited:mEdited(y, i)});
+    ["total","labor","laborFixed","laborVar","shaho","royalty","fee","rent","ad","misc","variable","fixed"]
+      .forEach(function(k){ agg[k] += R[k]; });
     R.costs.forEach(function(c){
       if(sums[c.key] === undefined){ sums[c.key] = 0; order.push(c.key); }
       sums[c.key] += c.v;
     });
   }
   var costs = order.map(function(k){ return {key:k, v:sums[k]}; });
-  var totalCost = costs.reduce(function(x, c){ return x + c.v; }, 0);
-  return {rows:rows, total:total, costs:costs, totalCost:totalCost,
-          profit: total - totalCost, margin: total > 0 ? (total - totalCost)/total*100 : 0};
+  var totalCost = sum(costs.map(function(c){ return c.v; }));
+  var profit = agg.total - totalCost;
+  return {rows:rows, total:agg.total, labor:agg.labor, laborFixed:agg.laborFixed, laborVar:agg.laborVar,
+          shaho:agg.shaho, royalty:agg.royalty, fee:agg.fee, rent:agg.rent, ad:agg.ad, misc:agg.misc,
+          costs:costs, totalCost:totalCost, profit:profit,
+          margin: agg.total > 0 ? profit/agg.total*100 : 0,
+          variable:agg.variable, fixed:agg.fixed,
+          contribution: agg.total - agg.variable,
+          contRate: agg.total > 0 ? (agg.total - agg.variable)/agg.total*100 : 0};
+}
+function yearBreakeven(Y){
+  if(!Y || Y.total <= 0) return null;
+  function pAt(k){
+    var p = 0;
+    for(var i = 0; i < 12; i++){
+      var r = Y.rows[i];
+      p += calc(spread(r.sales * k), {rent:r.rent, ad:r.ad, misc:r.misc}).profit;
+    }
+    return p;
+  }
+  var hit = null, k;
+  for(k = 0; k <= 3.0001; k += 0.02){ if(pAt(k) >= 0){ hit = k; break; } }
+  if(hit === null) return null;
+  for(k = Math.max(0, hit - 0.02); k <= hit + 0.0001; k += 0.002){ if(pAt(k) >= 0){ hit = k; break; } }
+  return Y.total * hit;
 }
 
-function visible(el){ return !!(el && el.offsetParent !== null); }
+/* ══ 経営指標 ══════════════════════════════════════════ */
+function stMax(v, ok, warn){ return v <= ok ? "ok" : (v <= warn ? "mid" : "ng"); }
+function stMin(v, ok, warn){ return v >= ok ? "ok" : (v >= warn ? "mid" : "ng"); }
+var ST_LABEL = {ok:"良好", mid:"注意", ng:"要改善"};
 
-/* 月別テーブルは一度だけ組み、あとは計算結果のセルだけ書き換える */
-function buildMonthTable(){
+function metricsOf(R, be, isYear){
+  var n = S.staff.length, div = isYear ? 12 : 1;
+  var per = R.total > 0 ? R.total / div / n : 0;
+  var beRatio = (be !== null && R.total > 0) ? be / R.total * 100 : null;
+  var laborAll = R.labor + R.shaho;
+  var taxed = R.profit > 0 ? R.profit * (1 - S.tax/100) : R.profit;
+  var out = [];
+  function row(name, note, val, bench, status){ out.push({name:name, note:note, val:val, bench:bench, status:status}); }
+
+  row("限界利益", "売上 − 変動費（売上に連動して増える費用）", yen(R.contribution),
+      "固定費 " + yen(R.fixed) + " をここから賄う", null);
+  row("限界利益率", "限界利益 ÷ 売上", pct(R.contRate),
+      "目安 55% 以上", R.total > 0 ? stMin(R.contRate, 55, 45) : null);
+  row("営業利益率", "税引前利益 ÷ 売上", pct(R.margin),
+      "目安 15% 以上", R.total > 0 ? stMin(R.margin, 15, 5) : null);
+  row("損益分岐点比率", "損益分岐点売上 ÷ 実際の売上",
+      beRatio === null ? "—" : pct(beRatio),
+      "目安 80% 以下", beRatio === null ? null : stMax(beRatio, 80, 90));
+  row("安全余裕率", "売上がこれだけ落ちても赤字にならない",
+      beRatio === null ? "—" : pct(100 - beRatio),
+      "目安 20% 以上", beRatio === null ? null : stMin(100 - beRatio, 20, 10));
+  row("労働分配率", "業務委託費（社会保険含む）÷ 売上",
+      R.total > 0 ? pct(laborAll/R.total*100) : "—",
+      "目安 55% 以下", R.total > 0 ? stMax(laborAll/R.total*100, 55, 65) : null);
+  row("一人当たり売上", isYear ? "年間売上 ÷ 12 ÷ 人数（月平均）" : "総売上 ÷ 人数",
+      yen(per), "目安 月100万円以上", per > 0 ? stMin(per, 1000000, 800000) : null);
+  row("家賃比率", "家賃 ÷ 売上", R.total > 0 ? pct(R.rent/R.total*100) : "—",
+      "目安 10% 以下", R.total > 0 ? stMax(R.rent/R.total*100, 10, 15) : null);
+  row("広告費比率", "広告費 ÷ 売上", R.total > 0 ? pct(R.ad/R.total*100) : "—",
+      "目安 10% 以下", R.total > 0 ? stMax(R.ad/R.total*100, 10, 15) : null);
+  row("税引後利益（概算）", "実効税率 " + S.tax + "% を引いた残り", yen(taxed),
+      "欠損金の繰越や控除は未反映", null);
+  return out;
+}
+function renderMetrics(hostId, R, be, isYear){
   var html = "";
-  for(var i = 0; i < 12; i++){
-    html += '<tr data-i="'+i+'">'
-      +  '<td>'+MONTHS[i]+'</td>'
-      +  '<td><input class="m-in num" type="number" inputmode="numeric" step="10000" min="0" '
-      +      'data-i="'+i+'" data-f="s" aria-label="'+MONTHS[i]+'の総売上"></td>'
-      +  '<td><input class="m-in num" type="number" inputmode="numeric" step="5000" min="0" '
-      +      'data-i="'+i+'" data-f="a" aria-label="'+MONTHS[i]+'の広告費"></td>'
-      +  '<td class="num m-labor">—</td><td class="num m-profit">—</td>'
-      + '</tr>';
+  metricsOf(R, be, isYear).forEach(function(m){
+    var bench = m.status
+      ? '<span class="m-bench ' + m.status + '"><span class="dot ' + m.status + '"></span>'
+        + '<span><span class="lab">' + ST_LABEL[m.status] + '</span> ・ ' + m.bench + '</span></span>'
+      : '<span class="m-bench">' + m.bench + '</span>';
+    html += '<div class="metric"><div class="m-name">' + m.name + '<em>' + m.note + '</em></div>'
+          + '<div class="m-val num">' + m.val + '</div>' + bench + '</div>';
+  });
+  document.getElementById(hostId).innerHTML = html;
+}
+
+/* ══ 描画: ウォーターフォール ══════════════════════════ */
+function renderWF(R, hostId){
+  var lo = Math.min(0, R.profit), hi = Math.max(R.total, R.totalCost, 1), span = hi - lo;
+  var x = function(v){ return (v - lo)/span*100; };
+  var zero = x(0), showZero = lo < 0, html = "";
+  function bar(cls, from, to){
+    var l = Math.min(x(from), x(to)), w = Math.abs(x(to) - x(from));
+    return '<div class="bar ' + cls + '" style="left:' + l + '%;width:' + Math.max(w, 0.4) + '%"></div>';
   }
-  document.getElementById("monthBody").innerHTML = html;
-  Array.prototype.forEach.call(document.querySelectorAll("#monthBody .m-in"), function(el){
-    el.addEventListener("input", function(){
-      var i = +el.dataset.i, f = el.dataset.f, raw = el.value.trim();
-      var v = parseFloat(raw);
-      S.months[i][f] = (raw === "" || !isFinite(v) || v < 0) ? null : v;
-      save(); render();
+  function row(cls, label, barHTML, amt, pctText){
+    html += '<div class="wf-row ' + cls + '"><div class="w-label">' + label + '</div>'
+          + '<div class="track">' + (showZero ? '<div class="zeroline" style="left:' + zero + '%"></div>' : '') + barHTML + '</div>'
+          + '<div class="w-amt num">' + amt + '</div><div class="w-pct num">' + pctText + '</div></div>';
+  }
+  row("gross", "売上", bar("gross", 0, R.total), yen(R.total), "100%");
+  var run = R.total;
+  R.costs.forEach(function(c){
+    var to = run - c.v;
+    row("", c.key, bar("cost", run, to), "−" + yen(c.v), R.total > 0 ? pct(c.v/R.total*100) : "—");
+    run = to;
+  });
+  var sign = R.profit >= 0 ? "pos" : "neg";
+  row("total " + sign, "税引前利益", bar(sign, 0, R.profit), yen(R.profit),
+      R.total > 0 ? pct(R.margin) : "—");
+  document.getElementById(hostId || "wf").innerHTML = html;
+}
+
+/* ══ 描画: スタッフ ════════════════════════════════════ */
+function staffName(i){ return "スタッフ" + (CIRCLED[i] || (i + 1)); }
+function renderStaff(R){
+  var html = "";
+  R.pays.forEach(function(d, i){
+    var guar = d.basis === "保証";
+    var chip = guar ? '<span class="chip guar">最低保証を適用</span>'
+                    : '<span class="chip tag">歩合</span>';
+    var f = guar
+      ? (S.mode === "floor" && d.sales < S.guarLine
+          ? "個人売上が保証ライン " + man(S.guarLine) + "円 に届かないため、保証額 " + yen(S.guar) + "（税込）を支給。歩合なら " + yen(d.commGross) + "。"
+          : "歩合 " + yen(d.commGross) + " が保証額 " + yen(S.guar) + " を下回るため保証額を支給。")
+      : yen(d.sales) + "（税抜） × " + d.rate + "% = " + yen(d.commGross) + "（税込）";
+    var netFirst = S.payBasis === "net";
+    html += '<div class="staff-card"><h3><span>' + staffName(i) + '</span>' + chip + '</h3>'
+          + '<div class="kv"><span>個人売上（税抜）</span><b class="num">' + yen(d.sales) + '</b></div>'
+          + '<div class="kv"><span>適用料率</span><b class="num">' + (guar ? "—" : d.rate + "%") + '</b></div>'
+          + '<div class="kv big"><span>' + (netFirst ? "委託費（税抜）" : "支払額（税込）") + '</span>'
+          + '<b class="num">' + yen(netFirst ? d.net : d.gross) + '</b></div>'
+          + '<div class="kv"><span>' + (netFirst ? "実際の支払額（税込）" : "税抜") + '</span>'
+          + '<b class="num">' + yen(netFirst ? d.gross : d.net) + '</b></div>'
+          + '<div class="formula">' + f + '</div></div>';
+  });
+  document.getElementById("staff").innerHTML = html;
+}
+
+/* ══ 描画: 料率表 ══════════════════════════════════════ */
+function renderTiers(R){
+  var ts = sortedTiers();
+  function tierIndex(s){ var idx = 0; for(var i = 0; i < ts.length; i++){ if(s >= ts[i].t) idx = i; } return idx; }
+  var act = R.pays.map(function(d){ return tierIndex(d.sales); });
+  var html = "", inverted = -1;
+  ts.forEach(function(rowv, i){
+    var warn = i > 0 && rowv.r < ts[i-1].r;
+    if(warn && inverted < 0) inverted = i;
+    html += '<tr class="' + (warn ? "warn " : "") + (act.indexOf(i) >= 0 ? "active" : "") + '">'
+      + '<td><span class="mark">' + (warn ? "!" : "") + '</span>'
+      + '<input type="number" data-i="' + i + '" data-f="t" step="50000" min="0" value="' + rowv.t + '" '
+      + 'style="width:calc(100% - 18px)" aria-label="売上基準' + (i+1) + '"></td>'
+      + '<td><input type="number" data-i="' + i + '" data-f="r" step="1" min="0" max="100" value="' + rowv.r + '" '
+      + 'aria-label="料率' + (i+1) + '"></td></tr>';
+  });
+  document.getElementById("tierBody").innerHTML = html;
+
+  var note = "";
+  if(inverted >= 0){
+    var bad = ts[inverted], prev = ts[inverted-1];
+    note = '<div class="note">元の表では <b>' + bad.t.toLocaleString("ja-JP") + '円 が ' + bad.r + '%</b> で、'
+      + 'ひとつ前の段（' + prev.t.toLocaleString("ja-JP") + '円・' + prev.r + '%）より低くなっています。'
+      + 'このままだと売上を上げたのに支給額が下がる逆転が起きます（'
+      + yen(prev.t*prev.r/100) + " → " + yen(bad.t*bad.r/100) + '）。';
+    note += '</div>';
+  }
+  document.getElementById("tierNote").innerHTML = note;
+  Array.prototype.forEach.call(document.querySelectorAll(".tiers input"), function(el){
+    el.addEventListener("change", function(){
+      var ts2 = sortedTiers(), i = +el.dataset.i, f = el.dataset.f, v = parseFloat(el.value);
+      if(!isFinite(v) || v < 0) return render();
+      ts2[i][f] = v; S.tiers = ts2; save(); render();
     });
   });
 }
-function updateMonthTable(Y){
-  var focus = document.activeElement;
-  Y.rows.forEach(function(row){
-    var tr = document.querySelector('#monthBody tr[data-i="'+row.i+'"]');
-    if(!tr) return;
-    tr.className = (row.edited ? "edited " : "") + (row.R.profit < 0 ? "loss" : "");
-    var ins = tr.querySelectorAll(".m-in");
-    if(ins[0] !== focus) ins[0].value = row.sales;
-    if(ins[1] !== focus) ins[1].value = row.ad;
-    tr.querySelector(".m-labor").textContent = yen(row.R.labor);
-    tr.querySelector(".m-profit").textContent = yen(row.R.profit);
-  });
-  document.getElementById("ftSales").textContent  = yen(Y.total);
-  document.getElementById("ftAd").textContent     = yen(Y.rows.reduce(function(x,r){ return x + r.ad; }, 0));
-  document.getElementById("ftLabor").textContent  = yen(Y.rows.reduce(function(x,r){ return x + r.R.labor; }, 0));
-  document.getElementById("ftProfit").textContent = yen(Y.profit);
+
+/* ══ 描画: 感度カーブ ══════════════════════════════════ */
+var tt = document.getElementById("tt"), curveData = null;
+function visible(el){ return !!(el && el.offsetParent !== null); }
+function niceStep(raw){
+  var mag = Math.pow(10, Math.floor(Math.log(raw)/Math.LN10)), n = raw/mag;
+  return (n <= 1 ? 1 : n <= 2 ? 2 : n <= 5 ? 5 : 10) * mag;
 }
-
-function renderYearChart(Y){
-  var svg = document.getElementById("yearChart");
-  if(!visible(svg.parentNode)) return;
-  var W = Math.max(svg.parentNode.clientWidth, 280), H = 210;
-  var P = {t:20, r:10, b:24, l:58};
-  var iw = W - P.l - P.r, ih = H - P.t - P.b;
-  var vals = Y.rows.map(function(r){ return r.R.profit; });
-  var vMax = Math.max.apply(null, vals.concat([0]));
-  var vMin = Math.min.apply(null, vals.concat([0]));
-  var pad = Math.max((vMax - vMin) * 0.14, 20000);
-  vMax += pad; vMin -= (vMin < 0 ? pad : 0);
-  var Y2 = function(v){ return P.t + (vMax - v)/(vMax - vMin) * ih; };
-  var zeroY = Y2(0);
-  var slot = iw / 12, bw = Math.min(slot * 0.6, 42);
-
-  var g = "";
-  var raw = (vMax - vMin)/3;
-  var mag = Math.pow(10, Math.floor(Math.log(raw)/Math.LN10));
-  var st = Math.ceil(raw/mag)*mag;
-  for(var v = Math.ceil(vMin/st)*st; v <= vMax; v += st){
-    var y = Y2(v);
-    g += '<line x1="'+P.l+'" y1="'+y+'" x2="'+(P.l+iw)+'" y2="'+y+'" stroke="var(--line)" stroke-width="1"/>'
-      +  '<text x="'+(P.l-9)+'" y="'+(y+4)+'" text-anchor="end" font-size="10" fill="var(--ink3)" '
-      +  'font-family="IBM Plex Mono, monospace">'+(v===0?"0":(v<0?"−":"")+man(Math.abs(v)))+'</text>';
-  }
-
-  var showLabels = slot >= 52;
-  Y.rows.forEach(function(r, i){
-    var x = P.l + slot*i + (slot - bw)/2;
-    var yv = Y2(r.R.profit);
-    var pos = r.R.profit >= 0;
-    var rad = Math.min(4, bw/2, Math.abs(zeroY - yv));
-    var d = pos
-      ? "M"+x+","+zeroY+" L"+x+","+(yv+rad)+" Q"+x+","+yv+" "+(x+rad)+","+yv
-        +" L"+(x+bw-rad)+","+yv+" Q"+(x+bw)+","+yv+" "+(x+bw)+","+(yv+rad)+" L"+(x+bw)+","+zeroY+" Z"
-      : "M"+x+","+zeroY+" L"+x+","+(yv-rad)+" Q"+x+","+yv+" "+(x+rad)+","+yv
-        +" L"+(x+bw-rad)+","+yv+" Q"+(x+bw)+","+yv+" "+(x+bw)+","+(yv-rad)+" L"+(x+bw)+","+zeroY+" Z";
-    g += '<path d="'+d+'" fill="'+(pos?"var(--good)":"var(--bad)")+'"/>';
-    if(showLabels){
-      g += '<text x="'+(x+bw/2)+'" y="'+(pos ? yv-6 : yv+13)+'" text-anchor="middle" font-size="10" '
-        +  'fill="var(--ink2)" font-family="IBM Plex Mono, monospace">'
-        +  (pos?"":"▲")+man(Math.abs(r.R.profit))+'</text>';
-    }
-    g += '<text x="'+(P.l + slot*i + slot/2)+'" y="'+(P.t+ih+17)+'" text-anchor="middle" font-size="10" '
-      +  'fill="var(--ink3)">'+MONTHS[i]+'</text>';
-  });
-  g += '<line x1="'+P.l+'" y1="'+zeroY+'" x2="'+(P.l+iw)+'" y2="'+zeroY+'" stroke="var(--line2)" stroke-width="1.5"/>';
-
-  svg.setAttribute("viewBox", "0 0 "+W+" "+H);
-  svg.setAttribute("width", W); svg.setAttribute("height", H);
-  svg.innerHTML = g;
-}
-
-function renderYear(Y){
-  var el = document.getElementById("yProfit");
-  el.textContent = yen(Y.profit);
-  el.className = "k-val num " + (Y.profit >= 0 ? "pos" : "neg");
-  document.getElementById("yPnlChip").innerHTML =
-    '<span class="chip '+(Y.profit>=0?"pos":"neg")+'">'+(Y.profit>=0?"黒字":"赤字")+'</span>';
-  document.getElementById("yProfitSub").textContent =
-    "利益率 " + (Y.total>0 ? pct(Y.margin) : "—") + " ・ 月あたり平均 " + yen(Y.profit/12);
-  document.getElementById("ySales").textContent = yen(Y.total);
-  document.getElementById("ySalesSub").textContent = "費用の合計 " + yen(Y.totalCost);
-  var pos = Y.rows.filter(function(r){ return r.R.profit >= 0; }).length;
-  document.getElementById("yPos").textContent = pos + " / 12";
-  document.getElementById("yPosSub").textContent =
-    pos === 12 ? "全ての月で黒字です" : (12 - pos) + "ヶ月が赤字です";
-
-  renderWF(Y, "ywf");
-  updateMonthTable(Y);
-  renderYearChart(Y);
-}
-
-/* ── 描画: 感度カーブ ─────────────────────────────────── */
-var tt = document.getElementById("tt");
-var curveData = null;
+function profitAt(total){ return calc(spread(total)).profit; }
 
 function renderCurve(R, be){
   var svg = document.getElementById("curve");
   if(!visible(svg.parentNode)) return;
-  var W = svg.parentNode.clientWidth;
-  if(!W || W < 200){ W = Math.max(svg.parentNode.getBoundingClientRect().width, 320); }
-  var H = 260;
-  var P = {t:18, r:16, b:30, l:66};
-  var iw = Math.max(W - P.l - P.r, 60), ih = H - P.t - P.b;
-
-  var cur = R.total;
-  var anchor = be != null ? be : cur;
+  var W = Math.max(svg.parentNode.clientWidth, 280), H = 260;
+  var P = {t:18, r:16, b:30, l:66}, iw = W - P.l - P.r, ih = H - P.t - P.b;
+  var cur = R.total, anchor = be !== null ? be : cur;
   var lo = Math.max(0, Math.min(cur*0.55, anchor*0.7));
   var hi = Math.max(cur*1.45, anchor*1.35, lo + 900000);
-  lo = Math.floor(lo/100000)*100000;
-  hi = Math.ceil(hi/100000)*100000;
+  lo = Math.floor(lo/100000)*100000; hi = Math.ceil(hi/100000)*100000;
 
   var N = 140, pts = [];
-  for(var i=0;i<=N;i++){
-    var s = lo + (hi-lo)*i/N;
-    pts.push({s:s, p:profitAt(s)});
-  }
-  var pMin = Math.min(0, Math.min.apply(null, pts.map(function(d){return d.p;})));
-  var pMax = Math.max(0, Math.max.apply(null, pts.map(function(d){return d.p;})));
-  var padY = Math.max((pMax - pMin) * 0.12, 20000);
-  pMin -= padY; pMax += padY;
+  for(var i = 0; i <= N; i++){ var s2 = lo + (hi-lo)*i/N; pts.push({s:s2, p:profitAt(s2)}); }
+  var pMin = Math.min(0, Math.min.apply(null, pts.map(function(d){ return d.p; })));
+  var pMax = Math.max(0, Math.max.apply(null, pts.map(function(d){ return d.p; })));
+  var padY = Math.max((pMax - pMin)*0.12, 20000); pMin -= padY; pMax += padY;
+  var X = function(s){ return P.l + (s - lo)/(hi - lo)*iw; };
+  var Y = function(p){ return P.t + (pMax - p)/(pMax - pMin)*ih; };
+  var zeroY = Y(0), g = "";
 
-  var X = function(s){ return P.l + (s - lo)/(hi - lo) * iw; };
-  var Y = function(p){ return P.t + (pMax - p)/(pMax - pMin) * ih; };
-  var zeroY = Y(0);
-
-  // y ticks
-  var rawStep = (pMax - pMin)/4;
-  var mag = Math.pow(10, Math.floor(Math.log(rawStep)/Math.LN10));
-  var step = Math.ceil(rawStep/mag)*mag;
-  var yt = [], start = Math.ceil(pMin/step)*step;
-  for(var v = start; v <= pMax; v += step) yt.push(v);
-
-  var g = "";
-  yt.forEach(function(v){
+  var st = niceStep((pMax - pMin)/4);
+  for(var v = Math.ceil(pMin/st)*st; v <= pMax; v += st){
     var y = Y(v);
-    g += '<line x1="'+P.l+'" y1="'+y+'" x2="'+(P.l+iw)+'" y2="'+y+'" stroke="var(--line)" stroke-width="1"/>';
-    g += '<text x="'+(P.l-9)+'" y="'+(y+4)+'" text-anchor="end" font-size="10.5" fill="var(--ink3)" font-family="IBM Plex Mono, monospace">'
-       + (v===0 ? "0" : (v<0?"−":"")+man(Math.abs(v))) + '</text>';
-  });
-
-  // x ticks（範囲が広がっても目盛りが混み合わないよう7本前後に保つ）
-  var xRaw = (hi - lo) / 7;
-  var xMag = Math.pow(10, Math.floor(Math.log(xRaw)/Math.LN10));
-  var xN = xRaw / xMag;
-  var xStep = (xN <= 1 ? 1 : xN <= 2 ? 2 : xN <= 5 ? 5 : 10) * xMag;
-  for(var s2 = Math.ceil(lo/xStep)*xStep; s2 <= hi; s2 += xStep){
-    g += '<text x="'+X(s2)+'" y="'+(P.t+ih+19)+'" text-anchor="middle" font-size="10.5" fill="var(--ink3)" font-family="IBM Plex Mono, monospace">'+man(s2)+'</text>';
+    g += '<line x1="' + P.l + '" y1="' + y + '" x2="' + (P.l+iw) + '" y2="' + y + '" stroke="var(--line)" stroke-width="1"/>'
+      + '<text x="' + (P.l-9) + '" y="' + (y+4) + '" text-anchor="end" font-size="10.5" fill="var(--ink3)" '
+      + 'font-family="IBM Plex Mono, monospace">' + (v === 0 ? "0" : (v < 0 ? "−" : "") + man(Math.abs(v))) + '</text>';
   }
-
-  // area + line
-  var line = pts.map(function(d,i){ return (i?"L":"M")+X(d.s).toFixed(1)+","+Y(d.p).toFixed(1); }).join(" ");
-  var area = "M"+X(pts[0].s).toFixed(1)+","+zeroY.toFixed(1)+" L"+line.substring(1)
-           + " L"+X(pts[N].s).toFixed(1)+","+zeroY.toFixed(1)+" Z";
-
-  var defs = '<defs>'
-    + '<clipPath id="clipTop"><rect x="'+P.l+'" y="'+P.t+'" width="'+iw+'" height="'+Math.max(zeroY-P.t,0)+'"/></clipPath>'
-    + '<clipPath id="clipBot"><rect x="'+P.l+'" y="'+zeroY+'" width="'+iw+'" height="'+Math.max(P.t+ih-zeroY,0)+'"/></clipPath>'
-    + '</defs>';
-
-  var body = defs + g
-    + '<path d="'+area+'" fill="var(--good)" opacity="0.16" clip-path="url(#clipTop)"/>'
-    + '<path d="'+area+'" fill="var(--bad)" opacity="0.16" clip-path="url(#clipBot)"/>'
-    + '<line x1="'+P.l+'" y1="'+zeroY+'" x2="'+(P.l+iw)+'" y2="'+zeroY+'" stroke="var(--line2)" stroke-width="1.5"/>'
-    + '<path d="'+line+'" fill="none" stroke="var(--ink)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>';
-
-  if(be != null && be >= lo && be <= hi){
-    body += '<line x1="'+X(be)+'" y1="'+P.t+'" x2="'+X(be)+'" y2="'+(P.t+ih)+'" stroke="var(--accent)" stroke-width="1.5" stroke-dasharray="4 4"/>'
-          + '<text x="'+(X(be)+6)+'" y="'+(P.t+12)+'" font-size="11" fill="var(--accent)" font-weight="600">分岐点 '+man(be)+'</text>';
+  var xStep = niceStep((hi - lo)/7);
+  for(var s3 = Math.ceil(lo/xStep)*xStep; s3 <= hi; s3 += xStep){
+    g += '<text x="' + X(s3) + '" y="' + (P.t+ih+19) + '" text-anchor="middle" font-size="10.5" fill="var(--ink3)" '
+      + 'font-family="IBM Plex Mono, monospace">' + man(s3) + '</text>';
+  }
+  var line = pts.map(function(d, i){ return (i ? "L" : "M") + X(d.s).toFixed(1) + "," + Y(d.p).toFixed(1); }).join(" ");
+  var area = "M" + X(pts[0].s).toFixed(1) + "," + zeroY.toFixed(1) + " L" + line.substring(1)
+           + " L" + X(pts[N].s).toFixed(1) + "," + zeroY.toFixed(1) + " Z";
+  var body = '<defs><clipPath id="clipTop"><rect x="' + P.l + '" y="' + P.t + '" width="' + iw + '" height="' + Math.max(zeroY-P.t, 0) + '"/></clipPath>'
+    + '<clipPath id="clipBot"><rect x="' + P.l + '" y="' + zeroY + '" width="' + iw + '" height="' + Math.max(P.t+ih-zeroY, 0) + '"/></clipPath></defs>'
+    + g
+    + '<path d="' + area + '" fill="var(--good)" opacity="0.16" clip-path="url(#clipTop)"/>'
+    + '<path d="' + area + '" fill="var(--bad)" opacity="0.16" clip-path="url(#clipBot)"/>'
+    + '<line x1="' + P.l + '" y1="' + zeroY + '" x2="' + (P.l+iw) + '" y2="' + zeroY + '" stroke="var(--line2)" stroke-width="1.5"/>'
+    + '<path d="' + line + '" fill="none" stroke="var(--ink)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>';
+  if(be !== null && be >= lo && be <= hi){
+    body += '<line x1="' + X(be) + '" y1="' + P.t + '" x2="' + X(be) + '" y2="' + (P.t+ih) + '" stroke="var(--accent)" stroke-width="1.5" stroke-dasharray="4 4"/>'
+      + '<text x="' + (X(be)+6) + '" y="' + (P.t+12) + '" font-size="11" fill="var(--accent)" font-weight="600">分岐点 ' + man(be) + '</text>';
   }
   if(cur >= lo && cur <= hi){
-    var cy = Y(R.profit);
-    body += '<circle cx="'+X(cur)+'" cy="'+cy+'" r="5.5" fill="var(--surface)" stroke="var(--ink)" stroke-width="2.5"/>';
+    body += '<circle cx="' + X(cur) + '" cy="' + Y(R.profit) + '" r="5.5" fill="var(--surface)" stroke="var(--ink)" stroke-width="2.5"/>';
   }
-  body += '<line id="cross" x1="0" y1="'+P.t+'" x2="0" y2="'+(P.t+ih)+'" stroke="var(--ink3)" stroke-width="1" stroke-dasharray="3 3" opacity="0"/>'
-        + '<circle id="crossDot" r="4.5" fill="var(--ink)" opacity="0"/>';
-
-  svg.setAttribute("viewBox", "0 0 "+W+" "+H);
-  svg.setAttribute("width", W);
-  svg.setAttribute("height", H);
+  body += '<line id="cross" x1="0" y1="' + P.t + '" x2="0" y2="' + (P.t+ih) + '" stroke="var(--ink3)" stroke-width="1" stroke-dasharray="3 3" opacity="0"/>'
+    + '<circle id="crossDot" r="4.5" fill="var(--ink)" opacity="0"/>';
+  svg.setAttribute("viewBox", "0 0 " + W + " " + H);
+  svg.setAttribute("width", W); svg.setAttribute("height", H);
   svg.innerHTML = body;
-
   curveData = {lo:lo, hi:hi, X:X, Y:Y, P:P, iw:iw, W:W};
-
-  document.getElementById("curveRead").textContent =
-    "表示範囲 " + man(lo) + "円 〜 " + man(hi) + "円";
+  document.getElementById("curveRead").textContent = "表示範囲 " + man(lo) + "円 〜 " + man(hi) + "円";
 }
-
 function bindCurve(){
   var svg = document.getElementById("curve");
+  function hide(){
+    tt.style.opacity = "0";
+    var c = svg.querySelector("#cross"), d = svg.querySelector("#crossDot");
+    if(c) c.setAttribute("opacity", "0");
+    if(d) d.setAttribute("opacity", "0");
+  }
   function move(ev){
     if(!curveData) return;
     var rect = svg.getBoundingClientRect();
     var cx = (ev.touches ? ev.touches[0].clientX : ev.clientX) - rect.left;
-    var scale = curveData.W / rect.width;
-    var px = cx * scale;
+    var scale = curveData.W / rect.width, px = cx * scale;
     if(px < curveData.P.l || px > curveData.P.l + curveData.iw){ hide(); return; }
-    var s = curveData.lo + (px - curveData.P.l)/curveData.iw * (curveData.hi - curveData.lo);
-    s = Math.round(s/10000)*10000;
+    var s = Math.round((curveData.lo + (px - curveData.P.l)/curveData.iw*(curveData.hi - curveData.lo))/10000)*10000;
     var p = profitAt(s);
-    var cross = svg.querySelector("#cross"), dot = svg.querySelector("#crossDot");
-    if(cross){ cross.setAttribute("x1", curveData.X(s)); cross.setAttribute("x2", curveData.X(s)); cross.setAttribute("opacity","0.8"); }
-    if(dot){ dot.setAttribute("cx", curveData.X(s)); dot.setAttribute("cy", curveData.Y(p)); dot.setAttribute("opacity","1"); }
-    tt.innerHTML = '<div style="color:var(--ink3);font-size:11px">総売上 '+yen(s)+'</div>'
-                 + '<b class="num" style="color:'+(p>=0?"var(--good)":"var(--bad)")+'">'+yen(p)+'</b>';
+    var c = svg.querySelector("#cross"), d = svg.querySelector("#crossDot");
+    if(c){ c.setAttribute("x1", curveData.X(s)); c.setAttribute("x2", curveData.X(s)); c.setAttribute("opacity", "0.8"); }
+    if(d){ d.setAttribute("cx", curveData.X(s)); d.setAttribute("cy", curveData.Y(p)); d.setAttribute("opacity", "1"); }
+    tt.innerHTML = '<div style="color:var(--ink3);font-size:11px">総売上 ' + yen(s) + '</div>'
+      + '<b class="num" style="color:' + (p >= 0 ? "var(--good)" : "var(--bad)") + '">' + yen(p) + '</b>';
     tt.style.opacity = "1";
     var left = curveData.X(s)/scale + 14;
     if(left > rect.width - 150) left = curveData.X(s)/scale - 150;
     tt.style.left = Math.max(0, left) + "px";
     tt.style.top = Math.max(0, curveData.Y(p)/scale - 46) + "px";
-  }
-  function hide(){
-    tt.style.opacity = "0";
-    var cross = svg.querySelector("#cross"), dot = svg.querySelector("#crossDot");
-    if(cross) cross.setAttribute("opacity","0");
-    if(dot) dot.setAttribute("opacity","0");
   }
   svg.addEventListener("mousemove", move);
   svg.addEventListener("mouseleave", hide);
@@ -968,144 +1008,233 @@ function bindCurve(){
   svg.addEventListener("touchend", hide);
 }
 
-/* ── 描画: 料率テーブル ───────────────────────────────── */
-function renderTiers(R){
-  var ts = sortedTiers();
-  function tierIndex(sales){
-    var idx = 0;
-    for(var i=0;i<ts.length;i++){ if(sales >= ts[i].t) idx = i; }
-    return idx;
+/* ══ 描画: 月別テーブル ════════════════════════════════ */
+var MFIELDS = [["s", 10000], ["r", 5000], ["a", 5000], ["m", 1000]];
+function buildMonthTable(){
+  var html = "";
+  for(var i = 0; i < 12; i++){
+    html += '<tr data-i="' + i + '"><td>' + MONTHS[i] + '</td>';
+    html += '<td><input class="m-in num" type="number" inputmode="numeric" step="10000" min="0" data-i="' + i + '" data-f="s" aria-label="' + MONTHS[i] + 'の総売上"></td>';
+    html += '<td class="num m-yoy">—</td>';
+    html += '<td><input class="m-in num" type="number" inputmode="numeric" step="5000" min="0" data-i="' + i + '" data-f="r" aria-label="' + MONTHS[i] + 'の家賃"></td>';
+    html += '<td><input class="m-in num" type="number" inputmode="numeric" step="5000" min="0" data-i="' + i + '" data-f="a" aria-label="' + MONTHS[i] + 'の広告費"></td>';
+    html += '<td><input class="m-in num" type="number" inputmode="numeric" step="1000" min="0" data-i="' + i + '" data-f="m" aria-label="' + MONTHS[i] + 'の雑費"></td>';
+    html += '<td class="num m-labor">—</td><td class="num m-cost">—</td><td class="num m-profit">—</td><td class="num m-margin">—</td></tr>';
   }
-  var act = R.pays.map(function(d){ return tierIndex(d.sales); });
-  var html = "", inverted = -1;
-  ts.forEach(function(row, i){
-    var warn = i > 0 && row.r < ts[i-1].r;
-    if(warn && inverted < 0) inverted = i;
-    var isActive = act.indexOf(i) >= 0;
-    html += '<tr class="'+(warn?"warn ":"")+(isActive?"active":"")+'">'
-          + '<td><span class="mark">'+(warn?"!":"")+'</span>'
-          + '<input type="number" data-i="'+i+'" data-f="t" step="50000" min="0" value="'+row.t+'" '
-          + 'style="width:calc(100% - 18px)" aria-label="売上基準'+(i+1)+'"></td>'
-          + '<td><input type="number" data-i="'+i+'" data-f="r" step="1" min="0" max="100" value="'+row.r+'" aria-label="料率'+(i+1)+'"></td>'
-          + '</tr>';
-  });
-  document.getElementById("tierBody").innerHTML = html;
-
-  var note = "";
-  if(inverted >= 0){
-    var bad = ts[inverted], prev = ts[inverted-1];
-    note = '<div class="note">元の表では <b>'+bad.t.toLocaleString("ja-JP")+'円 が '+bad.r+'%</b> で、'
-         + 'ひとつ前の段（'+prev.t.toLocaleString("ja-JP")+'円・'+prev.r+'%）より低くなっています。'
-         + 'このままだと売上を上げたのに支給額が下がる逆転が起きます（'
-         + yen(prev.t*prev.r/100)+' → '+yen(bad.t*bad.r/100)+'）。';
-    if(bad.t === 1400000 && bad.r === 34){
-      note += '<br><b>38%の打ち間違い</b>の可能性が高いです。'
-            + '<button type="button" class="btn btn-accent" id="fixTier">38%に直す</button>';
-    }
-    note += '</div>';
-  }
-  document.getElementById("tierNote").innerHTML = note;
-
-  var fix = document.getElementById("fixTier");
-  if(fix) fix.addEventListener("click", function(){
-    S.tiers.forEach(function(x){ if(x.t === 1400000) x.r = 38; });
-    save(); render();
-  });
-
-  Array.prototype.forEach.call(document.querySelectorAll(".tiers input"), function(el){
-    el.addEventListener("change", function(){
-      var ts2 = sortedTiers();
-      var i = +el.dataset.i, f = el.dataset.f, v = parseFloat(el.value);
-      if(!isFinite(v) || v < 0) return render();
-      ts2[i][f] = v;
-      S.tiers = ts2;
+  document.getElementById("monthBody").innerHTML = html;
+  Array.prototype.forEach.call(document.querySelectorAll("#monthBody .m-in"), function(el){
+    el.addEventListener("input", function(){
+      var i = +el.dataset.i, f = el.dataset.f, raw = el.value.trim(), v = parseFloat(raw);
+      ensureYear(S.year);
+      S.years[S.year][i][f] = (raw === "" || !isFinite(v) || v < 0) ? null : v;
       save(); render();
     });
   });
 }
+function updateMonthTable(Y, PY){
+  var focus = document.activeElement;
+  var table = document.querySelector(".months");
+  if(table) table.className = "months" + (PY ? "" : " no-prev");
+  Y.rows.forEach(function(r){
+    var tr = document.querySelector('#monthBody tr[data-i="' + r.i + '"]');
+    if(!tr) return;
+    tr.className = (r.edited ? "edited " : "") + (r.R.profit < 0 ? "loss" : "");
+    var ins = tr.querySelectorAll(".m-in");
+    var vals = [r.sales, r.rent, r.ad, r.misc];
+    for(var k = 0; k < ins.length; k++){ if(ins[k] !== focus) ins[k].value = vals[k]; }
+    var yo = tr.querySelector(".m-yoy");
+    if(PY && PY.rows[r.i].sales > 0){
+      var d = (r.sales - PY.rows[r.i].sales)/PY.rows[r.i].sales*100;
+      yo.textContent = signPct(d);
+      yo.className = "num m-yoy " + (d >= 0 ? "up" : "down");
+    }else{ yo.textContent = "—"; yo.className = "num m-yoy"; }
+    tr.querySelector(".m-labor").textContent = yen(r.R.labor);
+    tr.querySelector(".m-cost").textContent = yen(r.R.totalCost);
+    tr.querySelector(".m-profit").textContent = yen(r.R.profit);
+    tr.querySelector(".m-margin").textContent = r.R.total > 0 ? pct(r.R.margin) : "—";
+  });
+  function put(id, txt){ document.getElementById(id).textContent = txt; }
+  put("ftSales", yen(Y.total));
+  put("ftRent", yen(Y.rent)); put("ftAd", yen(Y.ad)); put("ftMisc", yen(Y.misc));
+  put("ftLabor", yen(Y.labor)); put("ftCost", yen(Y.totalCost));
+  put("ftProfit", yen(Y.profit));
+  put("ftMargin", Y.total > 0 ? pct(Y.margin) : "—");
+  put("ftYoy", (PY && PY.total > 0) ? signPct((Y.total - PY.total)/PY.total*100) : "—");
+}
 
-/* ── 全体描画 ─────────────────────────────────────────── */
-var lastR = null, lastBe = null, lastY = null, lastW = 0, roTimer;
+/* ══ 描画: 月別グラフ ══════════════════════════════════ */
+function renderYearChart(Y, PY){
+  var svg = document.getElementById("yearChart");
+  if(!visible(svg.parentNode)) return;
+  var W = Math.max(svg.parentNode.clientWidth, 280), H = 215;
+  var P = {t:20, r:10, b:24, l:58}, iw = W - P.l - P.r, ih = H - P.t - P.b;
+  var vals = Y.rows.map(function(r){ return r.R.profit; });
+  if(PY) vals = vals.concat(PY.rows.map(function(r){ return r.R.profit; }));
+  var vMax = Math.max.apply(null, vals.concat([0])), vMin = Math.min.apply(null, vals.concat([0]));
+  var pad = Math.max((vMax - vMin)*0.14, 20000);
+  vMax += pad; if(vMin < 0) vMin -= pad;
+  var Yc = function(v){ return P.t + (vMax - v)/(vMax - vMin)*ih; };
+  var zeroY = Yc(0), slot = iw/12, bw = Math.min(slot*0.6, 42), g = "";
+
+  var st = niceStep((vMax - vMin)/3);
+  for(var v = Math.ceil(vMin/st)*st; v <= vMax; v += st){
+    var y = Yc(v);
+    g += '<line x1="' + P.l + '" y1="' + y + '" x2="' + (P.l+iw) + '" y2="' + y + '" stroke="var(--line)" stroke-width="1"/>'
+      + '<text x="' + (P.l-9) + '" y="' + (y+4) + '" text-anchor="end" font-size="10" fill="var(--ink3)" '
+      + 'font-family="IBM Plex Mono, monospace">' + (v === 0 ? "0" : (v < 0 ? "−" : "") + man(Math.abs(v))) + '</text>';
+  }
+  var showLabels = slot >= 54;
+  Y.rows.forEach(function(r, i){
+    var x = P.l + slot*i + (slot - bw)/2, yv = Yc(r.R.profit), pos = r.R.profit >= 0;
+    var rad = Math.min(4, bw/2, Math.abs(zeroY - yv));
+    var d = pos
+      ? "M" + x + "," + zeroY + " L" + x + "," + (yv+rad) + " Q" + x + "," + yv + " " + (x+rad) + "," + yv
+        + " L" + (x+bw-rad) + "," + yv + " Q" + (x+bw) + "," + yv + " " + (x+bw) + "," + (yv+rad) + " L" + (x+bw) + "," + zeroY + " Z"
+      : "M" + x + "," + zeroY + " L" + x + "," + (yv-rad) + " Q" + x + "," + yv + " " + (x+rad) + "," + yv
+        + " L" + (x+bw-rad) + "," + yv + " Q" + (x+bw) + "," + yv + " " + (x+bw) + "," + (yv-rad) + " L" + (x+bw) + "," + zeroY + " Z";
+    g += '<path d="' + d + '" fill="' + (pos ? "var(--good)" : "var(--bad)") + '"/>';
+    if(showLabels){
+      g += '<text x="' + (x+bw/2) + '" y="' + (pos ? yv-6 : yv+13) + '" text-anchor="middle" font-size="10" '
+        + 'fill="var(--ink2)" font-family="IBM Plex Mono, monospace">' + (pos ? "" : "▲") + man(Math.abs(r.R.profit)) + '</text>';
+    }
+    g += '<text x="' + (P.l + slot*i + slot/2) + '" y="' + (P.t+ih+17) + '" text-anchor="middle" font-size="10" fill="var(--ink3)">' + MONTHS[i] + '</text>';
+  });
+  if(PY){
+    var pl = PY.rows.map(function(r, i){
+      return (i ? "L" : "M") + (P.l + slot*i + slot/2).toFixed(1) + "," + Yc(r.R.profit).toFixed(1);
+    }).join(" ");
+    g += '<path d="' + pl + '" fill="none" stroke="var(--ink3)" stroke-width="2" stroke-dasharray="5 4" stroke-linejoin="round"/>';
+  }
+  g += '<line x1="' + P.l + '" y1="' + zeroY + '" x2="' + (P.l+iw) + '" y2="' + zeroY + '" stroke="var(--line2)" stroke-width="1.5"/>';
+  svg.setAttribute("viewBox", "0 0 " + W + " " + H);
+  svg.setAttribute("width", W); svg.setAttribute("height", H);
+  svg.innerHTML = g;
+
+  var lg = '<span><i style="background:var(--good)"></i>黒字の月</span>'
+         + '<span><i style="background:var(--bad)"></i>赤字の月</span>';
+  if(PY) lg += '<span><i class="dash"></i>' + (S.year - 1) + '年の利益</span>';
+  document.getElementById("yearLegend").innerHTML = lg;
+}
+
+/* ══ 描画: 年間ビュー ══════════════════════════════════ */
+function renderYearSelect(){
+  var ks = yearKeys(), html = "";
+  ks.forEach(function(y){
+    html += '<option value="' + y + '"' + (y === S.year ? " selected" : "") + '>' + y + "年</option>";
+  });
+  document.getElementById("yearSel").innerHTML = html;
+  document.getElementById("delYear").disabled = ks.length <= 1;
+  document.getElementById("copyYear").disabled = false;
+}
+function renderYear(){
+  ensureYear(S.year);
+  renderYearSelect();
+  var Y = calcYear(S.year);
+  var PY = S.years[S.year - 1] ? calcYear(S.year - 1) : null;
+  var be = yearBreakeven(Y);
+
+  var el = document.getElementById("yProfit");
+  el.textContent = yen(Y.profit);
+  el.className = "k-val num " + (Y.profit >= 0 ? "pos" : "neg");
+  document.getElementById("yPnlChip").innerHTML =
+    '<span class="chip ' + (Y.profit >= 0 ? "pos" : "neg") + '">' + (Y.profit >= 0 ? "黒字" : "赤字") + '</span>';
+  var psub = "利益率 " + (Y.total > 0 ? pct(Y.margin) : "—")
+    + " ・ 月平均 " + yen(Y.profit/12);
+  if(PY) psub += " ・ 前年比 " + (PY.profit !== 0 ? signPct((Y.profit - PY.profit)/Math.abs(PY.profit)*100) : "—");
+  document.getElementById("yProfitSub").textContent = psub;
+
+  document.getElementById("ySales").textContent = yen(Y.total);
+  document.getElementById("ySalesSub").textContent = "費用の合計 " + yen(Y.totalCost)
+    + (be !== null ? " ・ 分岐点 " + yen(be) : "");
+  document.getElementById("ySalesChip").innerHTML = (PY && PY.total > 0)
+    ? '<span class="chip ' + (Y.total >= PY.total ? "pos" : "neg") + '">前年比 '
+      + signPct((Y.total - PY.total)/PY.total*100) + '</span>' : "";
+
+  var pos = Y.rows.filter(function(r){ return r.R.profit >= 0; }).length;
+  document.getElementById("yPos").textContent = pos + " / 12";
+  document.getElementById("yPosSub").textContent = pos === 12
+    ? "すべての月で黒字です" : (12 - pos) + "ヶ月が赤字です";
+
+  renderWF(Y, "ywf");
+  renderMetrics("yMetrics", Y, be, true);
+  updateMonthTable(Y, PY);
+  lastY = Y; lastPY = PY;
+  renderYearChart(Y, PY);
+}
+
+/* ══ 全体描画 ══════════════════════════════════════════ */
+var lastR = null, lastBe = null, lastY = null, lastPY = null, lastW = 0, lastYW = 0, roTimer, yTimer;
 function render(){
-  var R = calc(S.staff);
-  var be = breakeven();
-
+  var R = calc(S.staff), be = breakeven();
   document.getElementById("totalSales").textContent = yen(R.total);
 
   var pEl = document.getElementById("profit");
   pEl.textContent = yen(R.profit);
   pEl.className = "k-val num " + (R.profit >= 0 ? "pos" : "neg");
   document.getElementById("pnlChip").innerHTML =
-    '<span class="chip '+(R.profit>=0?"pos":"neg")+'">'+(R.profit>=0?"黒字":"赤字")+'</span>';
+    '<span class="chip ' + (R.profit >= 0 ? "pos" : "neg") + '">' + (R.profit >= 0 ? "黒字" : "赤字") + '</span>';
   document.getElementById("profitSub").textContent =
-    "総売上 "+yen(R.total)+" − 費用 "+yen(R.totalCost);
-
-  document.getElementById("margin").textContent = R.total>0 ? pct(R.margin) : "—";
+    "総売上 " + yen(R.total) + " − 費用 " + yen(R.totalCost);
+  document.getElementById("margin").textContent = R.total > 0 ? pct(R.margin) : "—";
   document.getElementById("marginSub").textContent =
-    "人件費率 " + (R.total>0 ? pct(R.labor/R.total*100) : "—");
+    "労働分配率 " + (R.total > 0 ? pct((R.labor + R.shaho)/R.total*100) : "—");
   document.getElementById("staffHint").textContent = S.staff.length + "人分";
 
-  if(be == null){
+  if(be === null){
     document.getElementById("be").textContent = "—";
     document.getElementById("beSub").textContent = "この条件では黒字になりません";
   }else{
     document.getElementById("be").textContent = yen(be);
     var diff = R.total - be;
     document.getElementById("beSub").textContent =
-      (diff >= 0 ? "いまは "+yen(diff)+" 上回っています" : "あと "+yen(-diff)+" 必要です")
-      + "（1人あたり "+man(be/S.staff.length)+"円）";
+      (diff >= 0 ? "いまは " + yen(diff) + " 上回っています"
+                 : "あと " + yen(-diff) + " 必要です")
+      + "（1人あたり " + man(be/S.staff.length) + "円）";
   }
 
   lastR = R; lastBe = be;
-  renderWF(R);
+  renderWF(R, "wf");
+  renderMetrics("mMetrics", R, be, false);
   renderStaff(R);
   renderTiers(R);
   renderCurve(R, be);
+  renderYear();
 
-  var Y = calcYear();
-  lastY = Y;
-  renderYear(Y);
-
-  var isYear = S.view === "year";
-  var D = isYear ? Y : R;
+  var isYear = S.view === "year", D = isYear ? lastY : R;
   var dv = document.getElementById("dockProfit");
   dv.textContent = yen(D.profit);
   dv.className = "d-val num " + (D.profit >= 0 ? "pos" : "neg");
-  document.getElementById("dockLabel").textContent = isYear ? "年間の税引前利益" : "税引前利益";
+  document.getElementById("dockLabel").textContent = isYear
+    ? S.year + "年の税引前利益" : "税引前利益";
   document.getElementById("dockMargin").textContent = D.total > 0 ? pct(D.margin) : "";
 }
-
 function setView(v){
   S.view = (v === "year") ? "year" : "month";
   document.getElementById("monthView").hidden = S.view !== "month";
-  document.getElementById("yearView").hidden  = S.view !== "year";
+  document.getElementById("yearView").hidden = S.view !== "year";
   Array.prototype.forEach.call(document.querySelectorAll("#view button"), function(b){
     b.setAttribute("aria-pressed", b.dataset.view === S.view ? "true" : "false");
   });
-  lastW = 0;               /* 隠れている間は測れないので次の描画で測り直す */
+  lastW = 0; lastYW = 0;
   save(); render();
 }
 
-/* ── 入力バインド ─────────────────────────────────────── */
-var NUMS = [
-  ["rent","rent_r"], ["ad","ad_r"], ["misc","misc_r"],
-  ["royalty","royalty_r"], ["fee","fee_r"], ["card","card_r"],
-  ["guar",null], ["guarLine",null]
-];
-/* スタッフの売上欄は人数が変わったときだけ組み直す（入力中にフォーカスを奪わないため） */
+/* ══ 入力 ══════════════════════════════════════════════ */
+var NUMS = [["rent","rent_r"], ["ad","ad_r"], ["misc","misc_r"], ["royalty","royalty_r"],
+            ["fee","fee_r"], ["card","card_r"], ["shaho","shaho_r"], ["tax","tax_r"], ["consumption",null],
+            ["guar",null], ["guarLine",null]];
 function buildStaffInputs(){
   var host = document.getElementById("staffInputs"), html = "";
   S.staff.forEach(function(v, i){
-    html += '<div class="field">'
-      +   '<div class="field-top"><label for="st'+i+'">'+staffName(i)+'の個人売上<span class="unit">円</span></label>'
-      +   '<input type="number" id="st'+i+'" inputmode="numeric" step="10000" min="0" value="'+v+'"></div>'
-      +   '<input type="range" id="st'+i+'_r" min="0" max="2500000" step="10000" value="'+Math.min(v,2500000)+'" '
-      +   'aria-label="'+staffName(i)+'の個人売上スライダー">'
-      + '</div>';
+    html += '<div class="field"><div class="field-top">'
+      + '<label for="st' + i + '">' + staffName(i) + 'の個人売上<span class="unit">円 税抜</span></label>'
+      + '<input type="number" id="st' + i + '" inputmode="numeric" step="10000" min="0" value="' + v + '"></div>'
+      + '<input type="range" id="st' + i + '_r" min="0" max="2500000" step="10000" value="' + Math.min(v, 2500000) + '" '
+      + 'aria-label="' + staffName(i) + 'の個人売上スライダー"></div>';
   });
   host.innerHTML = html;
   S.staff.forEach(function(v, i){
-    var n = document.getElementById("st"+i), r = document.getElementById("st"+i+"_r");
+    var n = document.getElementById("st" + i), r = document.getElementById("st" + i + "_r");
     n.addEventListener("input", function(){
       var x = parseFloat(n.value);
       if(!isFinite(x) || x < 0) return;
@@ -1118,14 +1247,15 @@ function buildStaffInputs(){
 }
 function setCount(n){
   n = Math.max(1, Math.min(MAX_STAFF, Math.round(n)));
-  while(S.staff.length < n) S.staff.push(S.staff.length ? S.staff[S.staff.length - 1] : 900000);
+  while(S.staff.length < n) S.staff.push(S.staff.length ? S.staff[S.staff.length-1] : 900000);
   while(S.staff.length > n) S.staff.pop();
-  document.getElementById("headcount").value = n;
-  document.getElementById("hcMinus").disabled = n <= 1;
-  document.getElementById("hcPlus").disabled = n >= MAX_STAFF;
-  buildStaffInputs(); save(); render();
+  syncCount(); buildStaffInputs(); save(); render();
 }
-
+function syncCount(){
+  document.getElementById("headcount").value = S.staff.length;
+  document.getElementById("hcMinus").disabled = S.staff.length <= 1;
+  document.getElementById("hcPlus").disabled = S.staff.length >= MAX_STAFF;
+}
 function syncInputs(){
   NUMS.forEach(function(pair){
     var n = document.getElementById(pair[0]);
@@ -1138,14 +1268,13 @@ function syncInputs(){
   Array.prototype.forEach.call(document.querySelectorAll("#mode button"), function(b){
     b.setAttribute("aria-pressed", b.dataset.mode === S.mode ? "true" : "false");
   });
-  document.getElementById("headcount").value = S.staff.length;
-  document.getElementById("hcMinus").disabled = S.staff.length <= 1;
-  document.getElementById("hcPlus").disabled = S.staff.length >= MAX_STAFF;
+  Array.prototype.forEach.call(document.querySelectorAll("#basis button"), function(b){
+    b.setAttribute("aria-pressed", b.dataset.basis === S.payBasis ? "true" : "false");
+  });
+  syncCount();
 }
 NUMS.forEach(function(pair){
-  var key = pair[0];
-  var n = document.getElementById(key);
-  var r = pair[1] ? document.getElementById(pair[1]) : null;
+  var key = pair[0], n = document.getElementById(key), r = pair[1] ? document.getElementById(pair[1]) : null;
   if(n) n.addEventListener("input", function(){
     var v = parseFloat(n.value);
     if(!isFinite(v) || v < 0) return;
@@ -1160,10 +1289,10 @@ NUMS.forEach(function(pair){
   });
 });
 Array.prototype.forEach.call(document.querySelectorAll("#mode button"), function(b){
-  b.addEventListener("click", function(){
-    S.mode = b.dataset.mode;
-    syncInputs(); save(); render();
-  });
+  b.addEventListener("click", function(){ S.mode = b.dataset.mode; syncInputs(); save(); render(); });
+});
+Array.prototype.forEach.call(document.querySelectorAll("#basis button"), function(b){
+  b.addEventListener("click", function(){ S.payBasis = b.dataset.basis; syncInputs(); save(); render(); });
 });
 document.getElementById("hcMinus").addEventListener("click", function(){ setCount(S.staff.length - 1); });
 document.getElementById("hcPlus").addEventListener("click", function(){ setCount(S.staff.length + 1); });
@@ -1174,21 +1303,41 @@ document.getElementById("headcount").addEventListener("change", function(){
 Array.prototype.forEach.call(document.querySelectorAll("#view button"), function(b){
   b.addEventListener("click", function(){ setView(b.dataset.view); });
 });
+document.getElementById("yearSel").addEventListener("change", function(){
+  S.year = parseInt(this.value, 10); ensureYear(S.year); lastYW = 0; save(); render();
+});
+document.getElementById("addYear").addEventListener("click", function(){
+  var ks = yearKeys(), next = (ks.length ? ks[ks.length-1] : THIS_YEAR) + 1;
+  S.years[next] = emptyMonths(); S.year = next; lastYW = 0; save(); render();
+});
+document.getElementById("copyYear").addEventListener("click", function(){
+  var ks = yearKeys(), next = (ks.length ? ks[ks.length-1] : THIS_YEAR) + 1;
+  S.years[next] = JSON.parse(JSON.stringify(S.years[S.year] || emptyMonths()));
+  S.year = next; lastYW = 0; save(); render();
+});
+document.getElementById("delYear").addEventListener("click", function(){
+  var ks = yearKeys();
+  if(ks.length <= 1) return;
+  if(!window.confirm(S.year + "年の記録を削除します。この操作は取り消せません。")) return;
+  delete S.years[S.year];
+  var rest = yearKeys();
+  S.year = rest[rest.length-1];
+  lastYW = 0; save(); render();
+});
 document.getElementById("resetMonths").addEventListener("click", function(){
-  S.months = S.months.map(function(){ return {s:null, a:null}; });
-  save(); render();
+  S.years[S.year] = emptyMonths(); save(); render();
 });
 document.getElementById("reset").addEventListener("click", function(){
-  var keepView = S.view;
+  var keepView = S.view, keepYears = S.years, keepYear = S.year;
   S = JSON.parse(JSON.stringify(DEFAULTS));
-  S.months = []; for(var i=0;i<12;i++) S.months.push({s:null, a:null});
-  S.view = keepView;
+  S.view = keepView; S.years = keepYears; S.year = keepYear;
+  ensureYear(S.year);
   save(); syncInputs(); buildStaffInputs(); render();
 });
 document.getElementById("theme").addEventListener("click", function(){
   var root = document.documentElement;
-  var isDark = root.getAttribute("data-theme") === "dark" ||
-    (!root.getAttribute("data-theme") && window.matchMedia("(prefers-color-scheme: dark)").matches);
+  var isDark = root.getAttribute("data-theme") === "dark"
+    || (!root.getAttribute("data-theme") && window.matchMedia("(prefers-color-scheme: dark)").matches);
   root.setAttribute("data-theme", isDark ? "light" : "dark");
   render();
 });
@@ -1198,24 +1347,18 @@ window.addEventListener("resize", function(){
   clearTimeout(rt);
   rt = setTimeout(function(){ render(); }, 120);
 });
-
-/* グラフの器の幅が決まった時点で描き直す（初回表示・タブ切替・埋め込み時の幅0対策） */
 if(window.ResizeObserver){
-  new ResizeObserver(function(entries){
-    var w = Math.round(entries[0].contentRect.width);
+  new ResizeObserver(function(en){
+    var w = Math.round(en[0].contentRect.width);
     if(!w || w === lastW) return;
-    lastW = w;
-    clearTimeout(roTimer);
+    lastW = w; clearTimeout(roTimer);
     roTimer = setTimeout(function(){ if(lastR) renderCurve(lastR, lastBe); }, 60);
   }).observe(document.querySelector(".chart-wrap"));
-
-  var lastYW = 0, yTimer;
-  new ResizeObserver(function(entries){
-    var w = Math.round(entries[0].contentRect.width);
+  new ResizeObserver(function(en){
+    var w = Math.round(en[0].contentRect.width);
     if(!w || w === lastYW) return;
-    lastYW = w;
-    clearTimeout(yTimer);
-    yTimer = setTimeout(function(){ if(lastY) renderYearChart(lastY); }, 60);
+    lastYW = w; clearTimeout(yTimer);
+    yTimer = setTimeout(function(){ if(lastY) renderYearChart(lastY, lastPY); }, 60);
   }).observe(document.getElementById("yearChart").parentNode);
 }
 if(document.fonts && document.fonts.ready){ document.fonts.ready.then(function(){ render(); }); }
