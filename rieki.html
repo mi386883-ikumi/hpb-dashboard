@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>二人体制の損益シミュレーター</title>
+<title>整体院の損益シミュレーター</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Noto+Sans+JP:wght@400;500;700&family=Outfit:wght@500;600;700&display=swap">
@@ -108,6 +108,17 @@ body{
 }
 input[type="range"]{width:100%; accent-color:var(--accent); height:18px; margin:0; cursor:pointer}
 
+.stepper{display:flex; align-items:stretch; border:1px solid var(--line); border-radius:6px; overflow:hidden; background:var(--inset)}
+.stepper button{
+  width:30px; font:inherit; font-size:16px; line-height:1; cursor:pointer; color:var(--ink2);
+  background:var(--surface2); border:0; border-right:1px solid var(--line);
+}
+.stepper button:last-of-type{border-right:0; border-left:1px solid var(--line)}
+.stepper button:hover:not(:disabled){color:var(--accent)}
+.stepper button:disabled{opacity:.35; cursor:not-allowed}
+.stepper input[type="number"]{width:56px; border:0; border-radius:0; background:transparent; text-align:center}
+.stepper input::-webkit-outer-spin-button,.stepper input::-webkit-inner-spin-button{-webkit-appearance:none; margin:0}
+.stepper input[type=number]{-moz-appearance:textfield}
 .sum{
   display:flex; align-items:baseline; justify-content:space-between;
   margin-top:10px; padding:9px 11px; background:var(--inset); border-radius:7px;
@@ -203,8 +214,7 @@ input[type="range"]{width:100%; accent-color:var(--accent); height:18px; margin:
 }
 
 /* ── staff ────────────────────────────────────────────── */
-.staff{display:grid; grid-template-columns:1fr 1fr; gap:12px}
-@media (max-width:560px){ .staff{grid-template-columns:1fr} }
+.staff{display:grid; grid-template-columns:repeat(auto-fit,minmax(212px,1fr)); gap:12px}
 .staff-card{background:var(--surface2); border:1px solid var(--line); border-radius:8px; padding:12px 13px}
 .staff-card h3{margin:0 0 8px; font-size:12px; font-weight:700; color:var(--ink2); display:flex; align-items:center; justify-content:space-between; gap:8px}
 .kv{display:flex; align-items:baseline; justify-content:space-between; gap:8px; padding:3px 0; font-size:12.5px; color:var(--ink2)}
@@ -254,8 +264,8 @@ input[type="range"]{width:100%; accent-color:var(--accent); height:18px; margin:
 <div class="page">
   <header class="masthead">
     <p class="eyebrow">NAORU整体 &middot; 月次損益シミュレーション</p>
-    <h1>二人体制の損益シミュレーター</h1>
-    <p class="lede">スタッフ2人の個人売上と、月ごとに変わる家賃・広告費・雑費を入れると、歩合の人件費・ロイヤリティ15%・Square決済手数料を差し引いた<strong>税引前利益</strong>と<strong>損益分岐点</strong>が出ます。</p>
+    <h1>整体院の損益シミュレーター</h1>
+    <p class="lede">スタッフの人数と一人ずつの個人売上、月ごとに変わる家賃・広告費・雑費を入れると、歩合の人件費・ロイヤリティ15%・Square決済手数料を差し引いた<strong>税引前利益</strong>と<strong>損益分岐点</strong>が出ます。</p>
   </header>
 
   <div class="layout">
@@ -263,18 +273,17 @@ input[type="range"]{width:100%; accent-color:var(--accent); height:18px; margin:
     <form class="rail" id="rail" onsubmit="return false">
 
       <section class="card">
-        <div class="card-hd"><h2>売上</h2><span class="hint">個人売上を2人分</span></div>
+        <div class="card-hd"><h2>売上</h2><span class="hint">一人ずつの個人売上</span></div>
         <div class="card-bd">
           <div class="field">
-            <div class="field-top"><label for="salesA">スタッフ①の個人売上<span class="unit">円</span></label>
-              <input type="number" id="salesA" inputmode="numeric" step="10000" min="0"></div>
-            <input type="range" id="salesA_r" min="0" max="2500000" step="10000" aria-label="スタッフ①の個人売上スライダー">
+            <div class="field-top"><label for="headcount">スタッフの人数<span class="unit">人</span></label>
+              <div class="stepper">
+                <button type="button" id="hcMinus" data-step="-1" aria-label="人数を1人減らす">−</button>
+                <input type="number" id="headcount" inputmode="numeric" step="1" min="1" max="10">
+                <button type="button" id="hcPlus" data-step="1" aria-label="人数を1人増やす">＋</button>
+              </div></div>
           </div>
-          <div class="field">
-            <div class="field-top"><label for="salesB">スタッフ②の個人売上<span class="unit">円</span></label>
-              <input type="number" id="salesB" inputmode="numeric" step="10000" min="0"></div>
-            <input type="range" id="salesB_r" min="0" max="2500000" step="10000" aria-label="スタッフ②の個人売上スライダー">
-          </div>
+          <div id="staffInputs"></div>
           <div class="sum"><span>店舗の総売上</span><strong class="num" id="totalSales">—</strong></div>
         </div>
       </section>
@@ -378,12 +387,12 @@ input[type="range"]{width:100%; accent-color:var(--accent); height:18px; margin:
       </section>
 
       <section class="card">
-        <div class="card-hd"><h2>人件費の内訳</h2><span class="hint">2人分</span></div>
+        <div class="card-hd"><h2>人件費の内訳</h2><span class="hint" id="staffHint">—</span></div>
         <div class="card-bd"><div class="staff" id="staff"></div></div>
       </section>
 
       <section class="card">
-        <div class="card-hd"><h2>売上をいくらにすると利益がどう動くか</h2><span class="hint">2人の売上比は現在のまま</span></div>
+        <div class="card-hd"><h2>売上をいくらにすると利益がどう動くか</h2><span class="hint">売上比は現在のまま</span></div>
         <div class="card-bd">
           <div class="chart-wrap">
             <svg id="curve" role="img" aria-label="総売上に対する税引前利益の推移"></svg>
@@ -404,7 +413,7 @@ input[type="range"]{width:100%; accent-color:var(--accent); height:18px; margin:
           <li>人件費は<b>個人売上 × 料率</b>で1人ずつ計算し、最低保証と比べて決めます。表の料率は左のパネルで直接書き換えられます。</li>
           <li>ロイヤリティと決済手数料は<b>店舗の総売上</b>に対してかけています。決済手数料はカード・電子決済の比率をかけた分だけ発生します。</li>
           <li>出るのは<b>税引前利益</b>です。法人税・所得税、消費税の納付、社会保険の会社負担分、減価償却は含みません。</li>
-          <li>損益分岐点は、いまの2人の売上比のまま総売上を動かしたときに利益が0円以上になる最小の売上です。</li>
+          <li>損益分岐点は、<b>いまのスタッフ間の売上比のまま</b>総売上を動かしたときに、利益が0円以上になる最小の売上です。人数を増やすと最低保証の分だけ分岐点も上がります。</li>
           <li>入力した値はこのブラウザに保存され、次に開いたときも残ります。</li>
         </ul>
       </div>
@@ -433,15 +442,16 @@ var DEFAULT_TIERS = [
   {t:1500000, r:39},
   {t:1600000, r:40}
 ];
+var MAX_STAFF = 10;
 var DEFAULTS = {
-  salesA:1000000, salesB:900000,
+  staff:[1000000, 900000],
   rent:200000, ad:150000, misc:40000,
   royalty:15, fee:2.75, card:100,
   guar:250000, guarLine:1000000,
   mode:"floor",
   tiers: DEFAULT_TIERS.map(function(x){return {t:x.t, r:x.r};})
 };
-var KEY = "naoru-pl-sim-v1";
+var KEY = "naoru-pl-sim-v2";
 var S = load();
 
 function load(){
@@ -452,8 +462,13 @@ function load(){
       var o = JSON.parse(raw);
       for(var k in base){ if(o[k] !== undefined && o[k] !== null) base[k] = o[k]; }
       if(!Array.isArray(base.tiers) || !base.tiers.length) base.tiers = DEFAULTS.tiers;
+      if(o.staff === undefined && (o.salesA !== undefined || o.salesB !== undefined)){
+        base.staff = [+o.salesA || 0, +o.salesB || 0];   /* 旧バージョンからの引き継ぎ */
+      }
     }
   }catch(e){}
+  if(!Array.isArray(base.staff) || !base.staff.length) base.staff = DEFAULTS.staff.slice();
+  base.staff = base.staff.slice(0, MAX_STAFF).map(function(v){ return isFinite(v) && v > 0 ? +v : 0; });
   return base;
 }
 function save(){ try{ localStorage.setItem(KEY, JSON.stringify(S)); }catch(e){} }
@@ -482,10 +497,10 @@ function payFor(sales){
   if(comm < S.guar) return {pay:S.guar, rate:rate, comm:comm, basis:"保証", sales:sales};
   return {pay:comm, rate:rate, comm:comm, basis:"歩合", sales:sales};
 }
-function calc(a, b){
-  var total = a + b;
-  var pa = payFor(a), pb = payFor(b);
-  var labor = pa.pay + pb.pay;
+function calc(list){
+  var total = list.reduce(function(x, v){ return x + v; }, 0);
+  var pays = list.map(payFor);
+  var labor = pays.reduce(function(x, d){ return x + d.pay; }, 0);
   var royalty = total * S.royalty / 100;
   var fee = total * (S.card/100) * (S.fee/100);
   var costs = [
@@ -497,20 +512,19 @@ function calc(a, b){
     {key:"雑費",       v:S.misc}
   ];
   var totalCost = costs.reduce(function(s,c){ return s+c.v; }, 0);
-  return {total:total, pa:pa, pb:pb, costs:costs, totalCost:totalCost,
+  return {total:total, pays:pays, labor:labor, costs:costs, totalCost:totalCost,
           profit: total - totalCost, margin: total>0 ? (total-totalCost)/total*100 : 0};
 }
-function ratio(){
-  var t = S.salesA + S.salesB;
-  return t > 0 ? S.salesA/t : 0.5;
+/* いまのスタッフ間の売上比を保ったまま、総売上だけを動かす */
+function spread(total){
+  var cur = S.staff, sum = cur.reduce(function(x, v){ return x + v; }, 0);
+  if(sum > 0) return cur.map(function(v){ return total * v / sum; });
+  return cur.map(function(){ return total / cur.length; });
 }
-function profitAt(total){
-  var k = ratio();
-  return calc(total*k, total*(1-k)).profit;
-}
+function profitAt(total){ return calc(spread(total)).profit; }
 function breakeven(){
-  var step = 10000;
-  for(var v = 0; v <= 8000000; v += step){ if(profitAt(v) >= 0) return v; }
+  var step = 10000, cap = 4000000 * Math.max(S.staff.length, 2);
+  for(var v = 0; v <= cap; v += step){ if(profitAt(v) >= 0) return v; }
   return null;
 }
 
@@ -555,10 +569,13 @@ function renderWF(R){
 }
 
 /* ── 描画: スタッフ ───────────────────────────────────── */
+var CIRCLED = ["①","②","③","④","⑤","⑥","⑦","⑧","⑨","⑩"];
+function staffName(i){ return "スタッフ" + (CIRCLED[i] || (i + 1)); }
+
 function renderStaff(R){
   var html = "";
-  [["スタッフ①", R.pa], ["スタッフ②", R.pb]].forEach(function(p){
-    var name = p[0], d = p[1];
+  R.pays.forEach(function(d, i){
+    var name = staffName(i);
     var chip = d.basis === "保証"
       ? '<span class="chip guar">最低保証を適用</span>'
       : '<span class="chip tag">歩合</span>';
@@ -626,8 +643,11 @@ function renderCurve(R, be){
        + (v===0 ? "0" : (v<0?"−":"")+man(Math.abs(v))) + '</text>';
   });
 
-  // x ticks
-  var xStep = (hi-lo) <= 1200000 ? 200000 : ((hi-lo) <= 2600000 ? 400000 : 600000);
+  // x ticks（範囲が広がっても目盛りが混み合わないよう7本前後に保つ）
+  var xRaw = (hi - lo) / 7;
+  var xMag = Math.pow(10, Math.floor(Math.log(xRaw)/Math.LN10));
+  var xN = xRaw / xMag;
+  var xStep = (xN <= 1 ? 1 : xN <= 2 ? 2 : xN <= 5 ? 5 : 10) * xMag;
   for(var s2 = Math.ceil(lo/xStep)*xStep; s2 <= hi; s2 += xStep){
     g += '<text x="'+X(s2)+'" y="'+(P.t+ih+19)+'" text-anchor="middle" font-size="10.5" fill="var(--ink3)" font-family="IBM Plex Mono, monospace">'+man(s2)+'</text>';
   }
@@ -713,7 +733,7 @@ function renderTiers(R){
     for(var i=0;i<ts.length;i++){ if(sales >= ts[i].t) idx = i; }
     return idx;
   }
-  var act = [tierIndex(R.pa.sales), tierIndex(R.pb.sales)];
+  var act = R.pays.map(function(d){ return tierIndex(d.sales); });
   var html = "", inverted = -1;
   ts.forEach(function(row, i){
     var warn = i > 0 && row.r < ts[i-1].r;
@@ -762,8 +782,9 @@ function renderTiers(R){
 }
 
 /* ── 全体描画 ─────────────────────────────────────────── */
+var lastR = null, lastBe = null;
 function render(){
-  var R = calc(S.salesA, S.salesB);
+  var R = calc(S.staff);
   var be = breakeven();
 
   document.getElementById("totalSales").textContent = yen(R.total);
@@ -778,7 +799,8 @@ function render(){
 
   document.getElementById("margin").textContent = R.total>0 ? pct(R.margin) : "—";
   document.getElementById("marginSub").textContent =
-    "人件費率 " + (R.total>0 ? pct((R.pa.pay+R.pb.pay)/R.total*100) : "—");
+    "人件費率 " + (R.total>0 ? pct(R.labor/R.total*100) : "—");
+  document.getElementById("staffHint").textContent = S.staff.length + "人分";
 
   if(be == null){
     document.getElementById("be").textContent = "—";
@@ -788,7 +810,7 @@ function render(){
     var diff = R.total - be;
     document.getElementById("beSub").textContent =
       (diff >= 0 ? "いまは "+yen(diff)+" 上回っています" : "あと "+yen(-diff)+" 必要です")
-      + "（1人 "+man(be/2)+"円）";
+      + "（1人あたり "+man(be/S.staff.length)+"円）";
   }
 
   var dv = document.getElementById("dockProfit");
@@ -796,6 +818,7 @@ function render(){
   dv.className = "d-val num " + (R.profit >= 0 ? "pos" : "neg");
   document.getElementById("dockMargin").textContent = R.total>0 ? pct(R.margin) : "";
 
+  lastR = R; lastBe = be;
   renderWF(R);
   renderStaff(R);
   renderTiers(R);
@@ -804,11 +827,44 @@ function render(){
 
 /* ── 入力バインド ─────────────────────────────────────── */
 var NUMS = [
-  ["salesA","salesA_r"], ["salesB","salesB_r"],
   ["rent","rent_r"], ["ad","ad_r"], ["misc","misc_r"],
   ["royalty","royalty_r"], ["fee","fee_r"], ["card","card_r"],
   ["guar",null], ["guarLine",null]
 ];
+/* スタッフの売上欄は人数が変わったときだけ組み直す（入力中にフォーカスを奪わないため） */
+function buildStaffInputs(){
+  var host = document.getElementById("staffInputs"), html = "";
+  S.staff.forEach(function(v, i){
+    html += '<div class="field">'
+      +   '<div class="field-top"><label for="st'+i+'">'+staffName(i)+'の個人売上<span class="unit">円</span></label>'
+      +   '<input type="number" id="st'+i+'" inputmode="numeric" step="10000" min="0" value="'+v+'"></div>'
+      +   '<input type="range" id="st'+i+'_r" min="0" max="2500000" step="10000" value="'+Math.min(v,2500000)+'" '
+      +   'aria-label="'+staffName(i)+'の個人売上スライダー">'
+      + '</div>';
+  });
+  host.innerHTML = html;
+  S.staff.forEach(function(v, i){
+    var n = document.getElementById("st"+i), r = document.getElementById("st"+i+"_r");
+    n.addEventListener("input", function(){
+      var x = parseFloat(n.value);
+      if(!isFinite(x) || x < 0) return;
+      S.staff[i] = x; r.value = Math.min(x, +r.max); save(); render();
+    });
+    r.addEventListener("input", function(){
+      S.staff[i] = parseFloat(r.value); n.value = S.staff[i]; save(); render();
+    });
+  });
+}
+function setCount(n){
+  n = Math.max(1, Math.min(MAX_STAFF, Math.round(n)));
+  while(S.staff.length < n) S.staff.push(S.staff.length ? S.staff[S.staff.length - 1] : 900000);
+  while(S.staff.length > n) S.staff.pop();
+  document.getElementById("headcount").value = n;
+  document.getElementById("hcMinus").disabled = n <= 1;
+  document.getElementById("hcPlus").disabled = n >= MAX_STAFF;
+  buildStaffInputs(); save(); render();
+}
+
 function syncInputs(){
   NUMS.forEach(function(pair){
     var n = document.getElementById(pair[0]);
@@ -821,6 +877,9 @@ function syncInputs(){
   Array.prototype.forEach.call(document.querySelectorAll("#mode button"), function(b){
     b.setAttribute("aria-pressed", b.dataset.mode === S.mode ? "true" : "false");
   });
+  document.getElementById("headcount").value = S.staff.length;
+  document.getElementById("hcMinus").disabled = S.staff.length <= 1;
+  document.getElementById("hcPlus").disabled = S.staff.length >= MAX_STAFF;
 }
 NUMS.forEach(function(pair){
   var key = pair[0];
@@ -845,9 +904,15 @@ Array.prototype.forEach.call(document.querySelectorAll("#mode button"), function
     syncInputs(); save(); render();
   });
 });
+document.getElementById("hcMinus").addEventListener("click", function(){ setCount(S.staff.length - 1); });
+document.getElementById("hcPlus").addEventListener("click", function(){ setCount(S.staff.length + 1); });
+document.getElementById("headcount").addEventListener("change", function(){
+  var v = parseInt(this.value, 10);
+  setCount(isFinite(v) ? v : S.staff.length);
+});
 document.getElementById("reset").addEventListener("click", function(){
   S = JSON.parse(JSON.stringify(DEFAULTS));
-  save(); syncInputs(); render();
+  save(); syncInputs(); buildStaffInputs(); render();
 });
 document.getElementById("theme").addEventListener("click", function(){
   var root = document.documentElement;
@@ -864,16 +929,20 @@ window.addEventListener("resize", function(){
 });
 
 /* グラフの器の幅が決まった時点で描き直す（初回表示・タブ切替・埋め込み時の幅0対策） */
-var lastW = 0;
+var lastW = 0, roTimer;
 if(window.ResizeObserver){
   new ResizeObserver(function(entries){
     var w = Math.round(entries[0].contentRect.width);
-    if(w > 0 && w !== lastW){ lastW = w; render(); }
+    if(!w || w === lastW) return;
+    lastW = w;
+    clearTimeout(roTimer);
+    roTimer = setTimeout(function(){ if(lastR) renderCurve(lastR, lastBe); }, 60);
   }).observe(document.querySelector(".chart-wrap"));
 }
 if(document.fonts && document.fonts.ready){ document.fonts.ready.then(function(){ render(); }); }
 
 syncInputs();
+buildStaffInputs();
 render();
 bindCurve();
 })();
