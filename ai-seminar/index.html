@@ -1,0 +1,1175 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AIが喜ぶ指示書のつくり方 ｜ 整体院のためのAI活用ゼミ 第1回</title>
+<meta name="description" content="整体院の先生向けAI活用ゼミ 第1回の資料。プロンプトに「深み」をつくる型、作業を任せて時間を作る実演（画像生成・HPBブログ・Googleマイビジネス投稿）、ChatGPT / Claude / Claude Code の使い分けまで、全35枚。">
+<meta name="author" content="NAORU整体 大森院 宮崎">
+<!-- 検索に出したくない場合は、次の行のコメントを外してください -->
+<!-- <meta name="robots" content="noindex, nofollow"> -->
+<meta name="theme-color" content="#FBFAF7" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0E1A1F" media="(prefers-color-scheme: dark)">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="整体院のためのAI活用ゼミ">
+<meta property="og:title" content="AIが喜ぶ指示書のつくり方">
+<meta property="og:description" content="整体院の先生向けAI活用ゼミ 第1回の資料。プロンプトに「深み」をつくる型、作業を任せて時間を作る実演（画像生成・HPBブログ・Googleマイビジネス投稿）、ChatGPT / Claude / Claude Code の使い分けまで、全35枚。">
+<meta property="og:image" content="https://mi386883-ikumi.github.io/hpb-dashboard/ai-seminar/ogp.png">
+<meta property="og:locale" content="ja_JP">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="AIが喜ぶ指示書のつくり方">
+<meta name="twitter:description" content="整体院の先生向けAI活用ゼミ 第1回の資料。プロンプトに「深み」をつくる型、作業を任せて時間を作る実演（画像生成・HPBブログ・Googleマイビジネス投稿）、ChatGPT / Claude / Claude Code の使い分けまで、全35枚。">
+<meta name="twitter:image" content="https://mi386883-ikumi.github.io/hpb-dashboard/ai-seminar/ogp.png">
+<link rel="icon" href="./favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;500;700;900&family=Shippori+Mincho+B1:wght@700&family=JetBrains+Mono:wght@400;700&display=swap">
+<style>
+*,*::before,*::after{box-sizing:border-box}
+html{color-scheme:light}
+@media (prefers-color-scheme: dark){html:not([data-theme="light"]){color-scheme:dark}}
+html[data-theme="dark"]{color-scheme:dark}
+html[data-theme="light"]{color-scheme:light}
+html,body{height:100%}
+body{margin:0;-webkit-text-size-adjust:100%}
+img{max-width:100%;height:auto}
+[hidden]{display:none!important}
+</style>
+</head>
+<body>
+<style>
+:root{
+  --ground:#FBFAF7;
+  --surface:#FFFFFF;
+  --ink:#14232A;
+  --muted:#61757B;
+  --faint:#8A9AA0;
+  --rule:#DBE4E3;
+  --rule-soft:#EDF1F0;
+  --accent:#0E8C96;
+  --accent-ink:#07636B;
+  --accent-soft:#E2F2F2;
+  --warn:#B2483C;
+  --warn-ink:#8E3227;
+  --warn-soft:#F8E9E5;
+  --gold:#A9822F;
+  --section-bg:#0B4F56;
+  --section-fg:#F1FAFA;
+  --section-dim:#8FC5C8;
+  --shadow:0 18px 50px rgba(20,35,42,.16);
+  --mono:"JetBrains Mono","SFMono-Regular",Consolas,monospace;
+  --sans:"Zen Kaku Gothic New","Hiragino Sans","Yu Gothic",sans-serif;
+  --serif:"Shippori Mincho B1","Hiragino Mincho ProN",serif;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --ground:#0E1A1F;
+    --surface:#17272D;
+    --ink:#E7EEEE;
+    --muted:#96AAB0;
+    --faint:#6F868C;
+    --rule:#2B3F46;
+    --rule-soft:#1E3138;
+    --accent:#3EC7CE;
+    --accent-ink:#7BDFE4;
+    --accent-soft:#10353A;
+    --warn:#E48374;
+    --warn-ink:#F0A597;
+    --warn-soft:#38201C;
+    --gold:#D6B269;
+    --section-bg:#08343A;
+    --section-fg:#E3F6F7;
+    --section-dim:#6BA9AE;
+    --shadow:0 18px 50px rgba(0,0,0,.5);
+  }
+}
+:root[data-theme="dark"]{
+  --ground:#0E1A1F;
+  --surface:#17272D;
+  --ink:#E7EEEE;
+  --muted:#96AAB0;
+  --faint:#6F868C;
+  --rule:#2B3F46;
+  --rule-soft:#1E3138;
+  --accent:#3EC7CE;
+  --accent-ink:#7BDFE4;
+  --accent-soft:#10353A;
+  --warn:#E48374;
+  --warn-ink:#F0A597;
+  --warn-soft:#38201C;
+  --gold:#D6B269;
+  --section-bg:#08343A;
+  --section-fg:#E3F6F7;
+  --section-dim:#6BA9AE;
+  --shadow:0 18px 50px rgba(0,0,0,.5);
+}
+
+*{box-sizing:border-box}
+body{
+  margin:0;background:var(--ground);color:var(--ink);
+  font-family:var(--sans);
+  overflow:hidden;
+}
+
+/* ---------- deck chrome ---------- */
+.progress{position:fixed;top:0;left:0;height:3px;background:var(--accent);z-index:40;transition:width .28s ease}
+.chrome{
+  position:fixed;right:18px;bottom:16px;z-index:40;
+  display:flex;align-items:center;gap:4px;
+  background:var(--surface);border:1px solid var(--rule);border-radius:999px;
+  padding:4px 7px;box-shadow:var(--shadow);
+  opacity:.42;transition:opacity .18s ease;
+}
+.chrome:hover,.chrome:focus-within{opacity:1}
+@media (prefers-reduced-motion: reduce){.chrome{transition:none}}
+.chrome button{
+  font-family:var(--sans);font-size:12.5px;font-weight:700;color:var(--ink);
+  background:transparent;border:0;border-radius:999px;cursor:pointer;
+  padding:6px 9px;line-height:1;
+}
+.chrome button:hover{background:var(--rule-soft)}
+.chrome button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.chrome .divider{width:1px;height:16px;background:var(--rule)}
+.hint{
+  position:fixed;left:18px;bottom:20px;z-index:40;
+  font-size:11px;letter-spacing:.1em;color:var(--faint);
+  font-family:var(--mono);opacity:.55;
+}
+
+/* ---------- stage ---------- */
+.deck{position:fixed;inset:0}
+.stage{
+  position:absolute;left:50%;top:50%;width:1280px;height:720px;
+  transform-origin:center center;
+  background:var(--ground);
+}
+.slide{
+  position:absolute;inset:0;padding:56px 72px 42px;
+  display:none;flex-direction:column;
+  background:var(--ground);
+}
+.slide.is-active{display:flex}
+@media (prefers-reduced-motion: no-preference){
+  .slide.is-active{animation:rise .3s ease both}
+  @keyframes rise{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+}
+
+.head{
+  display:flex;justify-content:space-between;align-items:baseline;
+  border-bottom:1px solid var(--rule);padding-bottom:10px;margin-bottom:26px;flex:none;
+}
+.eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.18em;color:var(--accent-ink);text-transform:uppercase}
+.eyebrow b{font-weight:700}
+.pageno{font-family:var(--mono);font-size:12px;letter-spacing:.12em;color:var(--faint);font-variant-numeric:tabular-nums}
+.body{flex:1;min-height:0;display:flex;flex-direction:column;gap:18px}
+
+h1,h2,h3{margin:0;text-wrap:balance;line-height:1.24}
+.t-xl{font-size:62px;font-weight:900;letter-spacing:-.01em}
+.t-lg{font-size:44px;font-weight:900;letter-spacing:-.005em}
+.t-md{font-size:34px;font-weight:800}
+.lead{font-size:21px;line-height:1.75;color:var(--muted);max-width:62ch}
+p{margin:0}
+strong{font-weight:800}
+.mark{color:var(--accent-ink);font-weight:800}
+.mark-w{color:var(--warn-ink);font-weight:800}
+
+/* ---------- cover ---------- */
+.cover{justify-content:center;gap:0;background:var(--ground)}
+.cover .kicker{
+  font-family:var(--mono);font-size:13px;letter-spacing:.22em;color:var(--accent-ink);
+  padding-bottom:18px;
+}
+.cover h1{font-size:82px;font-weight:900;letter-spacing:-.02em;line-height:1.14}
+.cover .sub{
+  font-family:var(--serif);font-size:27px;color:var(--muted);
+  padding-top:22px;line-height:1.6;
+}
+.cover .foot{
+  margin-top:auto;display:flex;justify-content:space-between;align-items:flex-end;
+  border-top:1px solid var(--rule);padding-top:16px;
+  font-size:15px;color:var(--muted);
+}
+.cover .foot .who{font-weight:700;color:var(--ink);font-size:17px}
+.cover .foot .mono{font-family:var(--mono);font-size:12px;letter-spacing:.1em;color:var(--faint)}
+
+/* ---------- section divider ---------- */
+.section{background:var(--section-bg);color:var(--section-fg);justify-content:center}
+.section .num{
+  font-family:var(--mono);font-size:14px;letter-spacing:.24em;color:var(--section-dim);
+  padding-bottom:20px;
+}
+.section h2{font-size:66px;font-weight:900;letter-spacing:-.015em;color:var(--section-fg)}
+.section .desc{
+  font-size:21px;line-height:1.8;color:var(--section-dim);padding-top:20px;max-width:56ch;
+}
+.section .strip{display:flex;gap:0;margin-top:auto;border-top:1px solid rgba(255,255,255,.16);padding-top:14px}
+.section .strip span{
+  font-family:var(--mono);font-size:11.5px;letter-spacing:.12em;color:var(--section-dim);
+  padding-right:22px;
+}
+
+/* ---------- statement ---------- */
+.statement{justify-content:center}
+.statement .big{
+  font-family:var(--serif);font-size:56px;line-height:1.5;font-weight:700;
+  letter-spacing:-.01em;text-wrap:balance;
+}
+.statement .big em{font-style:normal;color:var(--accent-ink);border-bottom:4px solid var(--accent);padding-bottom:2px}
+.statement .after{font-size:20px;color:var(--muted);padding-top:28px;line-height:1.8;max-width:60ch}
+
+/* ---------- form-style numbered list (問診票) ---------- */
+.fields{display:grid;gap:0;border-top:1px solid var(--rule)}
+.field{
+  display:grid;grid-template-columns:54px 1fr 1.15fr;gap:22px;align-items:baseline;
+  padding:13px 4px;border-bottom:1px solid var(--rule);
+}
+.field .n{
+  font-family:var(--mono);font-size:13px;font-weight:700;color:var(--accent);
+  letter-spacing:.06em;font-variant-numeric:tabular-nums;
+}
+.field .k{font-size:21px;font-weight:800}
+.field .k small{display:block;font-size:14px;font-weight:500;color:var(--faint);padding-top:3px;letter-spacing:.02em}
+.field .v{font-size:16.5px;line-height:1.7;color:var(--muted)}
+.field .v b{color:var(--ink);font-weight:700}
+
+/* ---------- two-up compare ---------- */
+.compare{display:grid;grid-template-columns:1fr 1fr;gap:26px;flex:1;min-height:0}
+.pane{
+  border:1px solid var(--rule);border-radius:3px;background:var(--surface);
+  padding:22px 24px;display:flex;flex-direction:column;gap:14px;min-height:0;
+}
+.pane.bad{border-color:var(--warn);background:var(--warn-soft)}
+.pane.good{border-color:var(--accent);background:var(--accent-soft)}
+.tag{
+  display:inline-flex;align-items:center;gap:8px;align-self:flex-start;
+  font-family:var(--mono);font-size:11.5px;letter-spacing:.14em;font-weight:700;
+}
+.tag .g{
+  width:20px;height:20px;border-radius:50%;display:grid;place-items:center;
+  font-size:12px;line-height:1;color:#fff;
+}
+.bad .tag{color:var(--warn-ink)} .bad .tag .g{background:var(--warn)}
+.good .tag{color:var(--accent-ink)} .good .tag .g{background:var(--accent)}
+.pane .said{font-size:17px;line-height:1.8;white-space:pre-wrap}
+.pane .why{font-size:14.5px;line-height:1.7;color:var(--muted);border-top:1px dashed var(--rule);padding-top:12px;margin-top:auto}
+
+/* ---------- prompt block ---------- */
+.prompt{
+  border:1px solid var(--rule);border-left:3px solid var(--accent);
+  background:var(--surface);border-radius:2px;
+  font-family:var(--mono);font-size:14px;line-height:1.72;
+  padding:16px 18px;white-space:pre-wrap;color:var(--ink);overflow:hidden;
+}
+.prompt.sm{font-size:12.7px;line-height:1.66;padding:14px 15px}
+.prompt .cm{color:var(--accent-ink);font-weight:700}
+.prompt .ng{color:var(--warn-ink);font-weight:700}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:18px;flex:1;min-height:0}
+
+/* ---------- cards ---------- */
+.cards{display:grid;gap:18px;flex:1;min-height:0}
+.c3{grid-template-columns:repeat(3,1fr)}
+.c2{grid-template-columns:repeat(2,1fr)}
+.card{
+  border-top:2px solid var(--accent);padding:16px 2px 0;
+  display:flex;flex-direction:column;gap:9px;
+}
+.card .ct{font-size:22px;font-weight:800;line-height:1.35}
+.card .cd{font-size:15.5px;line-height:1.78;color:var(--muted)}
+.card .cd b{color:var(--ink);font-weight:700}
+.card .cn{font-family:var(--mono);font-size:11.5px;letter-spacing:.14em;color:var(--accent-ink);font-weight:700}
+
+/* ---------- table ---------- */
+.tblwrap{overflow-x:auto;flex:1;min-height:0}
+table{border-collapse:collapse;width:100%;font-size:16px}
+th,td{text-align:left;padding:12px 14px;border-bottom:1px solid var(--rule);vertical-align:top;line-height:1.6}
+thead th{
+  font-family:var(--mono);font-size:11.5px;letter-spacing:.13em;color:var(--muted);
+  font-weight:700;border-bottom:1px solid var(--ink);padding-bottom:9px;text-transform:uppercase;
+}
+tbody th{font-weight:700;font-size:16px;color:var(--ink);width:170px}
+td.hi{background:var(--accent-soft);color:var(--ink);font-weight:700}
+th.hi{color:var(--accent-ink)}
+.tnote{font-size:13.5px;color:var(--faint);padding-top:10px}
+
+/* ---------- misc list ---------- */
+.todos{display:grid;gap:0;border-top:1px solid var(--rule)}
+.todo{display:grid;grid-template-columns:34px 1fr 78px;gap:20px;align-items:start;padding:17px 4px;border-bottom:1px solid var(--rule)}
+.todo .box{
+  width:26px;height:26px;border:2px solid var(--accent);border-radius:3px;
+  display:grid;place-items:center;margin-top:3px;
+  color:transparent;font-size:16px;font-weight:900;line-height:1;
+}
+.todo.done .box{background:var(--accent);border-color:var(--accent);color:var(--surface)}
+.todo .goal{font-size:26px;font-weight:800;line-height:1.4;letter-spacing:-.005em}
+.todo .how{font-size:15px;color:var(--muted);padding-top:8px;line-height:1.72}
+.todo .how b{color:var(--ink);font-weight:700}
+.todo .part{
+  font-family:var(--mono);font-size:11px;letter-spacing:.1em;color:var(--accent-ink);
+  font-weight:700;white-space:nowrap;padding-top:12px;text-align:right;
+}
+.checks{display:grid;gap:11px}
+.check{display:grid;grid-template-columns:26px 1fr;gap:12px;align-items:start;font-size:17.5px;line-height:1.7}
+.check .b{
+  width:19px;height:19px;border:1.5px solid var(--accent);border-radius:2px;margin-top:4px;
+  display:grid;place-items:center;color:var(--accent);font-size:12px;font-weight:700;
+}
+.check b{font-weight:800}
+.check small{display:block;font-size:14.5px;color:var(--muted);padding-top:2px;line-height:1.65}
+
+.myth{display:grid;grid-template-columns:1fr 1fr;gap:14px 30px;flex:1;align-content:start}
+.myth .m{border-left:2px solid var(--rule);padding:2px 0 2px 16px}
+.myth .q{font-size:17.5px;font-weight:800;color:var(--warn-ink);line-height:1.5}
+.myth .a{font-size:15px;line-height:1.72;color:var(--muted);padding-top:5px}
+.myth .a b{color:var(--ink);font-weight:700}
+
+.steps{display:flex;flex-direction:column;gap:0;border-top:1px solid var(--rule)}
+.step{display:grid;grid-template-columns:96px 1fr;gap:24px;padding:14px 2px;border-bottom:1px solid var(--rule);align-items:baseline}
+.step .tm{font-family:var(--mono);font-size:13px;color:var(--accent-ink);font-weight:700;letter-spacing:.06em;font-variant-numeric:tabular-nums}
+.step .wt{font-size:17.5px;line-height:1.65}
+.step .wt b{font-weight:800}
+
+.kv{display:grid;grid-template-columns:auto 1fr;gap:10px 18px;font-size:17px;line-height:1.7}
+.kv dt{font-weight:800;color:var(--accent-ink);white-space:nowrap}
+.kv dd{margin:0;color:var(--muted)}
+
+.foot-note{
+  font-size:14px;color:var(--faint);border-top:1px solid var(--rule);padding-top:11px;margin-top:auto;line-height:1.7;
+}
+
+/* ---------- overview ---------- */
+.overview{
+  position:fixed;inset:0;z-index:50;background:var(--ground);
+  display:none;overflow-y:auto;padding:44px 48px 80px;
+}
+.overview.open{display:block}
+.overview h2{font-size:30px;font-weight:900;padding-bottom:6px}
+.overview .osub{font-size:14px;color:var(--muted);padding-bottom:26px}
+.ogrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:8px 26px;max-width:1180px}
+.oitem{
+  display:grid;grid-template-columns:34px 1fr;gap:10px;align-items:baseline;
+  padding:8px 8px;border-bottom:1px solid var(--rule-soft);cursor:pointer;
+  background:none;border-left:0;border-right:0;border-top:0;text-align:left;
+  font-family:var(--sans);color:var(--ink);width:100%;
+}
+.oitem:hover{background:var(--rule-soft)}
+.oitem:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
+.oitem .on{font-family:var(--mono);font-size:11.5px;color:var(--faint);font-variant-numeric:tabular-nums}
+.oitem .ot{font-size:15px;line-height:1.45}
+.oitem.sec .ot{font-weight:800;color:var(--accent-ink)}
+
+@page{size:A4 landscape;margin:0}
+@media print{
+  :root,:root[data-theme="dark"],:root[data-theme="light"]{
+    --ground:#FFFFFF;--surface:#FFFFFF;--ink:#14232A;--muted:#5A6E74;--faint:#8A9AA0;
+    --rule:#D3DEDD;--rule-soft:#EDF1F0;--accent:#0E8C96;--accent-ink:#07636B;--accent-soft:#E6F4F4;
+    --warn:#B2483C;--warn-ink:#8E3227;--warn-soft:#F8EAE6;--gold:#A9822F;
+    --section-bg:#0B4F56;--section-fg:#F1FAFA;--section-dim:#9CCCCF;--shadow:none;
+  }
+  html,body{overflow:visible;background:#fff}
+  .chrome,.hint,.progress,.overview{display:none!important}
+  .deck{position:static}
+  .stage{position:static;transform:none!important;width:1280px;height:auto;zoom:.86}
+  .slide{position:static;display:flex!important;width:1280px;height:720px;page-break-after:always;break-after:page}
+  .slide:last-child{page-break-after:auto;break-after:auto}
+  .slide.is-active{animation:none}
+  .slide.section{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .pane,.prompt,td.hi{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+}
+</style>
+
+<div class="progress" id="prog"></div>
+
+<div class="deck">
+<div class="stage" id="stage">
+
+<!-- 1 -->
+<section class="slide cover is-active" data-title="表紙">
+  <div class="kicker">整体院のためのAI活用ゼミ ／ 第 1 回</div>
+  <h1>AIが喜ぶ<br>指示書のつくり方</h1>
+  <div class="sub">「なんとなく聞く」から「ちゃんと指示する」へ。<br>今日から現場で使える型を、実演つきで持ち帰ります。</div>
+  <div class="foot">
+    <div>
+      <div class="who">NAORU整体 大森院 店長　宮崎</div>
+      <div style="padding-top:4px">口コミ返信・HPBブログ・日報・経営ダッシュボードをAIで運用中</div>
+    </div>
+    <div class="mono">2026 / 全3部 ・ 実演2本</div>
+  </div>
+</section>
+
+<section class="slide" data-title="今日のゴール">
+  <div class="head"><div class="eyebrow">本日のゴール</div><div class="pageno"></div></div>
+  <div class="body">
+    <h2 class="t-lg">本日のTODO ── 終わるころに、3つチェックが入ります</h2>
+    <div class="todos">
+      <div class="todo">
+        <div class="box">✓</div>
+        <div>
+          <div class="goal">「浅い指示」から抜け出し、<span class="mark">プロンプトに深みを出せる</span></div>
+          <div class="how">やること：深い指示の正体を知り、<b>その場で1本書いて、直すところまで</b>　／　深さとは、AIに迷わせる場所をいくつ潰したか</div>
+        </div>
+        <div class="part">第 1 部</div>
+      </div>
+      <div class="todo">
+        <div class="box">✓</div>
+        <div>
+          <div class="goal">作業をAIに任せて、<span class="mark">自分の時間を作る</span></div>
+          <div class="how">やること：画像・ブログ・Googleマイビジネス投稿を<b>実物のプロンプトでお渡し</b>　／　月10本のブログと週1のMEO投稿を、貼るだけで回せる状態に</div>
+        </div>
+        <div class="part">第 2 部</div>
+      </div>
+      <div class="todo">
+        <div class="box">✓</div>
+        <div>
+          <div class="goal"><span class="mark">適切な作業分け</span>と、AIの選び方がわかる</div>
+          <div class="how">やること：<b>ChatGPT / Claude / Claude Code</b> の違いと選び方　／　どの仕事を、誰（どのAI）に渡すのかの判断がつく</div>
+        </div>
+        <div class="part">第 3 部</div>
+      </div>
+    </div>
+    <div class="foot-note">今日はAIの仕組みの話はしません。<strong>明日の朝いちばんに使えること</strong>だけ扱います。</div>
+  </div>
+</section>
+
+<section class="slide" data-title="なぜ差がつくのか">
+  <div class="head"><div class="eyebrow">問い</div><div class="pageno"></div></div>
+  <div class="body">
+    <h2 class="t-lg">同じAIを使っているのに、<br>なぜ「使える人」と「使えない人」が出るのか</h2>
+    <div class="compare">
+      <div class="pane bad">
+        <div class="tag"><span class="g">✕</span>うまくいかない人</div>
+        <div class="said">「口コミの返信、書いといて」
+「ブログ書いて」
+「画像つくって」</div>
+        <div class="why">→ 出てくるのは、どの院でも通用する<b>当たりさわりのない文章</b>。結局ぜんぶ書き直すので「AIは使えない」となる。</div>
+      </div>
+      <div class="pane good">
+        <div class="tag"><span class="g">○</span>うまくいく人</div>
+        <div class="said">誰として・何のために・何をもとに・
+どんな形で・何をしないか
+——を、最初にまとめて渡している</div>
+        <div class="why">→ 出てくるのは<b>その院にしか書けない文章</b>。手直しは1〜2か所。時間がそのまま浮く。</div>
+      </div>
+    </div>
+    <div class="foot-note">差は「AIの性能」ではなく、<strong>渡している情報の量と形</strong>にあります。</div>
+  </div>
+</section>
+
+<section class="slide statement" data-title="核：AIは新人">
+  <div class="head"><div class="eyebrow">今日いちばん大事なこと</div><div class="pageno"></div></div>
+  <div class="body statement" style="justify-content:center">
+    <div class="big">AIは、<em>優秀だけれど<br>うちの院を何も知らない新人</em>です。</div>
+    <div class="after">初日の新人に「適当にやっといて」と言えば、当然ちぐはぐなものが出てきます。逆に、うちのやり方をきちんと書いた<strong>指示書</strong>を渡せば、初日から戦力になります。<br>つまり——<strong>プロンプトとは「命令」ではなく「新人への指示書」</strong>です。</div>
+  </div>
+</section>
+
+<section class="slide section" data-title="第1部：プロンプトの深み" data-sec="1">
+  <div class="num">第 1 部</div>
+  <h2>プロンプトに、<br>「深み」をつくる。</h2>
+  <div class="desc">同じAIでも、指示の“深さ”で返ってくるものは別物になります。深さの正体を知り、この場で実際に1本書いて、直すところまでやります。</div>
+  <div class="strip"><span>浅い指示と深い指示</span><span>5つの箱</span><span>ビフォー・アフター</span><span>実践ワーク</span></div>
+</section>
+
+<section class="slide" data-title="深いプロンプトとは">
+  <div class="head"><div class="eyebrow"><b>第1部</b> ／ 深さの正体</div><div class="pageno"></div></div>
+  <div class="body">
+    <h2 class="t-md">「深いプロンプト」＝長い指示、ではありません</h2>
+    <div class="tblwrap">
+      <table>
+        <thead><tr><th>深さ</th><th>渡している指示</th><th>AIが自分で決めてしまう部分</th><th>出てくるもの</th></tr></thead>
+        <tbody>
+          <tr><th style="color:var(--warn-ink)">LV 0　丸投げ</th><td>「口コミの返信を書いて」</td><td>誰として書くか・目的・文体・長さ・触れてよい話題 <strong>…ぜんぶ</strong></td><td>毎回ちがう。<strong>どの院でも通る文章</strong></td></tr>
+          <tr><th style="color:var(--muted)">LV 1　すこし足す</th><td>「NAORU整体の口コミ返信を、丁寧な文体で300字で」</td><td>目的・入れる要素・禁止事項</td><td>それっぽいが、<strong>院の色が出ない</strong></td></tr>
+          <tr><th class="hi" style="color:var(--accent-ink)">LV 2　深い指示</th><td class="hi">役割・目的・材料・形式・禁止まで渡す</td><td class="hi">言葉選びだけ</td><td class="hi">毎回おなじ品質で、院の文章になる</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="statement" style="flex:none">
+      <div class="big" style="font-size:31px;line-height:1.55">深みとは、<em>AIに判断を委ねている場所を、いくつ潰したか</em>。</div>
+      <div class="after" style="padding-top:14px;font-size:17px">長く書くことが目的ではありません。<strong>AIが迷いそうな場所だけ</strong>を先に埋める——次のページの「5つの箱」は、その迷いどころの一覧です。</div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-title="指示書の5要素">
+  <div class="head"><div class="eyebrow"><b>第1部</b> ／ プロンプトの型</div><div class="pageno"></div></div>
+  <div class="body">
+    <h2 class="t-md">指示書に書く5つ ── これだけ覚えてください</h2>
+    <div class="fields">
+      <div class="field"><div class="n">01</div><div class="k">役割<small>誰として答える？</small></div><div class="v">「あなたは<b>大森院で施術を担当した宮崎</b>です」— 名乗らせると文章の主語が定まる</div></div>
+      <div class="field"><div class="n">02</div><div class="k">目的と読み手<small>何のため？誰が読む？</small></div><div class="v">「返信は本人だけでなく、<b>これから来る人が読む広告</b>です」— ゴールが変わると文章が変わる</div></div>
+      <div class="field"><div class="n">03</div><div class="k">材料<small>何をもとに書く？</small></div><div class="v">口コミの本文／症状／当院の強み（AI姿勢分析・駅から徒歩4分）— <b>事実は必ずこちらが渡す</b></div></div>
+      <div class="field"><div class="n">04</div><div class="k">出力の形<small>どんな形で返す？</small></div><div class="v">「300〜350字・5段構成・<b>そのまま貼れるプレーンテキスト</b>・2案」— 形を決めないと毎回バラつく</div></div>
+      <div class="field"><div class="n">05</div><div class="k">禁止事項<small>何をしない？</small></div><div class="v">「<b>料金に触れない</b>／『完治』は使わない／絵文字なし」— 事故を防ぐのはここ</div></div>
+    </div>
+    <div class="foot-note">迷ったら口に出して確認 →「<strong>誰が・何のために・何をもとに・どんな形で・何をしないか</strong>」</div>
+  </div>
+</section>
+
+<section class="slide" data-title="✕ 伝わらない例">
+  <div class="head"><div class="eyebrow"><b>第1部</b> ／ ビフォー</div><div class="pageno"></div></div>
+  <div class="body">
+    <h2 class="t-md">実例①　口コミ返信 ── これだと伝わりません</h2>
+    <div class="compare">
+      <div class="pane bad" style="grid-column:1/2">
+        <div class="tag"><span class="g">✕</span>渡した指示</div>
+        <div class="said" style="font-size:20px">この口コミに返信文を作って</div>
+        <div class="why">5要素のうち<b>ゼロ個</b>しか埋まっていない。AIは「一般的な整体院の一般的な返信」を書くしかない。</div>
+      </div>
+      <div class="pane" style="grid-column:2/3">
+        <div class="tag" style="color:var(--muted)"><span class="g" style="background:var(--faint)">→</span>返ってくるもの</div>
+        <div class="said" style="color:var(--muted)">この度はご来院いただき、誠にありがとうございました。お客様にご満足いただけましたことを大変嬉しく思います。またのご来店を心よりお待ちしております。</div>
+        <div class="why">悪くはない。でも——<b>誰が書いたか分からない／症状に触れていない／地域名がない／再来店の動機がない</b>。他院がそのままコピーしても成立してしまう。</div>
+      </div>
+    </div>
+    <div class="foot-note">口コミ返信は<strong>これから来る人が読む広告</strong>。「無難」は、いちばんもったいない。</div>
+  </div>
+</section>
+
+<section class="slide" data-title="○ 伝わる例">
+  <div class="head"><div class="eyebrow"><b>第1部</b> ／ アフター</div><div class="pageno"></div></div>
+  <div class="body">
+    <h2 class="t-md">実例①　5要素を埋めるとこうなる</h2>
+    <div class="prompt sm" style="flex:1">あなたは<span class="cm">NAORU整体 大森院で施術を担当した店長の宮崎</span>です。口コミ返信を作ってください。
+
+<span class="cm">【目的】</span>返信は投稿者本人だけでなく、これから来院を検討する人が読む「広告」です。
+
+<span class="cm">【材料】</span>（口コミ本文をここに貼る）　当院の強み：AI姿勢分析／丁寧な問診／大森駅 東口から徒歩4分
+
+<span class="cm">【必ず入れる】</span>
+・宛名「◯◯様」　・口コミの言葉を「」で引用して共感する
+・症状のワード（肩こり／猫背 など）　・「大森エリア」と院名
+・定期的なケアのすすめ　・署名「NAORU整体大森院　宮崎」
+
+<span class="cm">【形式】</span>300〜350字。装飾なしのプレーンテキスト。前置き不要。2パターン出す。
+
+<span class="ng">【禁止】</span>料金に触れない。「治る」「完治」は使わない。絵文字なし。キーワードの詰め込みすぎ。</div>
+    <div class="foot-note">長く見えますが、<strong>書くのは最初の1回だけ</strong>。2回目からは口コミを貼り替えるだけです（→ 第2部「仕組みにする」）。</div>
+  </div>
+</section>
+
+<section class="slide" data-title="何が効いたのか">
+  <div class="head"><div class="eyebrow"><b>第1部</b> ／ まとめ</div><div class="pageno"></div></div>
+  <div class="body">
+    <h2 class="t-md">効いたのは、この3か所</h2>
+    <div class="cards c3">
+      <div class="card">
+        <div class="cn">POINT 01</div>
+        <div class="ct">目的を書いた</div>
+        <div class="cd">「本人へのお礼」ではなく<b>「これから来る人への広告」</b>と定義した瞬間、文章の狙いが変わります。地域名も症状も、自然に入る理由ができる。</div>
+      </div>
+      <div class="card">
+        <div class="cn">POINT 02</div>
+        <div class="ct">形を固定した</div>
+        <div class="cd">字数・構成・<b>「そのまま貼れる形」</b>。装飾を禁じただけで、コピペ時に崩れる事故がゼロになりました。</div>
+      </div>
+      <div class="card">
+        <div class="cn">POINT 03</div>
+        <div class="ct">禁止を書いた</div>
+        <div class="cd">料金に触れない・断定しない。<b>禁止事項は最強の品質管理</b>です。スタッフが誰でも同じ安全ラインで書ける。</div>
+      </div>
+    </div>
+    <div class="foot-note">この3つは、ブログでも画像でも、まったく同じように効きます。</div>
+  </div>
+</section>
+
+<section class="slide" data-title="【実践】1本書く">
+  <div class="head"><div class="eyebrow"><b>第1部</b> ／ 実践ワーク</div><div class="pageno"></div></div>
+  <div class="body">
+    <h2 class="t-md">【実践】いま、この場で1本書いてみましょう（10分）</h2>
+    <div class="steps">
+      <div class="step"><div class="tm">1分</div><div class="wt">いま手元にある仕事を<b>1つだけ</b>選ぶ　── 口コミ返信／ブログ／休診のお知らせ、なんでも構いません</div></div>
+      <div class="step"><div class="tm">4分</div><div class="wt">配布シートの<b>5つの箱を埋める</b>　── 埋まらない箱があってもOK。<b>そこが、AIも迷う場所</b>です</div></div>
+      <div class="step"><div class="tm">2分</div><div class="wt">そのまま<b>AIに貼って実行</b>する　── スマホのChatGPTアプリで大丈夫です</div></div>
+      <div class="step"><div class="tm">2分</div><div class="wt">出てきた文章から「<b>イマイチな一言</b>」を1つだけ見つける　── 全部直そうとしないこと</div></div>
+      <div class="step"><div class="tm">1分</div><div class="wt">その一言を<b>【禁止】に足して、もう一度実行</b>する</div></div>
+    </div>
+    <div class="foot-note">2回目で変わったところを、隣の方と1つ共有してください。<strong>この「1行足すと直る」感覚が、今日いちばん持ち帰ってほしいものです。</strong></div>
+  </div>
+</section>
+
+<section class="slide section" data-title="第2部：任せて時間を作る" data-sec="1">
+  <div class="num">第 2 部 ／ 実演 ①</div>
+  <h2>任せて、<br>時間を作る。</h2>
+  <div class="desc">ここからは実演です。画像・ブログ・Googleマイビジネス——「毎週おなじことをやっているな」という作業を、そのままAIに渡せる形にしていきます。</div>
+  <div class="strip"><span>任せられる仕事の見分け方</span><span>実演① 画像生成</span><span>実演② ブログとMEO</span><span>仕組みにする</span></div>
+</section>
+
+<section class="slide" data-title="任せられる仕事の見分け方">
+  <div class="head"><div class="eyebrow"><b>第2部</b> ／ 作業の切り分け</div><div class="pageno"></div></div>
+  <div class="body">
+    <h2 class="t-md">どの作業なら、AIに渡していいのか</h2>
+    <div class="compare">
+      <div class="pane good">
+        <div class="tag"><span class="g">○</span>渡していい仕事（3つとも当てはまるもの）</div>
+        <div class="said" style="font-size:16.5px;line-height:1.85"><b>① 毎週・毎月、同じ形でくり返す</b>
+　口コミ返信／ブログ／MEO投稿／日報／お知らせ文
+
+<b>② 正解の形を言葉にできる</b>
+　字数・構成・必ず入れる要素が説明できる
+
+<b>③ 公開前に、自分が目を通せる</b>
+　間違えても取り返しがつく</div>
+      </div>
+      <div class="pane bad">
+        <div class="tag"><span class="g">✕</span>渡さない仕事</div>
+        <div class="said" style="font-size:16.5px;line-height:1.85">・患者さんの体に関する<b>判断そのもの</b>
+・料金やクレームへの<b>最終回答</b>
+・その場の空気で決めること
+
+AIは<b>下書きまで</b>。最後に人が目を通す一手間は、必ず残します。</div>
+      </div>
+    </div>
+    <div class="statement" style="flex:none">
+      <div class="big" style="font-size:29px;line-height:1.55">迷ったら——<em>スタッフに手順書を書いて渡せるか</em>。<br>書けるなら、AIにも渡せます。</div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-title="画像の5つの箱">
+  <div class="head"><div class="eyebrow"><b>第2部</b> ／ 実演① 画像</div><div class="pageno"></div></div>
+  <div class="body">
+    <h2 class="t-md">画像は「箱を5つ、この順で」埋める</h2>
+    <div class="fields">
+      <div class="field"><div class="n">01</div><div class="k">被写体<small>何が写る？</small></div><div class="v">「<b>30代の日本人女性</b>が椅子に座り、背筋を伸ばしている」— 年代・性別・国を書かないと外国人になります</div></div>
+      <div class="field"><div class="n">02</div><div class="k">場面<small>どんな場所・状況？</small></div><div class="v">「明るい日本の整体院の施術室、白とクリームの内装、<b>観葉植物が1つ</b>」— 小物を1つ指定すると生活感が出る</div></div>
+      <div class="field"><div class="n">03</div><div class="k">画角と構図<small>どう写す？</small></div><div class="v">「斜め上からの引き、被写体は右寄せ、<b>左上に文字を入れる余白</b>」— 余白の指定がバナー化の分かれ目</div></div>
+      <div class="field"><div class="n">04</div><div class="k">光と色<small>どんな雰囲気？</small></div><div class="v">「窓からの自然光、やわらかい影、<b>クリームとゴールド基調</b>」— 院のブランド色をここで固定する</div></div>
+      <div class="field"><div class="n">05</div><div class="k">仕上げ<small>どんな形で？</small></div><div class="v">「<b>写真風・実写</b>、横長、明るめ。<b>画像に文字は入れない</b>」— 文字は必ず後からCanvaで乗せる</div></div>
+    </div>
+    <div class="foot-note">文章の5要素（誰が・何を・何をもとに・どんな形・何をしない）と<strong>まったく同じ考え方</strong>です。名前が違うだけ。</div>
+  </div>
+</section>
+
+<section class="slide" data-title="画像 ✕→○">
+  <div class="head"><div class="eyebrow"><b>第2部</b> ／ 実演① ビフォー・アフター</div><div class="pageno"></div></div>
+  <div class="body">
+    <h2 class="t-md">実例②　HPBのトップ画像をつくる</h2>
+    <div class="compare">
+      <div class="pane bad">
+        <div class="tag"><span class="g">✕</span>これだと博打</div>
+        <div class="said" style="font-size:19px">整体院の画像をつくって</div>
+        <div class="why">出てくるのは<b>海外の高級スパ</b>か、<b>指が6本ある施術者</b>か、<b>意味不明な英字ロゴ入り</b>。何度引き直しても当たりません。</div>
+      </div>
+      <div class="pane good">
+        <div class="tag"><span class="g">○</span>箱を埋めるとこうなる</div>
+        <div class="said" style="font-size:14.6px;line-height:1.8">日本の整体院の明るい施術室。30代の日本人女性がベッドにうつ伏せで横たわり、紺色のポロシャツを着た男性の施術者が背中に手を添えている。<b>手元はアップにしない。</b>窓からの自然光、白とクリーム色の内装、観葉植物が1つ。斜め上からの引きの構図で、上部に文字を入れる余白。写真風・実写・横長。<b>画像に文字は入れない。</b></div>
+        <div class="why">同じAI・同じ1回で、使える画像が出ます。あとはCanvaでキャッチを乗せるだけ。</div>
+      </div>
+    </div>
+    <div class="foot-note">コツは<strong>「引き直す」より「書き足す」</strong>。気に入らない点を1つずつ箱に書き足すと、確実に近づきます。</div>
+  </div>
+</section>
+
+<section class="slide" data-title="整体院あるある4つ">
+  <div class="head"><div class="eyebrow"><b>第2部</b> ／ 実演① 失敗と対策</div><div class="pageno"></div></div>
+  <div class="body">
+    <h2 class="t-md">整体院の画像で、必ず起きる4つ</h2>
+    <div class="myth">
+      <div class="m"><div class="q">手が不自然になる（指が6本）</div><div class="a">AIがいちばん苦手な部位です。<b>「手元をアップにしない」</b>と書く／手が体に隠れる構図にする。これでほぼ防げます。</div></div>
+      <div class="m"><div class="q">文字がぐちゃぐちゃの日本語になる</div><div class="a">画像生成に文字を任せないこと。<b>「画像に文字は入れない」</b>と明記し、キャッチはCanvaで乗せる。これが唯一の正解です。</div></div>
+      <div class="m"><div class="q">海外の高級スパになる</div><div class="a"><b>「日本の」「日本人の」</b>を必ず入れる。さらに「白基調の清潔感のある内装」「派手な装飾なし」を足すと日本の院らしくなります。</div></div>
+      <div class="m"><div class="q">医療機関っぽくなりすぎる</div><div class="a">白衣を着せると病院に寄ります。<b>服装を指定</b>（紺のポロシャツ・黒のスクラブなど）すると、院のトーンに合います。</div></div>
+    </div>
+    <div class="foot-note">薬機法の注意は画像にも。<strong>ビフォーアフターを並べる画像は、使い方に注意</strong>が必要です（誇大表現とみなされる場合があります）。</div>
+  </div>
+</section>
+
+<section class="slide" data-title="使い回せる3パターン">
+  <div class="head"><div class="eyebrow"><b>第2部</b> ／ 実演① 持ち帰り</div><div class="pageno"></div></div>
+  <div class="body">
+    <h2 class="t-md">整体院で使い回せる、画像3パターン</h2>
+    <div class="cards c3">
+      <div class="card">
+        <div class="cn">USE 01</div>
+        <div class="ct">HPB・HPのトップ</div>
+        <div class="cd"><b>施術風景の引き。</b>上部に余白を確保して、キャッチと口コミ数を後乗せ。1200×900前後。<br><br>ポイント：手元アップNG／文字なし／院の色を固定。</div>
+      </div>
+      <div class="card">
+        <div class="cn">USE 02</div>
+        <div class="ct">インスタ投稿</div>
+        <div class="cd"><b>正方形の背景素材。</b>人物なしの「机・観葉植物・カーテンの光」などを作り、文字を大きく乗せる。<br><br>ポイント：人物を出さない方が、文字が読みやすく崩れも起きない。</div>
+      </div>
+      <div class="card">
+        <div class="cn">USE 03</div>
+        <div class="ct">ブログの挿絵</div>
+        <div class="cd"><b>セルフケアの図解。</b>「壁に背中をつけて立つ女性を横から」など、記事の動作と1対1で対応させる。<br><br>ポイント：1枚1動作。欲張ると必ず破綻します。</div>
+      </div>
+    </div>
+    <div class="foot-note">この場でやります → <strong>皆さんの院名・内装の色・スタッフの服装</strong>を教えてください。その場で1枚つくります。</div>
+  </div>
+</section>
+
+<section class="slide section" data-title="第2部：ブログとMEO（実演②）" data-sec="1">
+  <div class="num">第 2 部 ／ 実演 ②</div>
+  <h2>検索から人が来る<br>ブログのつくり方。</h2>
+  <div class="desc">AIで量産しても順位が上がらないブログには、共通の理由があります。SEO（検索）とMEO（Googleマップ）、両方に効く型を渡します。</div>
+  <div class="strip"><span>見つかる記事の5条件</span><span>3タイプの配分</span><span>コピペ用プロンプト</span><span>チェック7項目</span><span>MEO転用</span></div>
+</section>
+
+<section class="slide" data-title="見つかる記事の5条件">
+  <div class="head"><div class="eyebrow"><b>第2部</b> ／ 実演② SEOの前提</div><div class="pageno"></div></div>
+  <div class="body">
+    <h2 class="t-md">検索で見つかる記事の、5つの条件</h2>
+    <div class="checks">
+      <div class="check"><div class="b">1</div><div><b>タイトルに「地域名 × 症状」を入れる</b><small>「大森｜デスクワークの腰痛3選」。全国と戦っても勝てません。<b>近所の人の検索</b>を取りにいく。</small></div></div>
+      <div class="check"><div class="b">2</div><div><b>1記事1テーマにする</b><small>盛り込むほど「何の記事か」がぼやけます。腰痛の記事に肩こりを混ぜない。</small></div></div>
+      <div class="check"><div class="b">3</div><div><b>その院にしかない情報を必ず1つ入れる</b><small>AI姿勢分析／駅から徒歩4分／「当院でもこういうお声をよくいただきます」。<b>ここが他院との差</b>であり、検索エンジンが見ている「実体験」の部分です。</small></div></div>
+      <div class="check"><div class="b">4</div><div><b>読者の疑問に、その場で答えきる</b><small>原因 → 自分でできる対処 → それでもダメなときの相談先。<b>読み終わって行動できる</b>形にする。</small></div></div>
+      <div class="check"><div class="b">5</div><div><b>薬機法の線を越えない</b><small>「治る」「必ず」「解消します」はNG。「〜しやすくなります」「〜が目安です」に置き換える。<b>これはプロンプトの禁止事項に書いておく。</b></small></div></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-title="3タイプの配分">
+  <div class="head"><div class="eyebrow"><b>第2部</b> ／ 実演② 設計</div><div class="pageno"></div></div>
+  <div class="body">
+    <h2 class="t-md">集客記事だけ書いても、売上は伸びません</h2>
+    <div class="tblwrap">
+      <table>
+        <thead><tr><th>タイプ</th><th>目的</th><th>月あたり</th><th>中身</th><th>締めの導線</th></tr></thead>
+        <tbody>
+          <tr><th style="color:var(--accent-ink)">A：集客</th><td>新規の検索流入</td><td><strong>6本</strong></td><td>症状名＋地域名。まだ書いていない検索キーワードを埋めていく</td><td>AI姿勢分析＋徒歩4分</td></tr>
+          <tr><th style="color:var(--accent-ink)">B：安心</th><td>成約率・予約の後押し</td><td><strong>2本</strong></td><td>初めての方の不安をつぶす（流れ・持ち物・痛くないか）</td><td>「初めてでも大丈夫」＋クーポン</td></tr>
+          <tr><th style="color:var(--accent-ink)">C：継続</th><td>リピート・LTV</td><td><strong>2本</strong></td><td>通う頻度の目安、施術後の過ごし方、メンテナンスの価値</td><td>次回・メンテナンスの提案</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="statement" style="flex:none">
+      <div class="big" style="font-size:29px;line-height:1.6">新規が増えても<em>1回で終われば売上は積み上がりません</em>。<br>B・Cは<em>既存の患者さまも読む</em>ので、来院前後の行動が変わります。</div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-title="ブログのプロンプト">
+  <div class="head"><div class="eyebrow"><b>第2部</b> ／ 実演② コピペして使う</div><div class="pageno"></div></div>
+  <div class="body">
+    <h2 class="t-md" style="font-size:30px">実例③　そのまま使えるブログ生成プロンプト（〔　〕を自院に置換）</h2>
+    <div class="two">
+      <div class="prompt sm">あなたは<span class="cm">〔院名〕の店長〔氏名〕</span>です。
+ホットペッパービューティーのブログを1本書いてください。
+
+<span class="cm">【テーマ】</span>〔症状・悩み〕
+<span class="cm">【タイプ】</span>A：集客（新規の検索流入をねらう）
+<span class="cm">【読者】</span>〔地域名〕で〔症状〕に悩み、
+　　　　整体に行くか迷っている30〜40代
+
+<span class="cm">【必ず守る】</span>
+・タイトルは「〔地域名〕｜〜」で始め<b>25文字以内</b>
+・本文は<b>1000字以内</b>（末尾の定型文を含む）
+・構成：あいさつと共感
+　→ ■なぜ〇〇なの？（たとえ話で原因）
+　→ ■セルフケア3選
+　→ ■それでもつらい時は（来院への導線）</div>
+      <div class="prompt sm">・来院導線に<b>「〔駅名〕から徒歩◯分」</b>と
+　当院の強み〔AI姿勢分析〕を必ず入れる
+・ですます調。「！」は記事全体で<b>5〜8個</b>。
+　<b>原因の説明パートには入れない</b>
+・語尾は「〜してみてくださいね」
+　「〜だけでOKです」でやわらかく
+
+<span class="ng">【禁止】</span>
+・「治る」「必ず」「解消します」など効果の断定
+・絵文字
+・常体（〜だ／〜である）
+・強い痛み／しびれ／産後で医療判断に踏み込むこと
+
+<span class="cm">【最後に必ずそのまま入れる】</span>
+〔院名・住所・受付時間・アクセス・
+　キーワードの定型フッターを貼る〕</div>
+    </div>
+    <div class="foot-note">「！」の個数まで指定するのがコツ。<strong>数字で言えるものは全部数字で言う</strong>と、AIは迷いません。</div>
+  </div>
+</section>
+
+<section class="slide" data-title="出力チェック7項目">
+  <div class="head"><div class="eyebrow"><b>第2部</b> ／ 実演② 公開前に見る</div><div class="pageno"></div></div>
+  <div class="body">
+    <h2 class="t-md">出てきた記事は、この7つだけ見る</h2>
+    <div class="myth" style="gap:12px 30px">
+      <div class="m"><div class="q" style="color:var(--accent-ink)">1　タイトルは25字以内で、地域名が先頭にあるか</div></div>
+      <div class="m"><div class="q" style="color:var(--accent-ink)">2　「治る」「必ず」「解消」が紛れ込んでいないか</div></div>
+      <div class="m"><div class="q" style="color:var(--accent-ink)">3　院にしかない情報（強み・駅・実際のお声）が入っているか</div></div>
+      <div class="m"><div class="q" style="color:var(--accent-ink)">4　セルフケアが過去記事と重複していないか</div></div>
+      <div class="m"><div class="q" style="color:var(--accent-ink)">5　最後に予約への導線があるか</div></div>
+      <div class="m"><div class="q" style="color:var(--accent-ink)">6　定型フッターが原文どおり入っているか</div></div>
+      <div class="m" style="grid-column:1/3"><div class="q" style="color:var(--accent-ink)">7　声に出して読んで、自分がしゃべる感じになっているか</div><div class="a">ここだけは人間にしか判断できません。<b>違和感があった一言を、そのままプロンプトの禁止事項に足す</b>。次から出なくなります。</div></div>
+    </div>
+    <div class="foot-note">全文を書き直さないこと。<strong>直すのは記事ではなく、指示書</strong>です。</div>
+  </div>
+</section>
+
+<section class="slide" data-title="MEOへの転用">
+  <div class="head"><div class="eyebrow"><b>第2部</b> ／ 実演② MEO</div><div class="pageno"></div></div>
+  <div class="body">
+    <h2 class="t-md">同じ記事から、Googleマップ用の投稿も作る</h2>
+    <div class="compare">
+      <div class="pane">
+        <div class="tag" style="color:var(--accent-ink)"><span class="g" style="background:var(--accent)">B</span>ブログ（SEO）</div>
+        <dl class="kv" style="font-size:16px">
+          <dt>長さ</dt><dd>1000字前後</dd>
+          <dt>狙い</dt><dd>検索から新規を呼ぶ</dd>
+          <dt>構成</dt><dd>原因 → セルフケア3選 → 来院導線</dd>
+          <dt>頻度</dt><dd>月10本（A6・B2・C2）</dd>
+        </dl>
+      </div>
+      <div class="pane good">
+        <div class="tag"><span class="g">M</span>Googleビジネスプロフィール（MEO）</div>
+        <dl class="kv" style="font-size:16px">
+          <dt>長さ</dt><dd><b>300〜400字に圧縮</b></dd>
+          <dt>狙い</dt><dd>マップを見た近所の人を予約へ</dd>
+          <dt>構成</dt><dd>冒頭に<b>地域名＋院名</b> → 要点3つ → 予約ボタン導線</dd>
+          <dt>頻度</dt><dd><b>週1回</b>（更新が止まると効果が落ちます）</dd>
+          <dt>写真</dt><dd>必ず1枚（実演①の画像プロンプトの出番）</dd>
+        </dl>
+      </div>
+    </div>
+    <div class="prompt sm" style="flex:none">いま書いたブログを、Googleビジネスプロフィールの投稿用に<span class="cm">300〜400字</span>へ書き直してください。
+冒頭に<span class="cm">「〔駅名〕から徒歩◯分の〔院名〕店長の〔氏名〕です」</span>を入れ、最後は<span class="cm">「ご予約は『予約』ボタンから」</span>で締めてください。あわせて<span class="cm">添える写真の案を1つ</span>ください。</div>
+  </div>
+</section>
+
+<section class="slide" data-title="ルール化の3段階">
+  <div class="head"><div class="eyebrow"><b>第2部</b> ／ 仕組みにする</div><div class="pageno"></div></div>
+  <div class="body">
+    <h2 class="t-md">3つの段階で考える</h2>
+    <div class="tblwrap">
+      <table>
+        <thead><tr><th>段階</th><th>中身</th><th>ChatGPTなら</th><th>Claudeなら</th><th>Claude Codeなら</th></tr></thead>
+        <tbody>
+          <tr><th>① その場のお願い</th><td>1回きりの質問・相談</td><td colspan="3">ふつうにチャットに書く</td></tr>
+          <tr><th>② ルール</th><td>毎回同じ前提（院名・文体・NG・判断基準）</td><td>カスタム指示</td><td>プロジェクト</td><td class="hi">院のルールブック</td></tr>
+          <tr><th>③ 手順書</th><td>決まった作業の段取りそのもの</td><td colspan="2">定型文をメモ帳に保存してコピペ</td><td class="hi">「口コミ返信」と打つだけ</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="statement" style="flex:none">
+      <div class="big" style="font-size:29px;line-height:1.6">同じ指示を<em>3回書いたら</em>、それは②に上げるサインです。</div>
+      <div class="after" style="padding-top:16px;font-size:17px">まずは②から。ChatGPTの「カスタム指示」に、院名・自分の名前・文体・禁止事項を書いておくだけで、明日から返ってくる文章が変わります。（Claude Codeが何なのかは、次の第3部で扱います）</div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-title="ルールに書く4つ">
+  <div class="head"><div class="eyebrow"><b>第2部</b> ／ 仕組みにする</div><div class="pageno"></div></div>
+  <div class="body">
+    <h2 class="t-md">ルールに書くべき4つ</h2>
+    <div class="fields">
+      <div class="field"><div class="n">01</div><div class="k">答え方のクセ<small>返事の形を固定する</small></div><div class="v">「<b>常に日本語。専門用語には一言補足。結論から。おすすめは1つに絞る</b>」— 毎回の前置きが消えて、読む時間が減ります</div></div>
+      <div class="field"><div class="n">02</div><div class="k">うちの事実<small>間違えられたら困ること</small></div><div class="v">院名・住所・駅と徒歩分数・担当者名・強み・使ってよい症状ワード。<b>ここを書かないと毎回こちらが貼るはめに</b>なります</div></div>
+      <div class="field"><div class="n">03</div><div class="k">判断の基準<small>良い／悪いの線引き</small></div><div class="v">「良し悪しはこの数字で判定し、<b>自己流の基準を作らないこと</b>」— これを書かないとAIは毎回ちがう物差しを持ち出します</div></div>
+      <div class="field"><div class="n">04</div><div class="k">やらないと決めたこと<small>いちばん抜けやすい</small></div><div class="v">「<b>値下げとブログ増産は検討済みで不採用。蒸し返さない</b>」— 同じ提案が毎回出てくるのを止められます</div></div>
+    </div>
+    <div class="foot-note">③と④は、ほとんどの人が書いていません。<strong>ここを書くと「AIの提案が的外れ」がほぼ消えます。</strong></div>
+  </div>
+</section>
+
+<section class="slide" data-title="育て方">
+  <div class="head"><div class="eyebrow"><b>第2部</b> ／ 仕組みにする</div><div class="pageno"></div></div>
+  <div class="body">
+    <h2 class="t-md">1発で完璧を求めない。1行ずつ育てる</h2>
+    <div class="steps">
+      <div class="step"><div class="tm">STEP 1</div><div class="wt">イマイチな答えが出た　<b>← ここで諦める人が9割</b></div></div>
+      <div class="step"><div class="tm">STEP 2</div><div class="wt">「<b>どこがイマイチか</b>」を一言で言語化する（例：コピペしたら左端に変な棒が出た）</div></div>
+      <div class="step"><div class="tm">STEP 3</div><div class="wt">それを<b>ルールに1行だけ足す</b>（例：装飾なしのプレーンテキストで出す）</div></div>
+      <div class="step"><div class="tm">STEP 4</div><div class="wt">次回から<b>二度と出ない</b>。ルールは減らずに増えていく＝院の資産になる</div></div>
+    </div>
+    <div class="statement" style="flex:none">
+      <div class="big" style="font-size:29px;line-height:1.6">書き直すのは<em>出てきた文章</em>ではなく、<em>指示書のほう</em>。</div>
+      <div class="after" style="padding-top:14px;font-size:17px">当院のルールにある「装飾を付けない」という1行も、一度失敗したから書いてあります。<strong>失敗の数だけ、指示書は強くなります。</strong></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide section" data-title="第3部：作業分けとAIの選び方" data-sec="1">
+  <div class="num">第 3 部</div>
+  <h2>作業分けと、<br>AIの選び方。</h2>
+  <div class="desc">「AI＝ChatGPT」で止まっている方がほとんどです。どの仕事を、どのAIに渡すのか。ここを整理するだけで、できることの幅がはっきり変わります。</div>
+  <div class="strip"><span>3つの道具の整理</span><span>よくある勘違い</span><span>比較表</span><span>使い分けの結論</span></div>
+</section>
+
+<section class="slide" data-title="3つの道具の関係">
+  <div class="head"><div class="eyebrow"><b>第3部</b> ／ 用語の整理</div><div class="pageno"></div></div>
+  <div class="body">
+    <h2 class="t-md">まず、名前を整理します</h2>
+    <div class="cards c3">
+      <div class="card">
+        <div class="cn">OPENAI</div>
+        <div class="ct">ChatGPT</div>
+        <div class="cd">いちばん有名なAIチャット。<b>会話・アイデア出し・画像生成</b>が得意。スマホアプリで完結するのが強み。</div>
+      </div>
+      <div class="card">
+        <div class="cn">ANTHROPIC</div>
+        <div class="ct">Claude</div>
+        <div class="cd">ChatGPTと同じ「チャットのAI」。<b>長い文章の読み書きと、文章の質</b>に強い。画像は生成しません。</div>
+      </div>
+      <div class="card" style="border-top-color:var(--gold)">
+        <div class="cn" style="color:var(--gold)">ANTHROPIC</div>
+        <div class="ct">Claude Code</div>
+        <div class="cd"><b>Claudeに「手」がついたもの。</b>会話するだけでなく、パソコンの中でファイルを開き、作り、直し、保存してくれます。</div>
+      </div>
+    </div>
+    <div class="statement" style="flex:none">
+      <div class="big" style="font-size:34px;line-height:1.55">チャットのAIは<em>相談相手</em>。Claude Codeは<em>作業してくれる人</em>。</div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-title="Claude Codeの勘違い">
+  <div class="head"><div class="eyebrow"><b>第3部</b> ／ よくある勘違い</div><div class="pageno"></div></div>
+  <div class="body">
+    <h2 class="t-md">Claude Code、ここを誤解されています</h2>
+    <div class="myth">
+      <div class="m"><div class="q">「エンジニア専用でしょ？」</div><div class="a">名前にCodeと付いているだけ。実体は<b>パソコンの中で作業できるAI</b>です。資料づくり・集計・画像の加工・繰り返し作業に効きます。</div></div>
+      <div class="m"><div class="q">「コードが書けないと使えない」</div><div class="a">日本語で頼むだけです。必要な処理は中で勝手に書いて、<b>こちらには結果だけ</b>渡してくれます。中身を読む必要はありません。</div></div>
+      <div class="m"><div class="q">「黒い画面がこわい」</div><div class="a">今は<b>デスクトップアプリ版</b>があります。見た目はふつうのチャット。文字を打つだけです。</div></div>
+      <div class="m"><div class="q">「ChatGPTの上位版でしょ？」</div><div class="a">別物です。<b>得意分野が違う</b>ので、上下ではなく使い分け。画像生成はChatGPT、作業はClaude Code。</div></div>
+      <div class="m" style="grid-column:1/3"><div class="q">「うちみたいな小さい院には関係ない」</div><div class="a">むしろ逆です。<b>一人で何役もやる院ほど効きます。</b>この資料自体も、日本語で頼んだだけでClaude Codeが作りました。</div></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-title="比較表">
+  <div class="head"><div class="eyebrow"><b>第3部</b> ／ 比較</div><div class="pageno"></div></div>
+  <div class="body">
+    <h2 class="t-md">3つの道具、どこが違うのか</h2>
+    <div class="tblwrap">
+      <table>
+        <thead><tr><th></th><th>ChatGPT</th><th>Claude</th><th class="hi">Claude Code</th></tr></thead>
+        <tbody>
+          <tr><th>いちばんの得意</th><td>会話・発想・画像生成</td><td>長文の読み書き・文章の質</td><td class="hi">実際の作業（作る・直す・調べる）</td></tr>
+          <tr><th>手元のファイル</th><td>添付すれば読める</td><td>添付すれば読める</td><td class="hi">フォルダごと見て、直して、保存できる</td></tr>
+          <tr><th>返ってくるもの</th><td>チャットの返事</td><td>チャットの返事</td><td class="hi">ファイルそのもの（資料・表・ページ）</td></tr>
+          <tr><th>院のルールの記憶</th><td>カスタム指示</td><td>プロジェクト</td><td class="hi">ルールブック＋作業手順を丸ごと保存</td></tr>
+          <tr><th>画像を作る</th><td><strong>◎ 得意</strong></td><td>× 作れない</td><td>× 作れない（指示文づくりは得意）</td></tr>
+          <tr><th>向いている仕事</th><td>相談・下書き・画像</td><td>文章の仕上げ・要約</td><td class="hi">資料づくり・集計・毎月の繰り返し</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="tnote">※ 画像を作りたいときはChatGPT。<strong>その画像の指示文を練るのはClaude</strong>——という組み合わせが、いちばん失敗が少ないです。</div>
+  </div>
+</section>
+
+<section class="slide" data-title="Claude Codeのすごさ">
+  <div class="head"><div class="eyebrow"><b>第3部</b> ／ 核心</div><div class="pageno"></div></div>
+  <div class="body">
+    <h2 class="t-md">Claude Codeの、本当のすごさ</h2>
+    <div class="cards c3">
+      <div class="card">
+        <div class="cn">STRENGTH 01</div>
+        <div class="ct">「答え」ではなく<br>「成果物」が返る</div>
+        <div class="cd">「こう書くといいですよ」ではなく、<b>そのファイルが出てくる</b>。<br><br>いま見ているこのスライドが、まさにそれです。作れと頼んだだけ。</div>
+      </div>
+      <div class="card">
+        <div class="cn">STRENGTH 02</div>
+        <div class="ct">院のルールを<br>覚えたまま働く</div>
+        <div class="cd">院名・文体・NG表現・判断基準を<b>ルールブックに1回書けば、以後ずっと守る</b>。<br><br>担当者が代わっても、出てくる品質が変わりません。</div>
+      </div>
+      <div class="card">
+        <div class="cn">STRENGTH 03</div>
+        <div class="ct">繰り返し作業が<br>ひと言で終わる</div>
+        <div class="cd">手順を「技」として保存できます。<br><br>当院では<b>「口コミ返信」と打つだけ</b>で、大森院の型に沿った2案が出てきます。</div>
+      </div>
+    </div>
+    <div class="foot-note">ポイントは「賢さ」ではなく<strong>再現性</strong>。毎回おなじ品質で出てくることが、現場ではいちばん効きます。</div>
+  </div>
+</section>
+
+<section class="slide" data-title="実際の運用例">
+  <div class="head"><div class="eyebrow"><b>第3部</b> ／ 実例</div><div class="pageno"></div></div>
+  <div class="body">
+    <h2 class="t-md">大森院での、実際の使いどころ</h2>
+    <div class="fields">
+      <div class="field"><div class="n">A</div><div class="k">口コミ返信</div><div class="v">口コミの<b>スクリーンショットを貼るだけ</b>。大森院の型（5段構成・300〜350字・料金に触れない）で2案。選んで貼るだけ。</div></div>
+      <div class="field"><div class="n">B</div><div class="k">HPBブログ</div><div class="v">タイトル25字・本文1000字・定型フッター込み。<b>集客／安心／継続の3タイプ</b>を配分して量産。同じセルフケアの重複も自動で回避。</div></div>
+      <div class="field"><div class="n">C</div><div class="k">売上日報</div><div class="v">受付シートを集計し、<b>毎朝LINEグループへ自動送信</b>。新患数・契約数・当月予想までを毎日そろえる。</div></div>
+      <div class="field"><div class="n">D</div><div class="k">経営ダッシュボード</div><div class="v">複数店舗の売上・新患・退会・成約率を<b>1画面に</b>。月次会議の資料づくりが、ほぼゼロ分に。</div></div>
+      <div class="field"><div class="n">E</div><div class="k">この研修資料</div><div class="v">「セミナー資料をHTMLで作って」と<b>日本語で頼んだだけ</b>。構成・デザイン・原稿を含めて出てきたものです。</div></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-title="使い分けの結論">
+  <div class="head"><div class="eyebrow"><b>第3部</b> ／ 結論</div><div class="pageno"></div></div>
+  <div class="body">
+    <h2 class="t-md">迷ったときの、使い分け</h2>
+    <div class="checks" style="padding-top:6px">
+      <div class="check"><div class="b">✓</div><div><b>思いつきを広げたい・雑談したい・画像がほしい</b><small>→ ChatGPT。スマホひとつで完結するのが最大の強み。まずはここから。</small></div></div>
+      <div class="check"><div class="b">✓</div><div><b>長い文章を書きたい・読ませたい・トーンにこだわりたい</b><small>→ Claude。口コミ返信やブログの「文章の質」はここが得意。</small></div></div>
+      <div class="check"><div class="b">✓</div><div><b>毎月おなじ作業がある・数字を集計したい・資料の形で欲しい</b><small>→ Claude Code。ここを任せると、いちばん時間が浮きます。</small></div></div>
+      <div class="check"><div class="b">✓</div><div><b>画像を作りたい</b><small>→ 指示文をClaudeで練り、生成はChatGPTで。第2部の実演①でやったとおり、分業がいちばん失敗しません。</small></div></div>
+    </div>
+    <div class="statement" style="flex:none;padding-top:6px">
+      <div class="big" style="font-size:31px;line-height:1.55">最初の一歩は<em>ChatGPTで十分</em>。<br>「毎月おなじことをやっているな」と気づいたときが、<em>Claude Codeの出番</em>です。</div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-title="まとめと宿題">
+  <div class="head"><div class="eyebrow">まとめ</div><div class="pageno"></div></div>
+  <div class="body">
+    <h2 class="t-md">本日のTODO、3つとも埋まりました</h2>
+    <div class="cards c3">
+      <div class="card">
+        <div class="cn">✓ TODO 01</div>
+        <div class="ct">深みのある<br>指示が書ける</div>
+        <div class="cd">深さ＝AIに判断を委ねる場所をいくつ潰したか。<b>5つの箱を埋めるだけ。</b></div>
+      </div>
+      <div class="card">
+        <div class="cn">✓ TODO 02</div>
+        <div class="ct">任せて、<br>時間を作れる</div>
+        <div class="cd">画像・ブログ・MEO投稿は、実物のプロンプトを渡してあります。<b>3回書いた指示はルールへ。</b></div>
+      </div>
+      <div class="card">
+        <div class="cn">✓ TODO 03</div>
+        <div class="ct">作業分けと<br>AIの選び方</div>
+        <div class="cd">相談はChatGPT、文章はClaude、<b>毎月の繰り返しはClaude Code。</b>画像は指示文をClaude、生成はChatGPT。</div>
+      </div>
+    </div>
+    <div class="pane good" style="flex:none">
+      <div class="tag"><span class="g">宿</span>次回までの宿題</div>
+      <div class="said" style="font-size:18px">① 自分の業務を<b>1つだけ</b>選び、5つの箱を埋めた指示書を書く（口コミ返信がおすすめ）<br>② 1週間使い、イマイチだった点を<b>ルールに1行だけ</b>足す<br>③ 次回、その1行を持ち寄って共有する</div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-title="持ち帰りシート">
+  <div class="head"><div class="eyebrow">配布用</div><div class="pageno"></div></div>
+  <div class="body">
+    <h2 class="t-md">持ち帰りシート ── これを埋めるだけ</h2>
+    <div class="two">
+      <div class="prompt" style="font-size:15px;line-height:2.1">【役割】
+　あなたは〔　　　　　　　　　　〕です。
+
+【目的・読み手】
+　〔　　　　　〕のために〔　　　　　〕を
+　作ってください。読むのは〔　　　　　〕です。
+
+【材料】
+　〔 事実・数字・元の文章を貼る 〕
+
+【形式】
+　〔 字数・構成・そのまま使える形か 〕
+
+<span class="ng">【禁止】</span>
+　〔 使ってはいけない言葉・触れない話題 〕</div>
+      <div style="display:flex;flex-direction:column;gap:14px">
+        <div class="pane" style="flex:1">
+          <div class="tag" style="color:var(--accent-ink)"><span class="g" style="background:var(--accent)">補</span>埋めるときのヒント</div>
+          <dl class="kv" style="font-size:15.5px">
+            <dt>役割</dt><dd>院名＋役職＋自分の名前まで書く</dd>
+            <dt>目的</dt><dd>「誰に何をしてほしいか」まで書く</dd>
+            <dt>材料</dt><dd>強み・駅・徒歩分数は毎回入れる</dd>
+            <dt>形式</dt><dd>字数と個数は<b>必ず数字で</b></dd>
+            <dt>禁止</dt><dd>薬機法のNGワードは固定で入れる</dd>
+          </dl>
+        </div>
+        <div class="pane good" style="flex:none">
+          <div class="tag"><span class="g">→</span>次回予告</div>
+          <div class="said" style="font-size:16px">第2回：<b>院のルールブックをつくる</b><br>今日書いた指示書を「毎回書かなくていい形」にして、実際に1つ自動化するところまでやります。</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+</div>
+</div>
+
+<div class="hint">← → で移動　／　O で目次　／　T でテーマ切替</div>
+
+<div class="chrome">
+  <button id="btnIdx" aria-label="目次を開く">目次</button>
+  <button id="btnPrint" aria-label="印刷・PDFで保存" title="印刷 / PDFで保存">印刷</button>
+  <button id="btnTheme" aria-label="表示テーマを切り替え" title="ライト / ダーク">◐</button>
+  <span class="divider"></span>
+  <button id="btnPrev" aria-label="前のスライド">←</button>
+  <span class="pageno" id="counter" style="min-width:52px;text-align:center">1 / 1</span>
+  <button id="btnNext" aria-label="次のスライド">→</button>
+</div>
+
+<div class="overview" id="overview" hidden>
+  <h2>目次</h2>
+  <div class="osub">クリックでそのスライドへ移動します（閉じるのは Esc または O）</div>
+  <div class="ogrid" id="ogrid"></div>
+</div>
+
+<script>
+(function(){
+  var stage    = document.getElementById('stage');
+  var slides   = Array.prototype.slice.call(stage.querySelectorAll('.slide'));
+  var prog     = document.getElementById('prog');
+  var counter  = document.getElementById('counter');
+  var overview = document.getElementById('overview');
+  var ogrid    = document.getElementById('ogrid');
+  var idx = 0;
+
+  // slide numbers in each header
+  slides.forEach(function(s, i){
+    var p = s.querySelector('.head .pageno');
+    if (p) p.textContent = String(i+1).padStart(2,'0') + ' / ' + String(slides.length).padStart(2,'0');
+  });
+
+  // index
+  slides.forEach(function(s, i){
+    var b = document.createElement('button');
+    b.className = 'oitem' + (s.classList.contains('section') || s.classList.contains('cover') ? ' sec' : '');
+    b.innerHTML = '<span class="on">' + String(i+1).padStart(2,'0') + '</span><span class="ot"></span>';
+    b.querySelector('.ot').textContent = s.dataset.title || ('スライド ' + (i+1));
+    b.addEventListener('click', function(){ closeIndex(); go(i); });
+    ogrid.appendChild(b);
+  });
+
+  function go(n){
+    idx = Math.max(0, Math.min(slides.length - 1, n));
+    slides.forEach(function(s, i){ s.classList.toggle('is-active', i === idx); });
+    prog.style.width = ((idx + 1) / slides.length * 100) + '%';
+    counter.textContent = (idx + 1) + ' / ' + slides.length;
+    if (history.replaceState) history.replaceState(null, '', '#' + (idx + 1));
+  }
+  function next(){ go(idx + 1); }
+  function prev(){ go(idx - 1); }
+
+  function openIndex(){ overview.hidden = false; overview.classList.add('open'); }
+  function closeIndex(){ overview.classList.remove('open'); overview.hidden = true; }
+  function toggleIndex(){ overview.hidden ? openIndex() : closeIndex(); }
+
+  document.getElementById('btnNext').addEventListener('click', next);
+  document.getElementById('btnPrev').addEventListener('click', prev);
+  document.getElementById('btnIdx').addEventListener('click', toggleIndex);
+  document.getElementById('btnPrint').addEventListener('click', function(){ window.print(); });
+
+  var root = document.documentElement;
+  try{ var saved = localStorage.getItem('deck-theme'); if (saved) root.setAttribute('data-theme', saved); }catch(e){}
+  function toggleTheme(){
+    var cur = root.getAttribute('data-theme');
+    var sysDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    var next = cur === 'dark' ? 'light' : (cur === 'light' ? 'dark' : (sysDark ? 'light' : 'dark'));
+    root.setAttribute('data-theme', next);
+    try{ localStorage.setItem('deck-theme', next); }catch(e){}
+  }
+  document.getElementById('btnTheme').addEventListener('click', toggleTheme);
+
+  document.addEventListener('keydown', function(e){
+    if (e.key === 'Escape'){ closeIndex(); return; }
+    if (e.key === 'o' || e.key === 'O'){ toggleIndex(); return; }
+    if (e.key === 't' || e.key === 'T'){ toggleTheme(); return; }
+    if (!overview.hidden) return;
+    if (e.key === 'ArrowRight' || e.key === 'PageDown' || e.key === ' '){ e.preventDefault(); next(); }
+    else if (e.key === 'ArrowLeft' || e.key === 'PageUp'){ e.preventDefault(); prev(); }
+    else if (e.key === 'Home'){ go(0); }
+    else if (e.key === 'End'){ go(slides.length - 1); }
+  });
+
+  function fit(){
+    var s = Math.min(window.innerWidth / 1280, window.innerHeight / 720);
+    stage.style.transform = 'translate(-50%, -50%) scale(' + s + ')';
+  }
+  window.addEventListener('resize', fit);
+  fit();
+
+  var start = parseInt((location.hash || '').replace('#',''), 10);
+  go(isNaN(start) ? 0 : start - 1);
+})();
+</script>
+</body>
+</html>
