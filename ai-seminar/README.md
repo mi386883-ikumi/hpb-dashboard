@@ -38,7 +38,7 @@ git add ai-seminar && git commit -m "セミナー資料の更新" && git push
 ## 設定メモ
 
 - `vercel.json` … 画像のキャッシュ設定のみ。ビルド設定は不要
-- **検索エンジンに載せたくない場合** … `index.html` 冒頭の `<meta name="robots" content="noindex, nofollow">` のコメントアウトを外す
+- **検索エンジン対策** … 現在は `<meta name="robots" content="noindex, nofollow">` が**有効**（検索結果に出ない）。検索に載せたくなったら `index.html` 冒頭のこの1行を消す
 - OGP画像 `ogp.png` の参照先は GitHub Pages の絶対URL。Vercelの独自ドメインに寄せる場合は `index.html` の `og:image` / `twitter:image` を差し替える
 
 ## 第2回以降を足すとき
