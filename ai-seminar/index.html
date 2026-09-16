@@ -144,7 +144,7 @@ body{
   background:var(--ground);
 }
 .slide{
-  position:absolute;inset:0;padding:56px 72px 42px;
+  position:absolute;inset:0;padding:44px 56px 32px;
   display:none;flex-direction:column;
   background:var(--ground);
 }
@@ -156,18 +156,18 @@ body{
 
 .head{
   display:flex;justify-content:space-between;align-items:baseline;
-  border-bottom:1px solid var(--rule);padding-bottom:10px;margin-bottom:26px;flex:none;
+  border-bottom:1px solid var(--rule);padding-bottom:9px;margin-bottom:20px;flex:none;
 }
-.eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.18em;color:var(--accent-ink);text-transform:uppercase}
+.eyebrow{font-family:var(--mono);font-size:13px;letter-spacing:.18em;color:var(--accent-ink);text-transform:uppercase}
 .eyebrow b{font-weight:700}
-.pageno{font-family:var(--mono);font-size:12px;letter-spacing:.12em;color:var(--faint);font-variant-numeric:tabular-nums}
-.body{flex:1;min-height:0;display:flex;flex-direction:column;gap:18px}
+.pageno{font-family:var(--mono);font-size:13px;letter-spacing:.12em;color:var(--faint);font-variant-numeric:tabular-nums}
+.body{flex:1;min-height:0;display:flex;flex-direction:column;gap:16px}
 
 h1,h2,h3{margin:0;text-wrap:balance;line-height:1.24}
-.t-xl{font-size:62px;font-weight:900;letter-spacing:-.01em}
-.t-lg{font-size:44px;font-weight:900;letter-spacing:-.005em}
-.t-md{font-size:34px;font-weight:800}
-.lead{font-size:21px;line-height:1.75;color:var(--muted);max-width:62ch}
+.t-xl{font-size:68px;font-weight:900;letter-spacing:-.01em}
+.t-lg{font-size:50px;font-weight:900;letter-spacing:-.005em}
+.t-md{font-size:39px;font-weight:800}
+.lead{font-size:23px;line-height:1.75;color:var(--muted);max-width:62ch}
 p{margin:0}
 strong{font-weight:800}
 .mark{color:var(--accent-ink);font-weight:800}
@@ -176,73 +176,73 @@ strong{font-weight:800}
 /* ---------- cover ---------- */
 .cover{justify-content:center;gap:0;background:var(--ground)}
 .cover .kicker{
-  font-family:var(--mono);font-size:13px;letter-spacing:.22em;color:var(--accent-ink);
-  padding-bottom:18px;
+  font-family:var(--mono);font-size:14px;letter-spacing:.22em;color:var(--accent-ink);
+  padding-bottom:16px;
 }
-.cover h1{font-size:82px;font-weight:900;letter-spacing:-.02em;line-height:1.14}
+.cover h1{font-size:92px;font-weight:900;letter-spacing:-.02em;line-height:1.14}
 .cover .sub{
-  font-family:var(--serif);font-size:27px;color:var(--muted);
-  padding-top:22px;line-height:1.6;
+  font-family:var(--serif);font-size:30px;color:var(--muted);
+  padding-top:20px;line-height:1.6;
 }
 .cover .foot{
   margin-top:auto;display:flex;justify-content:space-between;align-items:flex-end;
-  border-top:1px solid var(--rule);padding-top:16px;
-  font-size:15px;color:var(--muted);
+  border-top:1px solid var(--rule);padding-top:14px;
+  font-size:16px;color:var(--muted);
 }
-.cover .foot .who{font-weight:700;color:var(--ink);font-size:17px}
+.cover .foot .who{font-weight:700;color:var(--ink);font-size:19px}
 .cover .foot .mono{font-family:var(--mono);font-size:12px;letter-spacing:.1em;color:var(--faint)}
 
 /* ---------- section divider ---------- */
 .section{background:var(--section-bg);color:var(--section-fg);justify-content:center}
 .section .num{
-  font-family:var(--mono);font-size:14px;letter-spacing:.24em;color:var(--section-dim);
-  padding-bottom:20px;
+  font-family:var(--mono);font-size:15px;letter-spacing:.24em;color:var(--section-dim);
+  padding-bottom:18px;
 }
-.section h2{font-size:66px;font-weight:900;letter-spacing:-.015em;color:var(--section-fg)}
+.section h2{font-size:74px;font-weight:900;letter-spacing:-.015em;color:var(--section-fg)}
 .section .desc{
-  font-size:21px;line-height:1.8;color:var(--section-dim);padding-top:20px;max-width:56ch;
+  font-size:24px;line-height:1.8;color:var(--section-dim);padding-top:18px;max-width:56ch;
 }
 .section .strip{display:flex;gap:0;margin-top:auto;border-top:1px solid rgba(255,255,255,.16);padding-top:14px}
 .section .strip span{
-  font-family:var(--mono);font-size:11.5px;letter-spacing:.12em;color:var(--section-dim);
-  padding-right:22px;
+  font-family:var(--mono);font-size:12.5px;letter-spacing:.12em;color:var(--section-dim);
+  padding-right:24px;
 }
 
 /* ---------- statement ---------- */
 .statement{justify-content:center}
 .statement .big{
-  font-family:var(--serif);font-size:56px;line-height:1.5;font-weight:700;
+  font-family:var(--serif);font-size:60px;line-height:1.5;font-weight:700;
   letter-spacing:-.01em;text-wrap:balance;
 }
 .statement .big em{font-style:normal;color:var(--accent-ink);border-bottom:4px solid var(--accent);padding-bottom:2px}
-.statement .after{font-size:20px;color:var(--muted);padding-top:28px;line-height:1.8;max-width:60ch}
+.statement .after{font-size:22px;color:var(--muted);padding-top:24px;line-height:1.8;max-width:60ch}
 
 /* ---------- form-style numbered list (問診票) ---------- */
 .fields{display:grid;gap:0;border-top:1px solid var(--rule)}
 .field{
-  display:grid;grid-template-columns:54px 1fr 1.15fr;gap:22px;align-items:baseline;
-  padding:13px 4px;border-bottom:1px solid var(--rule);
+  display:grid;grid-template-columns:58px 1fr 1.15fr;gap:24px;align-items:baseline;
+  padding:15px 4px;border-bottom:1px solid var(--rule);
 }
 .field .n{
-  font-family:var(--mono);font-size:13px;font-weight:700;color:var(--accent);
+  font-family:var(--mono);font-size:14px;font-weight:700;color:var(--accent);
   letter-spacing:.06em;font-variant-numeric:tabular-nums;
 }
-.field .k{font-size:21px;font-weight:800}
-.field .k small{display:block;font-size:14px;font-weight:500;color:var(--faint);padding-top:3px;letter-spacing:.02em}
-.field .v{font-size:16.5px;line-height:1.7;color:var(--muted)}
+.field .k{font-size:23px;font-weight:800}
+.field .k small{display:block;font-size:15.5px;font-weight:500;color:var(--faint);padding-top:3px;letter-spacing:.02em}
+.field .v{font-size:18px;line-height:1.7;color:var(--muted)}
 .field .v b{color:var(--ink);font-weight:700}
 
 /* ---------- two-up compare ---------- */
-.compare{display:grid;grid-template-columns:1fr 1fr;gap:26px;flex:1;min-height:0}
+.compare{display:grid;grid-template-columns:1fr 1fr;gap:24px;flex:1;min-height:0}
 .pane{
   border:1px solid var(--rule);border-radius:3px;background:var(--surface);
-  padding:22px 24px;display:flex;flex-direction:column;gap:14px;min-height:0;
+  padding:24px 26px;display:flex;flex-direction:column;gap:14px;min-height:0;
 }
 .pane.bad{border-color:var(--warn);background:var(--warn-soft)}
 .pane.good{border-color:var(--accent);background:var(--accent-soft)}
 .tag{
   display:inline-flex;align-items:center;gap:8px;align-self:flex-start;
-  font-family:var(--mono);font-size:11.5px;letter-spacing:.14em;font-weight:700;
+  font-family:var(--mono);font-size:12.5px;letter-spacing:.14em;font-weight:700;
 }
 .tag .g{
   width:20px;height:20px;border-radius:50%;display:grid;place-items:center;
@@ -250,17 +250,17 @@ strong{font-weight:800}
 }
 .bad .tag{color:var(--warn-ink)} .bad .tag .g{background:var(--warn)}
 .good .tag{color:var(--accent-ink)} .good .tag .g{background:var(--accent)}
-.pane .said{font-size:17px;line-height:1.8;white-space:pre-wrap}
-.pane .why{font-size:14.5px;line-height:1.7;color:var(--muted);border-top:1px dashed var(--rule);padding-top:12px;margin-top:auto}
+.pane .said{font-size:18.5px;line-height:1.8;white-space:pre-wrap}
+.pane .why{font-size:16px;line-height:1.7;color:var(--muted);border-top:1px dashed var(--rule);padding-top:12px;margin-top:auto}
 
 /* ---------- prompt block ---------- */
 .prompt{
   border:1px solid var(--rule);border-left:3px solid var(--accent);
   background:var(--surface);border-radius:2px;
-  font-family:var(--mono);font-size:14px;line-height:1.72;
+  font-family:var(--mono);font-size:15.2px;line-height:1.72;
   padding:16px 18px;white-space:pre-wrap;color:var(--ink);overflow:hidden;
 }
-.prompt.sm{font-size:12.7px;line-height:1.66;padding:14px 15px}
+.prompt.sm{font-size:13.8px;line-height:1.66;padding:14px 16px}
 .prompt .cm{color:var(--accent-ink);font-weight:700}
 .prompt .ng{color:var(--warn-ink);font-weight:700}
 .two{display:grid;grid-template-columns:1fr 1fr;gap:18px;flex:1;min-height:0}
@@ -273,67 +273,67 @@ strong{font-weight:800}
   border-top:2px solid var(--accent);padding:16px 2px 0;
   display:flex;flex-direction:column;gap:9px;
 }
-.card .ct{font-size:22px;font-weight:800;line-height:1.35}
-.card .cd{font-size:15.5px;line-height:1.78;color:var(--muted)}
+.card .ct{font-size:24px;font-weight:800;line-height:1.35}
+.card .cd{font-size:17px;line-height:1.78;color:var(--muted)}
 .card .cd b{color:var(--ink);font-weight:700}
-.card .cn{font-family:var(--mono);font-size:11.5px;letter-spacing:.14em;color:var(--accent-ink);font-weight:700}
+.card .cn{font-family:var(--mono);font-size:12.5px;letter-spacing:.14em;color:var(--accent-ink);font-weight:700}
 
 /* ---------- table ---------- */
 .tblwrap{overflow-x:auto;flex:1;min-height:0}
-table{border-collapse:collapse;width:100%;font-size:16px}
-th,td{text-align:left;padding:12px 14px;border-bottom:1px solid var(--rule);vertical-align:top;line-height:1.6}
+table{border-collapse:collapse;width:100%;font-size:17.5px}
+th,td{text-align:left;padding:14px 15px;border-bottom:1px solid var(--rule);vertical-align:top;line-height:1.6}
 thead th{
-  font-family:var(--mono);font-size:11.5px;letter-spacing:.13em;color:var(--muted);
+  font-family:var(--mono);font-size:12.5px;letter-spacing:.13em;color:var(--muted);
   font-weight:700;border-bottom:1px solid var(--ink);padding-bottom:9px;text-transform:uppercase;
 }
-tbody th{font-weight:700;font-size:16px;color:var(--ink);width:170px}
+tbody th{font-weight:700;font-size:17.5px;color:var(--ink);width:176px}
 td.hi{background:var(--accent-soft);color:var(--ink);font-weight:700}
 th.hi{color:var(--accent-ink)}
-.tnote{font-size:13.5px;color:var(--faint);padding-top:10px}
+.tnote{font-size:15px;color:var(--faint);padding-top:10px}
 
 /* ---------- misc list ---------- */
 .todos{display:grid;gap:0;border-top:1px solid var(--rule)}
-.todo{display:grid;grid-template-columns:34px 1fr 78px;gap:20px;align-items:start;padding:17px 4px;border-bottom:1px solid var(--rule)}
+.todo{display:grid;grid-template-columns:36px 1fr 84px;gap:22px;align-items:start;padding:19px 4px;border-bottom:1px solid var(--rule)}
 .todo .box{
   width:26px;height:26px;border:2px solid var(--accent);border-radius:3px;
   display:grid;place-items:center;margin-top:3px;
   color:transparent;font-size:16px;font-weight:900;line-height:1;
 }
 .todo.done .box{background:var(--accent);border-color:var(--accent);color:var(--surface)}
-.todo .goal{font-size:26px;font-weight:800;line-height:1.4;letter-spacing:-.005em}
-.todo .how{font-size:15px;color:var(--muted);padding-top:8px;line-height:1.72}
+.todo .goal{font-size:29px;font-weight:800;line-height:1.4;letter-spacing:-.005em}
+.todo .how{font-size:16.5px;color:var(--muted);padding-top:9px;line-height:1.72}
 .todo .how b{color:var(--ink);font-weight:700}
 .todo .part{
-  font-family:var(--mono);font-size:11px;letter-spacing:.1em;color:var(--accent-ink);
-  font-weight:700;white-space:nowrap;padding-top:12px;text-align:right;
+  font-family:var(--mono);font-size:12px;letter-spacing:.1em;color:var(--accent-ink);
+  font-weight:700;white-space:nowrap;padding-top:13px;text-align:right;
 }
-.checks{display:grid;gap:11px}
-.check{display:grid;grid-template-columns:26px 1fr;gap:12px;align-items:start;font-size:17.5px;line-height:1.7}
+.checks{display:grid;gap:13px}
+.check{display:grid;grid-template-columns:28px 1fr;gap:14px;align-items:start;font-size:19px;line-height:1.7}
 .check .b{
   width:19px;height:19px;border:1.5px solid var(--accent);border-radius:2px;margin-top:4px;
   display:grid;place-items:center;color:var(--accent);font-size:12px;font-weight:700;
 }
 .check b{font-weight:800}
-.check small{display:block;font-size:14.5px;color:var(--muted);padding-top:2px;line-height:1.65}
+.check small{display:block;font-size:16px;color:var(--muted);padding-top:3px;line-height:1.65}
 
-.myth{display:grid;grid-template-columns:1fr 1fr;gap:14px 30px;flex:1;align-content:start}
+.myth{display:grid;grid-template-columns:1fr 1fr;gap:16px 30px;flex:1;align-content:start}
 .myth .m{border-left:2px solid var(--rule);padding:2px 0 2px 16px}
-.myth .q{font-size:17.5px;font-weight:800;color:var(--warn-ink);line-height:1.5}
-.myth .a{font-size:15px;line-height:1.72;color:var(--muted);padding-top:5px}
+.myth .q{font-size:19px;font-weight:800;color:var(--warn-ink);line-height:1.5}
+.myth .a{font-size:16.5px;line-height:1.72;color:var(--muted);padding-top:6px}
 .myth .a b{color:var(--ink);font-weight:700}
 
 .steps{display:flex;flex-direction:column;gap:0;border-top:1px solid var(--rule)}
-.step{display:grid;grid-template-columns:96px 1fr;gap:24px;padding:14px 2px;border-bottom:1px solid var(--rule);align-items:baseline}
-.step .tm{font-family:var(--mono);font-size:13px;color:var(--accent-ink);font-weight:700;letter-spacing:.06em;font-variant-numeric:tabular-nums}
-.step .wt{font-size:17.5px;line-height:1.65}
+.step{display:grid;grid-template-columns:104px 1fr;gap:24px;padding:16px 2px;border-bottom:1px solid var(--rule);align-items:baseline}
+.step .tm{font-family:var(--mono);font-size:14px;color:var(--accent-ink);font-weight:700;letter-spacing:.06em;font-variant-numeric:tabular-nums}
+.step .wt{font-size:19px;line-height:1.65}
 .step .wt b{font-weight:800}
 
-.kv{display:grid;grid-template-columns:auto 1fr;gap:10px 18px;font-size:17px;line-height:1.7}
+.kv{display:grid;grid-template-columns:auto 1fr;gap:11px 20px;font-size:18.5px;line-height:1.7}
 .kv dt{font-weight:800;color:var(--accent-ink);white-space:nowrap}
 .kv dd{margin:0;color:var(--muted)}
 
 .foot-note{
-  font-size:14px;color:var(--faint);border-top:1px solid var(--rule);padding-top:11px;margin-top:auto;line-height:1.7;
+  font-size:15px;color:var(--faint);border-top:1px solid var(--rule);padding-top:11px;margin-top:auto;line-height:1.7;
 }
 
 /* ---------- overview ---------- */
@@ -418,8 +418,8 @@ th.hi{color:var(--accent-ink)}
       </div>
     </div>
     <div class="statement" style="flex:none">
-      <div class="big" style="font-size:34px;line-height:1.55">この業界の働き手が、<em>もっと幸せに働けるように</em>。</div>
-      <div class="after" style="padding-top:14px;font-size:17px">施術以外の仕事に追われて、休めない・続かない——そんな働き方を変えたくて、AIの使い方を考え始めました。<strong>私にとってAIは、整体業界の働き方改革の道具です。</strong></div>
+      <div class="big" style="font-size:38.1px;line-height:1.55">この業界の働き手が、<em>もっと幸せに働けるように</em>。</div>
+      <div class="after" style="padding-top:14px;font-size:19.0px">施術以外の仕事に追われて、休めない・続かない——そんな働き方を変えたくて、AIの使い方を考え始めました。<strong>私にとってAIは、整体業界の働き方改革の道具です。</strong></div>
     </div>
     <div class="foot-note">AIと一緒に回していること：口コミ返信 ／ HPBブログ（690本以上）／ 毎朝のLINE売上日報 ／ 経営ダッシュボード ／ インスタ投稿 ／ <strong>そして、この資料</strong></div>
   </div>
@@ -513,8 +513,8 @@ th.hi{color:var(--accent-ink)}
       </table>
     </div>
     <div class="statement" style="flex:none">
-      <div class="big" style="font-size:31px;line-height:1.55">深みとは、<em>AIに判断を委ねている場所を、いくつ潰したか</em>。</div>
-      <div class="after" style="padding-top:14px;font-size:17px">長く書くことが目的ではありません。<strong>AIが迷いそうな場所だけ</strong>を先に埋める——次のページの「5つの箱」は、その迷いどころの一覧です。</div>
+      <div class="big" style="font-size:34.7px;line-height:1.55">深みとは、<em>AIに判断を委ねている場所を、いくつ潰したか</em>。</div>
+      <div class="after" style="padding-top:14px;font-size:19.0px">長く書くことが目的ではありません。<strong>AIが迷いそうな場所だけ</strong>を先に埋める——次のページの「5つの箱」は、その迷いどころの一覧です。</div>
     </div>
   </div>
 </section>
@@ -541,7 +541,7 @@ th.hi{color:var(--accent-ink)}
     <div class="compare">
       <div class="pane bad" style="grid-column:1/2">
         <div class="tag"><span class="g">✕</span>渡した指示</div>
-        <div class="said" style="font-size:20px">この口コミに返信文を作って</div>
+        <div class="said" style="font-size:22.4px">この口コミに返信文を作って</div>
         <div class="why">5要素のうち<b>ゼロ個</b>しか埋まっていない。AIは「一般的な整体院の一般的な返信」を書くしかない。</div>
       </div>
       <div class="pane" style="grid-column:2/3">
@@ -630,7 +630,7 @@ th.hi{color:var(--accent-ink)}
     <div class="compare">
       <div class="pane good">
         <div class="tag"><span class="g">○</span>渡していい仕事（3つとも当てはまるもの）</div>
-        <div class="said" style="font-size:16.5px;line-height:1.85"><b>① 毎週・毎月、同じ形でくり返す</b>
+        <div class="said" style="font-size:18.5px;line-height:1.85"><b>① 毎週・毎月、同じ形でくり返す</b>
 　口コミ返信／ブログ／MEO投稿／日報／お知らせ文
 
 <b>② 正解の形を言葉にできる</b>
@@ -641,7 +641,7 @@ th.hi{color:var(--accent-ink)}
       </div>
       <div class="pane bad">
         <div class="tag"><span class="g">✕</span>渡さない仕事</div>
-        <div class="said" style="font-size:16.5px;line-height:1.85">・患者さんの体に関する<b>判断そのもの</b>
+        <div class="said" style="font-size:18.5px;line-height:1.85">・患者さんの体に関する<b>判断そのもの</b>
 ・料金やクレームへの<b>最終回答</b>
 ・その場の空気で決めること
 
@@ -649,7 +649,7 @@ AIは<b>下書きまで</b>。最後に人が目を通す一手間は、必ず�
       </div>
     </div>
     <div class="statement" style="flex:none">
-      <div class="big" style="font-size:29px;line-height:1.55">迷ったら——<em>スタッフに手順書を書いて渡せるか</em>。<br>書けるなら、AIにも渡せます。</div>
+      <div class="big" style="font-size:32.5px;line-height:1.55">迷ったら——<em>スタッフに手順書を書いて渡せるか</em>。<br>書けるなら、AIにも渡せます。</div>
     </div>
   </div>
 </section>
@@ -676,12 +676,12 @@ AIは<b>下書きまで</b>。最後に人が目を通す一手間は、必ず�
     <div class="compare">
       <div class="pane bad">
         <div class="tag"><span class="g">✕</span>これだと博打</div>
-        <div class="said" style="font-size:19px">平日限定のクーポン画像をつくって</div>
+        <div class="said" style="font-size:21.3px">平日限定のクーポン画像をつくって</div>
         <div class="why">出てくるのは<b>海外の高級スパ</b>か、<b>意味不明な英字</b>が並んだ画像。値段も雰囲気も当院と無関係で、何度引き直しても当たりません。</div>
       </div>
       <div class="pane good">
         <div class="tag"><span class="g">○</span>箱を埋めるとこうなる</div>
-        <div class="said" style="font-size:13.2px;line-height:1.7">添付した写真は当院の実際の内装です。<b>この色味と明るさに合わせて</b>、ホットペッパービューティーの<b>平日限定クーポン画像</b>を1枚つくってください。
+        <div class="said" style="font-size:13.8px;line-height:1.66">添付した写真は当院の実際の内装です。<b>この色味と明るさに合わせて</b>、ホットペッパービューティーの<b>平日限定クーポン画像</b>を1枚つくってください。
 
 <b>【被写体】</b>人物は入れない。クリーム色(#F4F2EA)の落ち着いた背景。
 <b>【場面】</b>添付写真と同じ内装の空気感。清潔感のある明るいトーン。
@@ -772,7 +772,7 @@ AIは<b>下書きまで</b>。最後に人が目を通す一手間は、必ず�
       </table>
     </div>
     <div class="statement" style="flex:none">
-      <div class="big" style="font-size:29px;line-height:1.6">新規が増えても<em>1回で終われば売上は積み上がりません</em>。<br>B・Cは<em>既存の患者さまも読む</em>ので、来院前後の行動が変わります。</div>
+      <div class="big" style="font-size:32.5px;line-height:1.6">新規が増えても<em>1回で終われば売上は積み上がりません</em>。<br>B・Cは<em>既存の患者さまも読む</em>ので、来院前後の行動が変わります。</div>
     </div>
   </div>
 </section>
@@ -780,7 +780,7 @@ AIは<b>下書きまで</b>。最後に人が目を通す一手間は、必ず�
 <section class="slide" data-title="ブログの指示文">
   <div class="head"><div class="eyebrow"><b>第2部</b> ／ 実演② コピペして使う</div><div class="pageno"></div></div>
   <div class="body">
-    <h2 class="t-md" style="font-size:30px">実例③　そのまま使えるブログ生成の指示文（〔　〕を自院に置換）</h2>
+    <h2 class="t-md" style="font-size:33.6px">実例③　そのまま使えるブログ生成の指示文（〔　〕を自院に置換）</h2>
     <div class="two">
       <div class="prompt sm">あなたは<span class="cm">〔院名〕の店長〔氏名〕</span>です。
 ホットペッパービューティーのブログを1本書いてください。
@@ -842,7 +842,7 @@ AIは<b>下書きまで</b>。最後に人が目を通す一手間は、必ず�
     <div class="compare">
       <div class="pane">
         <div class="tag" style="color:var(--accent-ink)"><span class="g" style="background:var(--accent)">B</span>ブログ（SEO）</div>
-        <dl class="kv" style="font-size:16px">
+        <dl class="kv" style="font-size:17.9px">
           <dt>長さ</dt><dd>1000字前後</dd>
           <dt>狙い</dt><dd>検索から新規を呼ぶ</dd>
           <dt>構成</dt><dd>原因 → セルフケア3選 → 来院導線</dd>
@@ -851,7 +851,7 @@ AIは<b>下書きまで</b>。最後に人が目を通す一手間は、必ず�
       </div>
       <div class="pane good">
         <div class="tag"><span class="g">M</span>Googleビジネスプロフィール（MEO）</div>
-        <dl class="kv" style="font-size:16px">
+        <dl class="kv" style="font-size:17.9px">
           <dt>長さ</dt><dd><b>300〜400字に圧縮</b></dd>
           <dt>狙い</dt><dd>マップを見た近所の人を予約へ</dd>
           <dt>構成</dt><dd>冒頭に<b>地域名＋院名</b> → 要点3つ → 予約ボタン導線</dd>
@@ -880,8 +880,8 @@ AIは<b>下書きまで</b>。最後に人が目を通す一手間は、必ず�
       </table>
     </div>
     <div class="statement" style="flex:none">
-      <div class="big" style="font-size:29px;line-height:1.6">同じ指示を<em>3回書いたら</em>、それは②に上げるサインです。</div>
-      <div class="after" style="padding-top:16px;font-size:17px">まずは②から。ChatGPTの「カスタム指示」に、院名・自分の名前・文体・禁止事項を書いておくだけで、明日から返ってくる文章が変わります。（Claude Codeが何なのかは、次の第3部で扱います）</div>
+      <div class="big" style="font-size:32.5px;line-height:1.6">同じ指示を<em>3回書いたら</em>、それは②に上げるサインです。</div>
+      <div class="after" style="padding-top:16px;font-size:19.0px">まずは②から。ChatGPTの「カスタム指示」に、院名・自分の名前・文体・禁止事項を書いておくだけで、明日から返ってくる文章が変わります。（Claude Codeが何なのかは、次の第3部で扱います）</div>
     </div>
   </div>
 </section>
@@ -911,8 +911,8 @@ AIは<b>下書きまで</b>。最後に人が目を通す一手間は、必ず�
       <div class="step"><div class="tm">STEP 4</div><div class="wt">次回から<b>二度と出ない</b>。ルールは減らずに増えていく＝院の資産になる</div></div>
     </div>
     <div class="statement" style="flex:none">
-      <div class="big" style="font-size:29px;line-height:1.6">書き直すのは<em>出てきた文章</em>ではなく、<em>指示書のほう</em>。</div>
-      <div class="after" style="padding-top:14px;font-size:17px">当院のルールにある「装飾を付けない」という1行も、一度失敗したから書いてあります。<strong>失敗の数だけ、指示書は強くなります。</strong></div>
+      <div class="big" style="font-size:32.5px;line-height:1.6">書き直すのは<em>出てきた文章</em>ではなく、<em>指示書のほう</em>。</div>
+      <div class="after" style="padding-top:14px;font-size:19.0px">当院のルールにある「装飾を付けない」という1行も、一度失敗したから書いてあります。<strong>失敗の数だけ、指示書は強くなります。</strong></div>
     </div>
   </div>
 </section>
@@ -946,7 +946,7 @@ AIは<b>下書きまで</b>。最後に人が目を通す一手間は、必ず�
       </div>
     </div>
     <div class="statement" style="flex:none">
-      <div class="big" style="font-size:34px;line-height:1.55">チャットのAIは<em>相談相手</em>。Claude Codeは<em>作業してくれる人</em>。</div>
+      <div class="big" style="font-size:38.1px;line-height:1.55">チャットのAIは<em>相談相手</em>。Claude Codeは<em>作業してくれる人</em>。</div>
     </div>
   </div>
 </section>
@@ -1036,7 +1036,7 @@ AIは<b>下書きまで</b>。最後に人が目を通す一手間は、必ず�
       <div class="check"><div class="b">✓</div><div><b>画像を作りたい</b><small>→ ChatGPTかGeminiで。指示文は第2部の実演①でやった「5つの箱」で書けば、どちらでも同じように効きます。</small></div></div>
     </div>
     <div class="statement" style="flex:none;padding-top:6px">
-      <div class="big" style="font-size:31px;line-height:1.55">最初の一歩は<em>ChatGPTで十分</em>。<br>「毎月おなじことをやっているな」と気づいたときが、<em>Claude Codeの出番</em>です。</div>
+      <div class="big" style="font-size:34.7px;line-height:1.55">最初の一歩は<em>ChatGPTで十分</em>。<br>「毎月おなじことをやっているな」と気づいたときが、<em>Claude Codeの出番</em>です。</div>
     </div>
   </div>
 </section>
@@ -1064,7 +1064,7 @@ AIは<b>下書きまで</b>。最後に人が目を通す一手間は、必ず�
     </div>
     <div class="pane good" style="flex:none">
       <div class="tag"><span class="g">宿</span>次回までの宿題</div>
-      <div class="said" style="font-size:18px">① 自分の業務を<b>1つだけ</b>選び、5つの箱を埋めた指示書を書く（口コミ返信がおすすめ）<br>② 1週間使い、イマイチだった点を<b>ルールに1行だけ</b>足す<br>③ 次回、その1行を持ち寄って共有する</div>
+      <div class="said" style="font-size:20.2px">① 自分の業務を<b>1つだけ</b>選び、5つの箱を埋めた指示書を書く（口コミ返信がおすすめ）<br>② 1週間使い、イマイチだった点を<b>ルールに1行だけ</b>足す<br>③ 次回、その1行を持ち寄って共有する</div>
     </div>
   </div>
 </section>
@@ -1074,7 +1074,7 @@ AIは<b>下書きまで</b>。最後に人が目を通す一手間は、必ず�
   <div class="body">
     <h2 class="t-md">持ち帰りシート ── これを埋めるだけ</h2>
     <div class="two">
-      <div class="prompt" style="font-size:15px;line-height:2.1">【役割】
+      <div class="prompt" style="font-size:15.4px;line-height:1.95">【役割】
 　あなたは〔　　　　　　　　　　〕です。
 
 【目的・読み手】
@@ -1092,7 +1092,7 @@ AIは<b>下書きまで</b>。最後に人が目を通す一手間は、必ず�
       <div style="display:flex;flex-direction:column;gap:14px">
         <div class="pane" style="flex:1">
           <div class="tag" style="color:var(--accent-ink)"><span class="g" style="background:var(--accent)">補</span>埋めるときのヒント</div>
-          <dl class="kv" style="font-size:15.5px">
+          <dl class="kv" style="font-size:17.4px">
             <dt>役割</dt><dd>院名＋役職＋自分の名前まで書く</dd>
             <dt>目的</dt><dd>「誰に何をしてほしいか」まで書く</dd>
             <dt>材料</dt><dd>強み・駅・徒歩分数は毎回入れる</dd>
@@ -1102,7 +1102,7 @@ AIは<b>下書きまで</b>。最後に人が目を通す一手間は、必ず�
         </div>
         <div class="pane good" style="flex:none">
           <div class="tag"><span class="g">→</span>次回予告</div>
-          <div class="said" style="font-size:16px">第2回：<b>院のルールブックをつくる</b><br>今日書いた指示書を「毎回書かなくていい形」にして、実際に1つ自動化するところまでやります。</div>
+          <div class="said" style="font-size:17.9px">第2回：<b>院のルールブックをつくる</b><br>今日書いた指示書を「毎回書かなくていい形」にして、実際に1つ自動化するところまでやります。</div>
         </div>
       </div>
     </div>
