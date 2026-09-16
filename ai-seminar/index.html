@@ -450,7 +450,7 @@ th.hi{color:var(--accent-ink)}
         <div class="box">✓</div>
         <div>
           <div class="goal"><span class="mark">適切な作業分け</span>と、AIの選び方がわかる</div>
-          <div class="how">やること：<b>ChatGPT / Claude / Claude Code</b> の違いと選び方　／　どの仕事を、誰（どのAI）に渡すのかの判断がつく</div>
+          <div class="how">やること：<b>ChatGPT / Gemini / Claude Code</b> の違いと選び方　／　どの仕事を、誰（どのAI）に渡すのかの判断がつく</div>
         </div>
         <div class="part">第 3 部</div>
       </div>
@@ -871,10 +871,10 @@ AIは<b>下書きまで</b>。最後に人が目を通す一手間は、必ず�
     <h2 class="t-md">3つの段階で考える</h2>
     <div class="tblwrap">
       <table>
-        <thead><tr><th>段階</th><th>中身</th><th>ChatGPTなら</th><th>Claudeなら</th><th>Claude Codeなら</th></tr></thead>
+        <thead><tr><th>段階</th><th>中身</th><th>ChatGPTなら</th><th>Geminiなら</th><th>Claude Codeなら</th></tr></thead>
         <tbody>
           <tr><th>① その場のお願い</th><td>1回きりの質問・相談</td><td colspan="3">ふつうにチャットに書く</td></tr>
-          <tr><th>② ルール</th><td>毎回同じ前提（院名・文体・NG・判断基準）</td><td>カスタム指示</td><td>プロジェクト</td><td class="hi">院のルールブック</td></tr>
+          <tr><th>② ルール</th><td>毎回同じ前提（院名・文体・NG・判断基準）</td><td>カスタム指示</td><td>Gem（自分専用のAI）</td><td class="hi">院のルールブック</td></tr>
           <tr><th>③ 手順書</th><td>決まった作業の段取りそのもの</td><td colspan="2">定型文をメモ帳に保存してコピペ</td><td class="hi">「口コミ返信」と打つだけ</td></tr>
         </tbody>
       </table>
@@ -932,17 +932,17 @@ AIは<b>下書きまで</b>。最後に人が目を通す一手間は、必ず�
       <div class="card">
         <div class="cn">OPENAI</div>
         <div class="ct">ChatGPT</div>
-        <div class="cd">いちばん有名なAIチャット。<b>会話・アイデア出し・画像生成</b>が得意。スマホアプリで完結するのが強み。</div>
+        <div class="cd"><span class="mark">なんでも相談できる、話し上手な相棒</span><br><br>・いちばん有名で、使っている人が多い<br>・会話が自然。<b>アイデア出し・文章の下書き</b>が得意<br>・<b>画像づくり</b>も、スマホに<b>話しかけて使う</b>のもOK<br><br><b>→ 迷ったら、まずここから</b></div>
       </div>
       <div class="card">
-        <div class="cn">ANTHROPIC</div>
-        <div class="ct">Claude</div>
-        <div class="cd">ChatGPTと同じ「チャットのAI」。<b>長い文章の読み書きと、文章の質</b>に強い。画像は生成しません。</div>
+        <div class="cn">GOOGLE</div>
+        <div class="ct">Gemini</div>
+        <div class="cd"><span class="mark">Googleの道具とつながる、調べもの上手</span><br><br>・Google検索の会社のAI。<b>新しい情報を調べる</b>のに強い<br>・<b>Gmail・Googleドライブ・スプレッドシート</b>と一緒に使える<br>・<b>画像づくり</b>も得意。Chromeやスマホにも入っている<br><br><b>→ Googleのサービスを普段使っている院に</b></div>
       </div>
       <div class="card" style="border-top-color:var(--gold)">
         <div class="cn" style="color:var(--gold)">ANTHROPIC</div>
         <div class="ct">Claude Code</div>
-        <div class="cd"><b>Claudeに「手」がついたもの。</b>会話するだけでなく、パソコンの中でファイルを開き、作り、直し、保存してくれます。</div>
+        <div class="cd"><span class="mark">パソコンの中で、実際に作業してくれる人</span><br><br>・資料・表・ページを<b>完成品のファイル</b>で作ってくれる<br>・<b>院のルールを覚えて</b>、毎回おなじ品質で仕上げる<br>・<b>毎月の集計や繰り返し作業</b>をまとめて任せられる<br><br><b>→ 「毎月おなじ作業」がある院に</b></div>
       </div>
     </div>
     <div class="statement" style="flex:none">
@@ -971,18 +971,18 @@ AIは<b>下書きまで</b>。最後に人が目を通す一手間は、必ず�
     <h2 class="t-md">3つの道具、どこが違うのか</h2>
     <div class="tblwrap">
       <table>
-        <thead><tr><th></th><th>ChatGPT</th><th>Claude</th><th class="hi">Claude Code</th></tr></thead>
+        <thead><tr><th></th><th>ChatGPT</th><th>Gemini</th><th class="hi">Claude Code</th></tr></thead>
         <tbody>
-          <tr><th>いちばんの得意</th><td>会話・発想・画像生成</td><td>長文の読み書き・文章の質</td><td class="hi">実際の作業（作る・直す・調べる）</td></tr>
-          <tr><th>手元のファイル</th><td>添付すれば読める</td><td>添付すれば読める</td><td class="hi">フォルダごと見て、直して、保存できる</td></tr>
+          <tr><th>いちばんの得意</th><td>会話・発想・画像生成</td><td>調べもの・Google連携・画像生成</td><td class="hi">実際の作業（作る・直す・調べる）</td></tr>
+          <tr><th>手元のファイル</th><td>添付すれば読める</td><td>添付＋Googleドライブから渡せる</td><td class="hi">フォルダごと見て、直して、保存できる</td></tr>
           <tr><th>返ってくるもの</th><td>チャットの返事</td><td>チャットの返事</td><td class="hi">ファイルそのもの（資料・表・ページ）</td></tr>
-          <tr><th>院のルールの記憶</th><td>カスタム指示</td><td>プロジェクト</td><td class="hi">ルールブック＋作業手順を丸ごと保存</td></tr>
-          <tr><th>画像を作る</th><td><strong>◎ 得意</strong></td><td>× 作れない</td><td>× 作れない（指示文づくりは得意）</td></tr>
-          <tr><th>向いている仕事</th><td>相談・下書き・画像</td><td>文章の仕上げ・要約</td><td class="hi">資料づくり・集計・毎月の繰り返し</td></tr>
+          <tr><th>院のルールの記憶</th><td>カスタム指示</td><td>Gem（自分専用のAI）</td><td class="hi">ルールブック＋作業手順を丸ごと保存</td></tr>
+          <tr><th>画像を作る</th><td><strong>◎ 得意</strong></td><td><strong>◎ 得意</strong></td><td>× 作れない（指示文づくりは得意）</td></tr>
+          <tr><th>向いている仕事</th><td>相談・下書き・画像</td><td>調べもの・要約・Google連携</td><td class="hi">資料づくり・集計・毎月の繰り返し</td></tr>
         </tbody>
       </table>
     </div>
-    <div class="tnote">※ 画像を作りたいときはChatGPT。<strong>その画像の指示文を練るのはClaude</strong>——という組み合わせが、いちばん失敗が少ないです。</div>
+    <div class="tnote">※ 画像はChatGPTもGeminiも得意。<strong>同じ指示文を両方に入れて、出てきた画像を見比べる</strong>のがいちばんはやいです。</div>
   </div>
 </section>
 
@@ -1031,9 +1031,9 @@ AIは<b>下書きまで</b>。最後に人が目を通す一手間は、必ず�
     <h2 class="t-md">迷ったときの、使い分け</h2>
     <div class="checks" style="padding-top:6px">
       <div class="check"><div class="b">✓</div><div><b>思いつきを広げたい・雑談したい・画像がほしい</b><small>→ ChatGPT。スマホひとつで完結するのが最大の強み。まずはここから。</small></div></div>
-      <div class="check"><div class="b">✓</div><div><b>長い文章を書きたい・読ませたい・トーンにこだわりたい</b><small>→ Claude。口コミ返信やブログの「文章の質」はここが得意。</small></div></div>
+      <div class="check"><div class="b">✓</div><div><b>調べものをしたい・Gmailやスプレッドシートと一緒に使いたい</b><small>→ Gemini。Googleのサービスを普段使っているなら、いちばん手数が少なく済みます。</small></div></div>
       <div class="check"><div class="b">✓</div><div><b>毎月おなじ作業がある・数字を集計したい・資料の形で欲しい</b><small>→ Claude Code。ここを任せると、いちばん時間が浮きます。</small></div></div>
-      <div class="check"><div class="b">✓</div><div><b>画像を作りたい</b><small>→ 指示文をClaudeで練り、生成はChatGPTで。第2部の実演①でやったとおり、分業がいちばん失敗しません。</small></div></div>
+      <div class="check"><div class="b">✓</div><div><b>画像を作りたい</b><small>→ ChatGPTかGeminiで。指示文は第2部の実演①でやった「5つの箱」で書けば、どちらでも同じように効きます。</small></div></div>
     </div>
     <div class="statement" style="flex:none;padding-top:6px">
       <div class="big" style="font-size:31px;line-height:1.55">最初の一歩は<em>ChatGPTで十分</em>。<br>「毎月おなじことをやっているな」と気づいたときが、<em>Claude Codeの出番</em>です。</div>
@@ -1059,7 +1059,7 @@ AIは<b>下書きまで</b>。最後に人が目を通す一手間は、必ず�
       <div class="card">
         <div class="cn">✓ TODO 03</div>
         <div class="ct">作業分けと<br>AIの選び方</div>
-        <div class="cd">相談はChatGPT、文章はClaude、<b>毎月の繰り返しはClaude Code。</b>画像は指示文をClaude、生成はChatGPT。</div>
+        <div class="cd">相談はChatGPT、調べものはGemini、<b>毎月の繰り返しはClaude Code。</b>画像はChatGPTかGeminiで。</div>
       </div>
     </div>
     <div class="pane good" style="flex:none">
